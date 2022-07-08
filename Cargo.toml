@@ -1,5 +1,5 @@
 [workspace]
 
-members = ["examples/*"]
+members = ["examples/*", "libs/*"]
 
 resolver = "2"

@@ -609,6 +609,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_shader_utils"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_sprite"
 version = "0.8.0-dev"
 source = "git+https://github.com/bevyengine/bevy.git?rev=cf200f09dd7dd359a02f7cc7166b1485df276882#cf200f09dd7dd359a02f7cc7166b1485df276882"
@@ -2602,6 +2609,7 @@ name = "shader-test-001"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_shader_utils",
 ]
 
 [[package]]
