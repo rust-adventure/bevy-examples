@@ -2,7 +2,9 @@
 name = "bevy_shader_utils"
 version = "0.1.0"
 edition = "2021"
-
+description = "A utility package that provides a series of noise functions and other utilities for use in wgpu shaders."
+license = "MIT"
+keywords = ["bevy", "wgpu"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
