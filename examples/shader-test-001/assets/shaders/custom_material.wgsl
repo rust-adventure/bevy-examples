@@ -13,11 +13,11 @@ var base_color_sampler: sampler;
 
 [[stage(fragment)]]
 fn fragment([[location(2)]] uv: vec2<f32>) -> [[location(0)]] vec4<f32> {
-    return material.color * textureSample(base_color_texture, base_color_sampler, uv);
-    // var input: vec3<f32> = vec3<f32>(uv.x * 40.0, uv.y * 40.0, 1.);
-    // var noise = perlinNoise3(input);
-    // var alpha = (noise + 1.0) / 2.0;
-    // return material.color 
-    //   * textureSample(base_color_texture, base_color_sampler, uv)
-    //   * vec4<f32>(1.0,1.0,1.0,alpha);
+    // return material.color * textureSample(base_color_texture, base_color_sampler, uv);
+    var input: vec3<f32> = vec3<f32>(uv.x * 40.0, uv.y * 40.0, 1.);
+    var noise = perlinNoise3(input);
+    var alpha = (noise + 1.0) / 2.0;
+    return material.color 
+      * textureSample(base_color_texture, base_color_sampler, uv)
+      * vec4<f32>(1.0,1.0,1.0,alpha);
 }
