@@ -1,0 +1,9 @@
+[package]
+name = "shader-test-001"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = { git = "https://github.com/bevyengine/bevy.git", rev = "cf200f09dd7dd359a02f7cc7166b1485df276882" }
