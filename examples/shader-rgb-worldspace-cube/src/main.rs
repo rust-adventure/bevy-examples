@@ -17,6 +17,7 @@ fn main() {
         )
         .add_startup_system(setup)
         .add_system(change_color)
+        .add_system(movement)
         .run();
 }
 
@@ -31,16 +32,19 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     // cube
-    commands.spawn().insert_bundle(MaterialMeshBundle {
-        mesh: meshes
-            .add(Mesh::from(shape::Cube { size: 1.0 })),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        material: materials.add(CustomMaterial {
-            time: 0.,
-            alpha_mode: AlphaMode::Blend,
-        }),
-        ..default()
-    });
+    commands
+        .spawn()
+        .insert_bundle(MaterialMeshBundle {
+            mesh: meshes
+                .add(Mesh::from(shape::Cube { size: 1.0 })),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+            material: materials.add(CustomMaterial {
+                time: 0.,
+                alpha_mode: AlphaMode::Blend,
+            }),
+            ..default()
+        })
+        .insert(Movable);
 
     // camera
     commands.spawn_bundle(Camera3dBundle {
@@ -79,4 +83,31 @@ pub struct CustomMaterial {
     #[uniform(0)]
     time: f32,
     alpha_mode: AlphaMode,
+}
+
+#[derive(Component)]
+struct Movable;
+fn movement(
+    input: Res<Input<KeyCode>>,
+    time: Res<Time>,
+    mut query: Query<&mut Transform, With<Movable>>,
+) {
+    for mut transform in query.iter_mut() {
+        let mut direction = Vec3::ZERO;
+        if input.pressed(KeyCode::Up) {
+            direction.y += 1.0;
+        }
+        if input.pressed(KeyCode::Down) {
+            direction.y -= 1.0;
+        }
+        if input.pressed(KeyCode::Left) {
+            direction.x -= 1.0;
+        }
+        if input.pressed(KeyCode::Right) {
+            direction.x += 1.0;
+        }
+
+        transform.translation +=
+            time.delta_seconds() * 2.0 * direction;
+    }
 }

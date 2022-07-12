@@ -8,4 +8,4 @@ keywords = ["bevy", "wgpu"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.8.0-dev", git = "https://github.com/bevyengine/bevy.git", rev = "cf200f09dd7dd359a02f7cc7166b1485df276882" }
+bevy = { version = "0.8.0-dev", git = "https://github.com/bevyengine/bevy.git", rev = "3c51ad27641f23a8bcff77b7c2ab7f253b2af22d" }
