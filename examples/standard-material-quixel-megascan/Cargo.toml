@@ -1,0 +1,15 @@
+
+
+[dependencies.bevy]
+features = ["jpeg"]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "de484c1e4147d01bf34c88a10797b75128a0d98a"
+# path = "../../vendor/bevy"
+
+[dependencies.bevy_shader_utils]
+path = "../../libs/bevy_shader_utils"
+
+[package]
+edition = "2021"
+name = "standard-material-quixel-megascan"
+version = "0.1.0"
