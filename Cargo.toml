@@ -1,5 +1,11 @@
 [workspace]
 
-members = ["examples/*", "libs/*"]
+members = [
+    "examples/*",
+    "libs/*",
+    # "vendor/bevy_asset_loader/bevy_asset_loader_derive",
+    # "vendor/bevy_asset_loader/bevy_asset_loader",
+    # , "vendor/bevy/crates/*"
+]
 
 resolver = "2"

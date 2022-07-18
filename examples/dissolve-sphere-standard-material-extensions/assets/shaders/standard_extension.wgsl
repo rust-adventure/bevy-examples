@@ -2,16 +2,16 @@
 // #import bevy_pbr::pbr_bindings
 // #import bevy_pbr::pbr_types
 struct StandardMaterial {
-    time: f32;
-    base_color: vec4<f32>;
-    emissive: vec4<f32>;
-    perceptual_roughness: f32;
-    metallic: f32;
-    reflectance: f32;
+    time: f32,
+    base_color: vec4<f32>,
+    emissive: vec4<f32>,
+    perceptual_roughness: f32,
+    metallic: f32,
+    reflectance: f32,
     // 'flags' is a bit field indicating various options. u32 is 32 bits so we have up to 32 options.
-    flags: u32;
-    alpha_cutoff: f32;
-};
+    flags: u32,
+    alpha_cutoff: f32,
+}
 
 let STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT: u32         = 1u;
 let STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT: u32           = 2u;
@@ -53,52 +53,48 @@ fn standard_material_new() -> StandardMaterial {
 #import bevy_shader_utils::simplex_noise_3d
 #import bevy_shader_utils::simplex_noise_2d
 
-
-
-
-
-[[group(1), binding(0)]]
+@group(1) @binding(0)
 var<uniform> material: StandardMaterial;
-[[group(1), binding(1)]]
+@group(1) @binding(1)
 var base_color_texture: texture_2d<f32>;
-[[group(1), binding(2)]]
+@group(1) @binding(2)
 var base_color_sampler: sampler;
-[[group(1), binding(3)]]
+@group(1) @binding(3)
 var emissive_texture: texture_2d<f32>;
-[[group(1), binding(4)]]
+@group(1) @binding(4)
 var emissive_sampler: sampler;
-[[group(1), binding(5)]]
+@group(1) @binding(5)
 var metallic_roughness_texture: texture_2d<f32>;
-[[group(1), binding(6)]]
+@group(1) @binding(6)
 var metallic_roughness_sampler: sampler;
-[[group(1), binding(7)]]
+@group(1) @binding(7)
 var occlusion_texture: texture_2d<f32>;
-[[group(1), binding(8)]]
+@group(1) @binding(8)
 var occlusion_sampler: sampler;
-[[group(1), binding(9)]]
+@group(1) @binding(9)
 var normal_map_texture: texture_2d<f32>;
-[[group(1), binding(10)]]
+@group(1) @binding(10)
 var normal_map_sampler: sampler;
 
 
 struct FragmentInput {
-    [[builtin(front_facing)]] is_front: bool;
-    [[builtin(position)]] frag_coord: vec4<f32>;
-    [[location(0)]] world_position: vec4<f32>;
-    [[location(1)]] world_normal: vec3<f32>;
+    @builtin(front_facing) is_front: bool,
+    @builtin(position) frag_coord: vec4<f32>,
+    @location(0) world_position: vec4<f32>,
+    @location(1) world_normal: vec3<f32>,
 #ifdef VERTEX_UVS
-    [[location(2)]] uv: vec2<f32>;
+    @location(2) uv: vec2<f32>,
 #endif
 #ifdef VERTEX_TANGENTS
-    [[location(3)]] world_tangent: vec4<f32>;
+    @location(3) world_tangent: vec4<f32>,
 #endif
 #ifdef VERTEX_COLORS
-    [[location(4)]] color: vec4<f32>;
+    @location(4) color: vec4<f32>,
 #endif
 };
 
-[[stage(fragment)]]
-fn fragment(in: FragmentInput) -> [[location(0)]] vec4<f32> {
+@fragment
+fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
     // var output_color = vec4<f32>(0.533, 0.533, 0.80, 1.0);
 
     var output_color: vec4<f32> = material.base_color;
@@ -191,7 +187,7 @@ fn fragment(in: FragmentInput) -> [[location(0)]] vec4<f32> {
 
     // var edge_color = vec3<f32>(0.0, 1.0, 0.8);
     var edge_color = output_color * 3.0;
-    var border_step = smoothStep(threshold - 0.2, threshold + 0.2, noise);
+    var border_step = smoothstep(threshold - 0.2, threshold + 0.2, noise);
     var dissolve_border = vec3<f32>(edge_color.x * border_step, edge_color.y * border_step, edge_color.z * border_step);
 
     var output_color = vec4<f32>(

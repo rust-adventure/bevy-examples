@@ -86,8 +86,8 @@ fn setup(
         mesh: meshes.add(mesh),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         material: custom_materials.add(dissolve_sphere_standard_material_extension::StandardMaterial {
-            // base_color: Color::rgb(0.533, 0.533, 0.80,),
-            base_color: Color::YELLOW,
+            base_color: Color::rgb(0.533, 0.533, 0.80,),
+            // base_color: Color::YELLOW,
             base_color_texture: Some(assets.albedo.clone()),
             normal_map_texture: Some(
                 assets.normal_map.clone(),

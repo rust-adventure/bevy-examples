@@ -1,11 +1,14 @@
+[dependencies]
+bitflags = "1.3.2"
+
+[dependencies.bevy]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "e0a8087408c9177927e00a538c8581ada74e1831"
+
+[dependencies.bevy_shader_utils]
+path = "../../libs/bevy_shader_utils"
+
 [package]
+edition = "2021"
 name = "dissolve-sphere"
 version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy.git", rev = "3c51ad27641f23a8bcff77b7c2ab7f253b2af22d" }
-bevy_shader_utils = { path = "../../libs/bevy_shader_utils" }
-bitflags = "1.3.2"

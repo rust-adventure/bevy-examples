@@ -1,28 +1,19 @@
 #import bevy_shader_utils::perlin_noise_2d
 
 struct CustomMaterial {
-    time: f32;
+    time: f32,
 };
 
-[[group(1), binding(0)]]
+@group(1) @binding(0)
 var<uniform> material: CustomMaterial;
 
-// [[stage(fragment)]]
-// fn fragment([[location(2)]] uv: vec2<f32>) -> [[location(0)]] vec4<f32> {
-//     // return material.color * textureSample(base_color_texture, base_color_sampler, uv);
-//     var input: vec3<f32> = vec3<f32>(uv.x * 40.0, uv.y * 40.0, 1.);
-//     var noise = perlinNoise3(input);
-//     var alpha = (noise + 1.0) / 2.0;
-//     return vec4<f32>(1.0,1.0,1.0,alpha);
-// }
-
-[[stage(fragment)]]
+@fragment
 fn fragment(
-    [[builtin(position)]] coord: vec4<f32>,
-    [[location(0)]] world_position: vec4<f32>,
-    [[location(1)]] normals: vec3<f32>,
-    [[location(2)]] uv: vec2<f32>
-) -> [[location(0)]] vec4<f32> {
+    @builtin(position) coord: vec4<f32>,
+    @location(0) world_position: vec4<f32>,
+    @location(1) normals: vec3<f32>,
+    @location(2) uv: vec2<f32>
+) -> @location(0) vec4<f32> {
     var input1: vec2<f32> = vec2<f32>(world_position.x, material.time);
     var input2: vec2<f32> = vec2<f32>(world_position.y, material.time);
     var input3: vec2<f32> = vec2<f32>(world_position.z, material.time);

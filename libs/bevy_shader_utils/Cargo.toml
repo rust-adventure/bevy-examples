@@ -1,11 +1,11 @@
+[dependencies.bevy]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "e0a8087408c9177927e00a538c8581ada74e1831"
+
 [package]
+description = "A utility package that provides a series of noise functions and other utilities for use in wgpu shaders."
+edition = "2021"
+keywords = ["bevy", "wgpu"]
+license = "MIT"
 name = "bevy_shader_utils"
 version = "0.1.0"
-edition = "2021"
-description = "A utility package that provides a series of noise functions and other utilities for use in wgpu shaders."
-license = "MIT"
-keywords = ["bevy", "wgpu"]
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-bevy = { version = "0.8.0-dev", git = "https://github.com/bevyengine/bevy.git", rev = "3c51ad27641f23a8bcff77b7c2ab7f253b2af22d" }
