@@ -78,7 +78,7 @@ fn vertex(vertex: Vertex) -> VertexOutput {
 
     out.clip_position = mesh_position_world_to_clip(out.world_position);
 
-    out.color = vec4<f32>(vertex.position.x, noise, vertex.position.z, 1.0);
+    // out.color = vec4<f32>(vertex.position.x, noise, vertex.position.z, 1.0);
 
 
     return out;
