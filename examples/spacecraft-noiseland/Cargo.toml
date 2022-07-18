@@ -1,0 +1,15 @@
+[dependencies]
+itertools = "0.10.3"
+
+[dependencies.bevy]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "e0a8087408c9177927e00a538c8581ada74e1831"
+
+[dependencies.bevy_shader_utils]
+path = "../../libs/bevy_shader_utils"
+
+
+[package]
+edition = "2021"
+name = "spacecraft-noiseland"
+version = "0.1.0"
