@@ -1,7 +1,7 @@
 [dependencies.bevy]
 features = ["jpeg"]
 git = "https://github.com/bevyengine/bevy.git"
-rev = "e0a8087408c9177927e00a538c8581ada74e1831"
+rev = "959f3b1186b20a5066bfb51b9b71542705db76d8"
 
 [dependencies.bevy_shader_utils]
 path = "../../libs/bevy_shader_utils"

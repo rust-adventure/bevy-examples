@@ -5,14 +5,8 @@ use bevy::{
         mesh::VertexAttributeValues, render_resource::Face,
     },
 };
-use bevy_asset_loader::prelude::*;
 use bevy_shader_utils::ShaderUtilsPlugin;
 
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-enum MyStates {
-    AssetLoading,
-    Next,
-}
 fn main() {
     App::new()
         .insert_resource(ClearColor(
@@ -23,21 +17,11 @@ fn main() {
         //     ..default()
         // })
         .add_plugins(DefaultPlugins)
-        .add_loading_state(
-            LoadingState::new(MyStates::AssetLoading)
-                .continue_to_state(MyStates::Next)
-                .with_collection::<MyAssets>(),
-        )
-        .add_state(MyStates::AssetLoading)
-        .add_system_set(
-            SystemSet::on_enter(MyStates::Next)
-                .with_system(setup),
-        )
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<dissolve_sphere_standard_material_extension::StandardMaterial>::default(),
         )
-        // .add_startup_system(setup)
+        .add_startup_system(setup)
         .add_system(change_color)
         .add_system(animate_light_direction)
         .add_system(movement)
@@ -53,8 +37,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut custom_materials: ResMut<Assets<dissolve_sphere_standard_material_extension::StandardMaterial>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    // asset_server: Res<AssetServer>,
-    assets: Res<MyAssets>,
+    asset_server: Res<AssetServer>,
 ) {
     let mut mesh = Mesh::from(shape::UVSphere {
         radius: 1.0,
@@ -88,9 +71,9 @@ fn setup(
         material: custom_materials.add(dissolve_sphere_standard_material_extension::StandardMaterial {
             base_color: Color::rgb(0.533, 0.533, 0.80,),
             // base_color: Color::YELLOW,
-            base_color_texture: Some(assets.albedo.clone()),
+            base_color_texture: Some(asset_server.load("concrete/sekjcawb_2K_Albedo.jpg")),
             normal_map_texture: Some(
-                assets.normal_map.clone(),
+                asset_server.load("concrete/sekjcawb_2K_Normal.jpg"),
             ),
             double_sided: true,
             cull_mode: None,
@@ -303,11 +286,4 @@ fn movement(
         transform.translation +=
             time.delta_seconds() * 2.0 * direction;
     }
-}
-#[derive(AssetCollection)]
-struct MyAssets {
-    #[asset(path = "concrete/sekjcawb_2K_Albedo.jpg")]
-    albedo: Handle<Image>,
-    #[asset(path = "concrete/sekjcawb_2K_Normal.jpg")]
-    normal_map: Handle<Image>,
 }
