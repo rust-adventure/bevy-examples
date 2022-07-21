@@ -20,6 +20,7 @@ use bevy::{
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
 use itertools::Itertools;
+use noise::{BasicMulti, NoiseFn};
 
 fn main() {
     App::new()
@@ -37,6 +38,7 @@ fn main() {
             features: WgpuFeatures::POLYGON_MODE_LINE,
             ..default()
         })
+        .insert_resource(BasicMulti::new())
         .add_plugins(DefaultPlugins)
         .add_plugin(WireframePlugin)
         .add_plugin(ShaderUtilsPlugin)
@@ -135,31 +137,38 @@ fn setup(
     // .insert(Wireframe);
 
     // ship
+    // commands
+    //     .spawn()
+    //     .insert_bundle(MaterialMeshBundle {
+    //         mesh: meshes
+    //             .add(Mesh::from(shape::Cube { size: 0.3 })),
+    //         transform: Transform::from_xyz(0.0, 1.5, 0.0),
+    //         material: standard_materials.add(
+    //             StandardMaterial {
+    //                 base_color: Color::BLUE,
+    //                 ..default()
+    //             },
+    //         ),
+    //         ..default()
+    //     })
+    //     .insert(Ship)
+    //     .insert(Movable);
     commands
-        .spawn()
-        .insert_bundle(MaterialMeshBundle {
-            mesh: meshes
-                .add(Mesh::from(shape::Cube { size: 0.3 })),
-            transform: Transform::from_xyz(0.0, 1.5, 0.0),
-            material: standard_materials.add(
-                StandardMaterial {
-                    base_color: Color::BLUE,
-                    ..default()
-                },
-            ),
+        .spawn_bundle(SceneBundle {
+            scene: asset_server
+                .load("craft/craft_miner.glb#Scene0"),
+            transform: Transform::from_xyz(
+                -2.0 as f32,
+                1.0,
+                0.0 as f32,
+            )
+            .with_scale(Vec3::splat(0.2)),
+            // scene: asset_server
+            //     .load("racecar/raceCarGreen.glb/#Scene0"),
             ..default()
         })
         .insert(Ship)
         .insert(Movable);
-    // commands.spawn_bundle(SceneBundle {
-    //     scene: asset_server
-    //         .load("craft/craft_racer.glb#Scene0"),
-    //     // scene: asset_server
-    //     //     .load("racecar/raceCarGreen.glb/#Scene0"),
-    //     ..default()
-    // });
-    // let my_gltf =
-    //     asset_server.load("craft/craft_racer.glb#Scene0");
 }
 
 fn animate_light_direction(
@@ -193,11 +202,23 @@ fn animate_light_direction(
 
 fn change_position(
     mut materials: ResMut<Assets<LandMaterial>>,
-    ship: Query<&Transform, With<Ship>>,
+    mut ship: Query<&mut Transform, With<Ship>>,
+    noise: Res<BasicMulti>,
+    time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
-        material.1.ship_position =
-            ship.single().translation;
+        let mut ship = ship.single_mut();
+        material.1.ship_position = ship.translation;
+        let new_x = noise.get([
+            ship.translation.z as f64 * 0.02,
+            time.seconds_since_startup() * 0.02,
+        ]);
+        let new_y = noise.get([
+            ship.translation.z as f64 * 0.2,
+            time.seconds_since_startup() * 0.2,
+        ]);
+        ship.translation.x = new_x as f32;
+        ship.translation.y = new_y as f32 * 0.2 + 1.0;
     }
 }
 

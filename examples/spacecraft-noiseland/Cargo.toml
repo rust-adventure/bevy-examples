@@ -1,5 +1,6 @@
 [dependencies]
 itertools = "0.10.3"
+noise = "0.7.0"
 
 [dependencies.bevy]
 git = "https://github.com/bevyengine/bevy.git"
