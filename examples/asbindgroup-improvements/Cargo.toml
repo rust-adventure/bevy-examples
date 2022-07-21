@@ -1,0 +1,12 @@
+[package]
+name = "asbindgroup-improvements"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[dependencies.bevy]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "959f3b1186b20a5066bfb51b9b71542705db76d8"
