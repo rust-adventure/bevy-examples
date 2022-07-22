@@ -1,21 +1,31 @@
 //! Loads and renders a glTF file as a scene.
 
 use bevy::{
+    core_pipeline::clear_color::ClearColorConfig,
     pbr::wireframe::{
         Wireframe, WireframeConfig, WireframePlugin,
     },
     prelude::*,
     reflect::TypeUuid,
     render::{
+        camera::RenderTarget,
         mesh::{
             Indices, PrimitiveTopology,
             VertexAttributeValues,
         },
         render_resource::{AsBindGroup, ShaderRef},
+        view::RenderLayers,
     },
     render::{
-        render_resource::WgpuFeatures,
+        render_resource::{
+            Extent3d, TextureDescriptor, TextureDimension,
+            TextureFormat, TextureUsages, WgpuFeatures,
+        },
         settings::WgpuSettings,
+        view::ViewDepthTexture,
+    },
+    sprite::{
+        Material2d, Material2dPlugin, MaterialMesh2dBundle,
     },
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
@@ -42,6 +52,9 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(WireframePlugin)
         .add_plugin(ShaderUtilsPlugin)
+        .add_plugin(Material2dPlugin::<
+            PostProcessingMaterial,
+        >::default())
         .add_plugin(
             MaterialPlugin::<LandMaterial>::default(),
         )
@@ -49,6 +62,7 @@ fn main() {
         .add_system(animate_light_direction)
         .add_system(movement)
         .add_system(change_position)
+        .add_system(update_time_uniform)
         .run();
 }
 
@@ -62,10 +76,65 @@ fn setup(
     mut standard_materials: ResMut<
         Assets<StandardMaterial>,
     >,
+    mut windows: ResMut<Windows>,
+    mut post_processing_materials: ResMut<
+        Assets<PostProcessingMaterial>,
+    >,
+    mut images: ResMut<Assets<Image>>,
     asset_server: Res<AssetServer>,
 ) {
+    let window = windows.get_primary_mut().unwrap();
+    let size = Extent3d {
+        width: window.physical_width(),
+        height: window.physical_height(),
+        ..default()
+    };
+
+    // This is the texture that will be rendered to.
+    let mut image = Image {
+        texture_descriptor: TextureDescriptor {
+            label: None,
+            size,
+            dimension: TextureDimension::D2,
+            format: TextureFormat::Bgra8UnormSrgb,
+            mip_level_count: 1,
+            sample_count: 1,
+            usage: TextureUsages::TEXTURE_BINDING
+                | TextureUsages::COPY_DST
+                | TextureUsages::RENDER_ATTACHMENT,
+        },
+        ..default()
+    };
+
+    // fill image.data with zeroes
+    image.resize(size);
+
+    let image_handle = images.add(image);
+
+    // commands
+    //     .spawn_bundle(Camera3dBundle {
+    //         transform: Transform::from_xyz(0.0, 1.5, 2.0)
+    //             .looking_at(
+    //                 Vec3::new(0.0, 1.5, 0.0),
+    //                 Vec3::Y,
+    //             ),
+    //         ..default()
+    //     })
+    //     .insert(Movable);
     commands
         .spawn_bundle(Camera3dBundle {
+            camera_3d: Camera3d {
+                clear_color: ClearColorConfig::Custom(
+                    Color::WHITE,
+                ),
+                ..default()
+            },
+            camera: Camera {
+                target: RenderTarget::Image(
+                    image_handle.clone(),
+                ),
+                ..default()
+            },
             transform: Transform::from_xyz(0.0, 1.5, 2.0)
                 .looking_at(
                     Vec3::new(0.0, 1.5, 0.0),
@@ -74,6 +143,26 @@ fn setup(
             ..default()
         })
         .insert(Movable);
+
+    // This specifies the layer used for the post processing camera, which will be attached to the post processing camera and 2d quad.
+    let post_processing_pass_layer = RenderLayers::layer(
+        (RenderLayers::TOTAL_LAYERS - 1) as u8,
+    );
+
+    let quad_handle = meshes.add(Mesh::from(
+        shape::Quad::new(Vec2::new(
+            size.width as f32,
+            size.height as f32,
+        )),
+    ));
+
+    // This material has the texture that has been rendered.
+    let material_handle = post_processing_materials.add(
+        PostProcessingMaterial {
+            time: 0.,
+            source_image: image_handle,
+        },
+    );
 
     const HALF_SIZE: f32 = 1.0;
     commands.spawn_bundle(DirectionalLightBundle {
@@ -136,23 +225,6 @@ fn setup(
     });
     // .insert(Wireframe);
 
-    // ship
-    // commands
-    //     .spawn()
-    //     .insert_bundle(MaterialMeshBundle {
-    //         mesh: meshes
-    //             .add(Mesh::from(shape::Cube { size: 0.3 })),
-    //         transform: Transform::from_xyz(0.0, 1.5, 0.0),
-    //         material: standard_materials.add(
-    //             StandardMaterial {
-    //                 base_color: Color::BLUE,
-    //                 ..default()
-    //             },
-    //         ),
-    //         ..default()
-    //     })
-    //     .insert(Ship)
-    //     .insert(Movable);
     commands
         .spawn_bundle(SceneBundle {
             scene: asset_server
@@ -169,6 +241,31 @@ fn setup(
         })
         .insert(Ship)
         .insert(Movable);
+
+    // Post processing 2d quad, with material using the render texture done by the main camera, with a custom shader.
+    commands
+        .spawn_bundle(MaterialMesh2dBundle {
+            mesh: quad_handle.into(),
+            material: material_handle,
+            transform: Transform {
+                translation: Vec3::new(0.0, 0.0, 1.5),
+                ..default()
+            },
+            ..default()
+        })
+        .insert(post_processing_pass_layer);
+
+    // The post-processing pass camera.
+    commands
+        .spawn_bundle(Camera2dBundle {
+            camera: Camera {
+                // renders after the first main camera which has default value: 0.
+                priority: 1,
+                ..default()
+            },
+            ..Camera2dBundle::default()
+        })
+        .insert(post_processing_pass_layer);
 }
 
 fn animate_light_direction(
@@ -190,15 +287,15 @@ fn animate_light_direction(
     }
 }
 
-// fn change_color(
-//     mut materials: ResMut<Assets<LandMaterial>>,
-//     time: Res<Time>,
-// ) {
-//     for material in materials.iter_mut() {
-//         material.1.time =
-//             time.seconds_since_startup() as f32;
-//     }
-// }
+fn update_time_uniform(
+    mut materials: ResMut<Assets<PostProcessingMaterial>>,
+    time: Res<Time>,
+) {
+    for material in materials.iter_mut() {
+        material.1.time =
+            time.seconds_since_startup() as f32;
+    }
+}
 
 fn change_position(
     mut materials: ResMut<Assets<LandMaterial>>,
@@ -347,6 +444,14 @@ impl From<Land> for Mesh {
     }
 }
 
+// fn debug_depth_texture(cameras: Query<&ViewDepthTexture>) {
+//     for camera in cameras.iter() {
+//         // dbg!(camera.depth_calculation);
+//         dbg!(camera.texture.as_image_copy());
+//     }
+//     // ViewDepthTexture
+// }
+
 #[derive(Component)]
 struct Movable;
 fn movement(
@@ -371,5 +476,22 @@ fn movement(
 
         transform.translation +=
             time.delta_seconds() * 2.0 * direction;
+    }
+}
+
+#[derive(AsBindGroup, TypeUuid, Clone)]
+#[uuid = "bc2f08eb-a0fb-43f1-a908-54871ea597d5"]
+struct PostProcessingMaterial {
+    #[uniform(0)]
+    time: f32,
+    /// In this example, this image will be the result of the main camera.
+    #[texture(1)]
+    #[sampler(2)]
+    source_image: Handle<Image>,
+}
+
+impl Material2d for PostProcessingMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "shaders/chromatic_aberration.wgsl".into()
     }
 }

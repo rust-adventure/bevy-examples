@@ -93,6 +93,7 @@ fn vertex(vertex: Vertex) -> VertexOutput {
 
     out.clip_position = mesh_position_world_to_clip(out.world_position);
 
+    // var thing = directional_shadow_textures;
 
     return out;
 }
