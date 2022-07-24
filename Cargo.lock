@@ -1330,6 +1330,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1db59621ec70f09c5e9b597b220c7a2b43611f4710dc03ceb8748637775692c"
 
 [[package]]
+name = "candy-cane"
+version = "0.1.0"
+dependencies = [
+ "bevy 0.8.0-dev (git+https://github.com/bevyengine/bevy.git?rev=959f3b1186b20a5066bfb51b9b71542705db76d8)",
+ "bevy_asset_loader",
+ "bevy_shader_utils",
+ "bitflags",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.73"
 source = "registry+https://github.com/rust-lang/crates.io-index"

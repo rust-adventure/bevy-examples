@@ -1,0 +1,19 @@
+[dependencies]
+bitflags = "1.3.2"
+
+[dependencies.bevy]
+features = ["jpeg"]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "959f3b1186b20a5066bfb51b9b71542705db76d8"
+
+[dependencies.bevy_asset_loader]
+branch = "bevy_main"
+git = "https://github.com/niklasei/bevy_asset_loader.git"
+
+[dependencies.bevy_shader_utils]
+path = "../../libs/bevy_shader_utils"
+
+[package]
+edition = "2021"
+name = "candy-cane"
+version = "0.1.0"
