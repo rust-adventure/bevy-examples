@@ -28,9 +28,6 @@ fn main() {
         .run();
 }
 
-#[derive(Component)]
-struct Cube;
-
 /// set up a simple 3D scene
 fn setup(
     mut commands: Commands,
@@ -41,11 +38,16 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
-    let mut mesh = Mesh::from(shape::UVSphere {
+    // let mut mesh = Mesh::from(shape::UVSphere {
+    //     radius: 1.0,
+    //     ..default()
+    // });
+    // let mut mesh = Mesh::from(shape::Cube { size: 1.0 });
+    let mut mesh = Mesh::from(shape::Capsule {
         radius: 1.0,
+        depth: 10.0,
         ..default()
     });
-    // let mut mesh = Mesh::from(shape::Cube { size: 1.0 });
     if let Some(VertexAttributeValues::Float32x3(
         positions,
     )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
@@ -93,8 +95,10 @@ fn setup(
     // camera
     commands
         .spawn_bundle(Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 2.5, 5.0)
-                .looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(
+                -2.0, 10.0, 15.0,
+            )
+            .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         })
         .insert(Movable);
