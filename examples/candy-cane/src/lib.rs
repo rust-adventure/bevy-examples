@@ -300,9 +300,9 @@ impl Material for StandardMaterial {
         }
         Ok(())
     }
-    fn vertex_shader() -> ShaderRef {
-        "shaders/vertex_shader.wgsl".into()
-    }
+    // fn vertex_shader() -> ShaderRef {
+    //     "shaders/vertex_shader.wgsl".into()
+    // }
     fn fragment_shader() -> ShaderRef {
         "shaders/standard_extension.wgsl".into()
     }

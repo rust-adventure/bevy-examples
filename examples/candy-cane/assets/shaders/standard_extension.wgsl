@@ -174,28 +174,28 @@ fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
 
     // return output_color;
 // custom code
-    var base_color = output_color;
+//     var base_color = output_color;
     
-//  var base_color = vec4<f32>(1.0,0.4,1.0,1.0);
-    var noise_step = 5.0;
-    // var base_color = vec3<f32>(0.533, 0.533, 0.80);
+// //  var base_color = vec4<f32>(1.0,0.4,1.0,1.0);
+//     var noise_step = 5.0;
+//     // var base_color = vec3<f32>(0.533, 0.533, 0.80);
 
-    // var noise = simplexNoise3(vec3<f32>(in.frag_coord.x * noise_step, in.frag_coord.y * noise_step, in.frag_coord.z * noise_step));
-    var noise = simplexNoise3(vec3<f32>(in.color.x * noise_step, in.color.y * noise_step, in.color.z * noise_step));
-    var threshold = sin(material.time);
-    var alpha = step(noise, threshold);
+//     // var noise = simplexNoise3(vec3<f32>(in.frag_coord.x * noise_step, in.frag_coord.y * noise_step, in.frag_coord.z * noise_step));
+//     var noise = simplexNoise3(vec3<f32>(in.color.x * noise_step, in.color.y * noise_step, in.color.z * noise_step));
+//     var threshold = sin(material.time);
+//     var alpha = step(noise, threshold);
 
-    // var edge_color = vec3<f32>(0.0, 1.0, 0.8);
-    var edge_color = output_color * 3.0;
-    var border_step = smoothstep(threshold - 0.2, threshold + 0.2, noise);
-    var dissolve_border = vec3<f32>(edge_color.x * border_step, edge_color.y * border_step, edge_color.z * border_step);
+//     // var edge_color = vec3<f32>(0.0, 1.0, 0.8);
+//     var edge_color = output_color * 3.0;
+//     var border_step = smoothstep(threshold - 0.2, threshold + 0.2, noise);
+//     var dissolve_border = vec3<f32>(edge_color.x * border_step, edge_color.y * border_step, edge_color.z * border_step);
 
-    var output_color = vec4<f32>(
-        base_color.x + dissolve_border.x,
-        base_color.y + dissolve_border.y,
-        base_color.z + dissolve_border.z,
-        alpha
-    );
+//     var output_color = vec4<f32>(
+//         base_color.x + dissolve_border.x,
+//         base_color.y + dissolve_border.y,
+//         base_color.z + dissolve_border.z,
+//         alpha
+//     );
 // var test = (simplexNoise3(vec3<f32>(material.time, material.time, material.time)) + 1.0) / 2.0;
 // return vec4<f32>(test, test,test,test);
     if (output_color.a == 0.0) { discard; } else {
