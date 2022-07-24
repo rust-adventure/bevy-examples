@@ -74,7 +74,7 @@ fn setup(
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         material: custom_materials.add(
             candy_cane::StandardMaterial {
-                base_color: Color::rgb(0.533, 0.533, 0.80),
+                base_color: Color::rgb(1.0, 1.0, 1.0),
                 // base_color: Color::YELLOW,
                 double_sided: true,
                 cull_mode: None,

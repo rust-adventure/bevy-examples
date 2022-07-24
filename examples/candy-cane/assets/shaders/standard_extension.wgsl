@@ -93,18 +93,39 @@ struct FragmentInput {
 #endif
 };
 
+
 @fragment
 fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
 
 /// Begin Candy Cane Colors
 
-    let u_sin = abs(sin(in.uv.x));
+    /// use the uv u (or x) coordinate of the capsule
+    /// to define a stripe, then multiply by a number 
+    /// which will increase the frequency of the sin wave,
+    /// increasing the number of stripes
+    let u_sin = abs(sin(40.0 * in.uv.x));
+
+    let stripe_color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
+
+    /// control the fade between stripe color and base color
+    ///
+    /// use a minimum value and a saturate function to raise
+    /// the u_sin by the minimum, then clamp the value to 1.0,
+    /// which will result in a range 0.4..1.0. This controls the
+    /// stripe color "thickness"
+    ///
+    /// larger minimum value is thicker stripe
+    ///
+    /// larger power value is thicker base color
+    let minimum_value = 0.0;
+    let power_value = 30.0;
+    let thicc_stripe = pow(saturate(u_sin + minimum_value), power_value);
 
 /// End Candy Cane Colors
 
     // var output_color = vec4<f32>(0.533, 0.533, 0.80, 1.0);
 
-    var output_color: vec4<f32> = material.base_color * u_sin;
+    var output_color: vec4<f32> = mix(material.base_color, stripe_color, thicc_stripe);
 // #ifdef VERTEX_COLORS
 //     output_color = output_color * in.color;
 // #endif
