@@ -74,16 +74,6 @@ fn setup(
             candy_cane::StandardMaterial {
                 base_color: Color::rgb(0.533, 0.533, 0.80),
                 // base_color: Color::YELLOW,
-                base_color_texture: Some(
-                    asset_server.load(
-                        "concrete/sekjcawb_2K_Albedo.jpg",
-                    ),
-                ),
-                normal_map_texture: Some(
-                    asset_server.load(
-                        "concrete/sekjcawb_2K_Normal.jpg",
-                    ),
-                ),
                 double_sided: true,
                 cull_mode: None,
                 // alpha_mode: AlphaMode::Blend,
@@ -108,117 +98,12 @@ fn setup(
             ..default()
         })
         .insert(Movable);
-    // ground plane
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes
-            .add(Mesh::from(shape::Plane { size: 10.0 })),
-        material: materials.add(StandardMaterial {
-            base_color: Color::WHITE,
-            perceptual_roughness: 1.0,
-            ..default()
-        }),
-        ..default()
-    });
-    // left wall
-    let mut transform = Transform::from_xyz(2.5, 2.5, 0.0);
-    transform.rotate_z(std::f32::consts::FRAC_PI_2);
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Box::new(
-            5.0, 0.15, 5.0,
-        ))),
-        transform,
-        material: materials.add(StandardMaterial {
-            base_color: Color::INDIGO,
-            perceptual_roughness: 1.0,
-            ..default()
-        }),
-        ..default()
-    });
-    // // back (right) wall
-    let mut transform = Transform::from_xyz(0.0, 2.5, -2.5);
-    transform.rotate_x(std::f32::consts::FRAC_PI_2);
-    commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Box::new(
-            5.0, 0.15, 5.0,
-        ))),
-        transform,
-        material: materials.add(StandardMaterial {
-            base_color: Color::INDIGO,
-            perceptual_roughness: 1.0,
-            ..default()
-        }),
-        ..default()
-    });
 
     // ambient light
     commands.insert_resource(AmbientLight {
         color: Color::ORANGE_RED,
         brightness: 0.02,
     });
-
-    // red point light
-    commands
-        .spawn_bundle(PointLightBundle {
-            // transform: Transform::from_xyz(5.0, 8.0, 2.0),
-            transform: Transform::from_xyz(1.0, 2.0, 0.0),
-            point_light: PointLight {
-                intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
-                color: Color::RED,
-                shadows_enabled: true,
-                ..default()
-            },
-            ..default()
-        })
-        .with_children(|builder| {
-            builder.spawn_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(
-                    shape::UVSphere {
-                        radius: 0.1,
-                        ..default()
-                    },
-                )),
-                material: materials.add(StandardMaterial {
-                    base_color: Color::RED,
-                    emissive: Color::rgba_linear(
-                        100.0, 0.0, 0.0, 0.0,
-                    ),
-                    ..default()
-                }),
-                ..default()
-            });
-        });
-
-    // blue point light
-    commands
-        .spawn_bundle(PointLightBundle {
-            // transform: Transform::from_xyz(5.0, 8.0, 2.0),
-            transform: Transform::from_xyz(0.0, 4.0, 0.0),
-            point_light: PointLight {
-                intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
-                color: Color::BLUE,
-                shadows_enabled: true,
-                ..default()
-            },
-            ..default()
-        })
-        .with_children(|builder| {
-            builder.spawn_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(
-                    shape::UVSphere {
-                        radius: 0.1,
-                        ..default()
-                    },
-                )),
-                material: materials.add(StandardMaterial {
-                    base_color: Color::BLUE,
-                    emissive: Color::rgba_linear(
-                        0.0, 0.0, 100.0, 0.0,
-                    ),
-                    ..default()
-                }),
-                ..default()
-            });
-        });
 
     // directional 'sun' light
     const HALF_SIZE: f32 = 10.0;
