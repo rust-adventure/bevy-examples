@@ -95,9 +95,16 @@ struct FragmentInput {
 
 @fragment
 fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
+
+/// Begin Candy Cane Colors
+
+    let u_sin = abs(sin(in.uv.x));
+
+/// End Candy Cane Colors
+
     // var output_color = vec4<f32>(0.533, 0.533, 0.80, 1.0);
 
-    var output_color: vec4<f32> = material.base_color;
+    var output_color: vec4<f32> = material.base_color * u_sin;
 // #ifdef VERTEX_COLORS
 //     output_color = output_color * in.color;
 // #endif

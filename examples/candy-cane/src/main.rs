@@ -186,5 +186,16 @@ fn movement(
 
         transform.translation +=
             time.delta_seconds() * 2.0 * direction;
+
+        if input.pressed(KeyCode::R) {
+            transform.rotate_around(
+                Vec3::from((0.0, 0.5, 0.0)),
+                Quat::from_rotation_y(
+                    time.delta_seconds()
+                        * 2.0
+                        * std::f32::consts::FRAC_PI_8,
+                ),
+            );
+        }
     }
 }
