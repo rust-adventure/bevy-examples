@@ -6,11 +6,12 @@ use bevy::{
     },
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
+use candy_cane::Stripe;
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(
-            Color::hex("071f3c").unwrap(),
+            Color::hex("66b1c3").unwrap(),
         ))
         // .insert_resource(AssetServerSettings {
         //     watch_for_changes: true,
@@ -23,7 +24,7 @@ fn main() {
         >::default())
         .add_startup_system(setup)
         .add_system(change_color)
-        .add_system(animate_light_direction)
+        // .add_system(animate_light_direction)
         .add_system(movement)
         .run();
 }
@@ -70,10 +71,91 @@ fn setup(
     }
 
     commands.spawn().insert_bundle(MaterialMeshBundle {
-        mesh: meshes.add(mesh),
+        mesh: meshes.add(mesh.clone()),
+        transform: Transform::from_xyz(-5.0, 0.5, 0.0),
+        material: custom_materials.add(
+            candy_cane::StandardMaterial {
+                stripe_one: Stripe {
+                    frequency: 10.0,
+                    minimum_value: 0.4,
+                    power_value: 100.0,
+                    should_use: 1.0,
+                },
+                stripe_two: Stripe {
+                    frequency: 10.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                stripe_three: Stripe {
+                    frequency: 20.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                stripe_four: Stripe {
+                    frequency: 20.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                stripe_five: Stripe {
+                    frequency: 20.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                base_color: Color::rgb(1.0, 1.0, 1.0),
+                // base_color: Color::YELLOW,
+                double_sided: true,
+                cull_mode: None,
+                // alpha_mode: AlphaMode::Blend,
+                // perceptual_roughness: 10.0,
+                // time: 0.,
+                ..default()
+            },
+        ),
+        ..default()
+    });
+
+    commands.spawn().insert_bundle(MaterialMeshBundle {
+        mesh: meshes.add(mesh.clone()),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         material: custom_materials.add(
             candy_cane::StandardMaterial {
+                stripe_one: Stripe {
+                    frequency: 10.0,
+                    minimum_value: 0.2,
+                    power_value: 100.0,
+                    should_use: 1.0,
+                },
+                stripe_two: Stripe {
+                    frequency: 10.0,
+                    minimum_value: 0.0,
+                    power_value: 300.0,
+                    should_use: 1.2,
+                },
+                stripe_three: Stripe {
+                    frequency: 10.0,
+                    minimum_value: 0.0,
+                    power_value: 300.0,
+                    should_use: 1.5,
+                },
+                stripe_four: Stripe {
+                    frequency: 10.0,
+                    minimum_value: 0.0,
+                    power_value: 300.0,
+                    should_use: 1.8,
+                },
+                stripe_five: Stripe {
+                    frequency: 10.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                stripe_color_two: Color::DARK_GREEN,
+                stripe_color_three: Color::DARK_GREEN,
+                stripe_color_four: Color::DARK_GREEN,
                 base_color: Color::rgb(1.0, 1.0, 1.0),
                 // base_color: Color::YELLOW,
                 double_sided: true,
@@ -91,7 +173,56 @@ fn setup(
         // }),
         ..default()
     });
-
+    commands.spawn().insert_bundle(MaterialMeshBundle {
+        mesh: meshes.add(mesh.clone()),
+        transform: Transform::from_xyz(5.0, 0.5, 0.0),
+        material: custom_materials.add(
+            candy_cane::StandardMaterial {
+                stripe_one: Stripe {
+                    frequency: 5.0,
+                    minimum_value: 0.2,
+                    power_value: 100.0,
+                    should_use: 1.0,
+                },
+                stripe_two: Stripe {
+                    frequency: 5.0,
+                    minimum_value: 0.1,
+                    power_value: 400.0,
+                    should_use: 1.5,
+                },
+                stripe_three: Stripe {
+                    frequency: 20.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                stripe_four: Stripe {
+                    frequency: 20.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                stripe_five: Stripe {
+                    frequency: 20.0,
+                    minimum_value: 0.0,
+                    power_value: 100.0,
+                    should_use: 0.0,
+                },
+                stripe_color_one: Color::DARK_GREEN,
+                stripe_color_two: Color::hex("b1b100")
+                    .unwrap(),
+                base_color: Color::rgb(1.0, 1.0, 1.0),
+                // base_color: Color::YELLOW,
+                double_sided: true,
+                cull_mode: None,
+                // alpha_mode: AlphaMode::Blend,
+                // perceptual_roughness: 10.0,
+                // time: 0.,
+                ..default()
+            },
+        ),
+        ..default()
+    });
     // camera
     commands
         .spawn_bundle(Camera3dBundle {

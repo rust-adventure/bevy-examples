@@ -2,6 +2,16 @@
 // #import bevy_pbr::pbr_bindings
 // #import bevy_pbr::pbr_types
 struct StandardMaterial {
+    stripe_one: vec4<f32>,
+    stripe_two: vec4<f32>,
+    stripe_three: vec4<f32>,
+    stripe_four: vec4<f32>,
+    stripe_five: vec4<f32>,
+    stripe_color_one: vec4<f32>,
+    stripe_color_two: vec4<f32>,
+    stripe_color_three: vec4<f32>,
+    stripe_color_four: vec4<f32>,
+    stripe_color_five: vec4<f32>,
     time: f32,
     base_color: vec4<f32>,
     emissive: vec4<f32>,
@@ -12,6 +22,8 @@ struct StandardMaterial {
     flags: u32,
     alpha_cutoff: f32,
 }
+
+
 
 let STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT: u32         = 1u;
 let STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT: u32           = 2u;
@@ -95,12 +107,16 @@ struct FragmentInput {
 
 // let PI: f32 = 3.14159265358979323846264338327950288;
 
-fn stripe(uv: vec2<f32>, frequency: f32, minimum_value: f32, power_value: f32) -> f32 {
+
+
+
+
+fn make_stripe(uv: vec2<f32>, frequency: f32, minimum_value: f32, power_value: f32, offset: f32) -> f32 {
     /// use the uv u (or x) coordinate of the capsule
     /// to define a stripe, then multiply by a number 
     /// which will increase the frequency of the sin wave,
     /// increasing the number of stripes
-    let mix_value = abs(sin(((frequency * uv.y) + uv.x) * PI));
+    let mix_value = abs(sin(((frequency * uv.y) + uv.x) * PI + offset));
 
 
     /// control the fade between stripe color and base color
@@ -119,95 +135,162 @@ fn stripe(uv: vec2<f32>, frequency: f32, minimum_value: f32, power_value: f32) -
 
 @fragment
 fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
+    var output_color: vec4<f32> = in.color;
 
-/// Begin Candy Cane Colors
+    /// candy cane config
+    // let stripes = vec3<
 
-    let stripe_color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
+    // let stripe_one: Stripe = Stripe(
+    //     in.uv,
+    //     20.0,
+    //     0.0,
+    //     30.0,
+    // );
+    // let stripe_two: Stripe = Stripe(
+    //     in.uv,
+    //     40.0,
+    //     0.0,
+    //     10.0,
+    // );
 
-    let frequency = 40.0;
-    let minimum_value = 0.0;
-    let power_value = 30.0;
+    // var stripes = array(stripe_one, stripe_two);
+    /// Begin Candy Cane Colors
 
-    let thicc_stripe = stripe(in.uv, frequency, minimum_value, power_value);
+    // let stripe_color = vec4<f32>(1.0, 0.0, 0.0, 1.0);
+    // let stripe_color_two = vec4<f32>(0.0, 1.0, 0.0, 1.0);
+    // let stripe_color_three = vec4<f32>(1.0, 1.0, 0.0, 1.0);
+    // let stripe_color_four = vec4<f32>(0.0, 0.0, 1.0, 1.0);
+    // let stripe_color_five = vec4<f32>(0.5, 0.5, 0.0, 1.0);
 
+    var stripe_output: vec4<f32>;
+
+    let has_one = material.stripe_one
+        .
+        w != 0.0;
+    if has_one {
+        let stripe_mix = make_stripe(in.uv, material.stripe_one.r, material.stripe_one.g, material.stripe_one.b, 0.0);
+        stripe_output = mix(material.base_color, material.stripe_color_one, stripe_mix);
+    };
+    let has_two = material.stripe_two
+        .
+        w != 0.0;
+    if has_two {
+        let stripe_mix = make_stripe(in.uv, material.stripe_two.r, material.stripe_two.g, material.stripe_two.b, material.stripe_two.w);
+        stripe_output = mix(stripe_output, material.stripe_color_two, stripe_mix);
+    };
+    let has_three = material.stripe_three
+        .
+        w != 0.0;
+    if has_three {
+        let stripe_mix = make_stripe(in.uv, material.stripe_three.r, material.stripe_three.g, material.stripe_three.b, material.stripe_three.w);
+        stripe_output = mix(stripe_output, material.stripe_color_three, stripe_mix);
+    };
+    let has_four = material.stripe_four
+        .
+        w != 0.0;
+    if has_four {
+        let stripe_mix = make_stripe(in.uv, material.stripe_four.r, material.stripe_four.g, material.stripe_four.b, material.stripe_four.w);
+        stripe_output = mix(stripe_output, material.stripe_color_four, stripe_mix);
+    };
+    let has_five = material.stripe_five
+        .
+        w != 0.0;
+    if has_five {
+        let stripe_mix = make_stripe(in.uv, material.stripe_five.r, material.stripe_five.g, material.stripe_five.b, material.stripe_five.w);
+        stripe_output = mix(stripe_output, material.stripe_color_five, stripe_mix);
+    };
+
+    // let len = arrayLength(&stripes);
+    // // loop {
+    // //     if i >= len { break; };
+
+    // //     i++
+    // // };
+        // let stripe_mix_one = stripe(stripe_one);
+        // let stripe_mix_two = stripe(stripe_two);
+
+        // let combo_color = mix(material.base_color, stripe_color, stripe_mix_one);
+        // let combo_color_two = mix(combo_color, stripe_color_two, stripe_mix_two);
 /// End Candy Cane Colors
 
     // var output_color = vec4<f32>(0.533, 0.533, 0.80, 1.0);
 
-    var output_color: vec4<f32> = mix(material.base_color, stripe_color, thicc_stripe);
+    if stripe_output.w > 0.0 {
+            output_color = stripe_output;
+        }
 // #ifdef VERTEX_COLORS
 //     output_color = output_color * in.color;
 // #endif
 #ifdef VERTEX_UVS
-    if ((material.flags & STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT) != 0u) {
-        output_color = output_color * textureSample(base_color_texture, base_color_sampler, in.uv);
-    }
+        if ((material.flags & STANDARD_MATERIAL_FLAGS_BASE_COLOR_TEXTURE_BIT) != 0u) {
+            output_color = output_color * textureSample(base_color_texture, base_color_sampler, in.uv);
+        }
 #endif
 
     // NOTE: Unlit bit not set means == 0 is true, so the true case is if lit
-    if ((material.flags & STANDARD_MATERIAL_FLAGS_UNLIT_BIT) == 0u) {
+        if ((material.flags & STANDARD_MATERIAL_FLAGS_UNLIT_BIT) == 0u) {
         // Prepare a 'processed' StandardMaterial by sampling all textures to resolve
         // the material members
-        var pbr_input: PbrInput;
+            var pbr_input: PbrInput;
 
-        pbr_input.material.base_color = output_color;
-        pbr_input.material.reflectance = material.reflectance;
-        pbr_input.material.flags = material.flags;
-        pbr_input.material.alpha_cutoff = material.alpha_cutoff;
+            pbr_input.material.base_color = output_color;
+            pbr_input.material.reflectance = material.reflectance;
+            pbr_input.material.flags = material.flags;
+            pbr_input.material.alpha_cutoff = material.alpha_cutoff;
 
         // TODO use .a for exposure compensation in HDR
-        var emissive: vec4<f32> = material.emissive;
+            var emissive: vec4<f32> = material.emissive;
 #ifdef VERTEX_UVS
-        if ((material.flags & STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT) != 0u) {
-            emissive = vec4<f32>(emissive.rgb * textureSample(emissive_texture, emissive_sampler, in.uv).rgb, 1.0);
-        }
+            if ((material.flags & STANDARD_MATERIAL_FLAGS_EMISSIVE_TEXTURE_BIT) != 0u) {
+                emissive = vec4<f32>(emissive.rgb * textureSample(emissive_texture, emissive_sampler, in.uv).rgb, 1.0);
+            }
 #endif
-        pbr_input.material.emissive = emissive;
+            pbr_input.material.emissive = emissive;
 
-        var metallic: f32 = material.metallic;
-        var perceptual_roughness: f32 = material.perceptual_roughness;
+            var metallic: f32 = material.metallic;
+            var perceptual_roughness: f32 = material.perceptual_roughness;
 #ifdef VERTEX_UVS
-        if ((material.flags & STANDARD_MATERIAL_FLAGS_METALLIC_ROUGHNESS_TEXTURE_BIT) != 0u) {
-            let metallic_roughness = textureSample(metallic_roughness_texture, metallic_roughness_sampler, in.uv);
+            if ((material.flags & STANDARD_MATERIAL_FLAGS_METALLIC_ROUGHNESS_TEXTURE_BIT) != 0u) {
+                let metallic_roughness = textureSample(metallic_roughness_texture, metallic_roughness_sampler, in.uv);
             // Sampling from GLTF standard channels for now
-            metallic = metallic * metallic_roughness.b;
-            perceptual_roughness = perceptual_roughness * metallic_roughness.g;
-        }
+                metallic = metallic * metallic_roughness.b;
+                perceptual_roughness = perceptual_roughness * metallic_roughness.g;
+            }
 #endif
-        pbr_input.material.metallic = metallic;
-        pbr_input.material.perceptual_roughness = perceptual_roughness;
+            pbr_input.material.metallic = metallic;
+            pbr_input.material.perceptual_roughness = perceptual_roughness;
 
-        var occlusion: f32 = 1.0;
+            var occlusion: f32 = 1.0;
 #ifdef VERTEX_UVS
-        if ((material.flags & STANDARD_MATERIAL_FLAGS_OCCLUSION_TEXTURE_BIT) != 0u) {
-            occlusion = textureSample(occlusion_texture, occlusion_sampler, in.uv).r;
-        }
+            if ((material.flags & STANDARD_MATERIAL_FLAGS_OCCLUSION_TEXTURE_BIT) != 0u) {
+                occlusion = textureSample(occlusion_texture, occlusion_sampler, in.uv).r;
+            }
 #endif
-        pbr_input.occlusion = occlusion;
+            pbr_input.occlusion = occlusion;
 
-        pbr_input.frag_coord = in.frag_coord;
-        pbr_input.world_position = in.world_position;
-        pbr_input.world_normal = in.world_normal;
+            pbr_input.frag_coord = in.frag_coord;
+            pbr_input.world_position = in.world_position;
+            pbr_input.world_normal = in.world_normal;
 
-        pbr_input.is_orthographic = view.projection[3].w == 1.0;
+            pbr_input.is_orthographic = view.projection[3].w == 1.0;
 
-        pbr_input.N = prepare_normal(
-            material.flags,
-            in.world_normal,
+            pbr_input.N = prepare_normal(
+                material.flags,
+                in.world_normal,
 #ifdef VERTEX_TANGENTS
 #ifdef STANDARDMATERIAL_NORMAL_MAP
-            in.world_tangent,
+                in.world_tangent,
 #endif
 #endif
 #ifdef VERTEX_UVS
-            in.uv,
+                in.uv,
 #endif
-            in.is_front,
-        );
-        pbr_input.V = calculate_view(in.world_position, pbr_input.is_orthographic);
+                in.is_front,
+            );
+            pbr_input.V = calculate_view(in.world_position, pbr_input.is_orthographic);
 
-        output_color = tone_mapping(pbr(pbr_input));
-    }
+            output_color = tone_mapping(pbr(pbr_input));
+        }
 
     // return output_color;
 // custom code
@@ -235,7 +318,7 @@ fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
 //     );
 // var test = (simplexNoise3(vec3<f32>(material.time, material.time, material.time)) + 1.0) / 2.0;
 // return vec4<f32>(test, test,test,test);
-    if (output_color.a == 0.0) { discard; } else {
-        return output_color;
-    }
+        if (output_color.a == 0.0) { discard; } else {
+            return output_color;
+        }
 }

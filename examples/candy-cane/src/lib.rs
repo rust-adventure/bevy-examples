@@ -11,6 +11,26 @@ use bevy::render::{
     texture::Image,
 };
 
+#[derive(
+    encase::ShaderType, Default, Debug, Clone, Copy,
+)]
+pub struct Stripe {
+    pub frequency: f32,
+    pub minimum_value: f32,
+    pub power_value: f32,
+    pub should_use: f32,
+}
+
+impl From<Stripe> for [f32; 4] {
+    fn from(stripe: Stripe) -> Self {
+        [
+            stripe.frequency,
+            stripe.minimum_value,
+            stripe.power_value,
+            stripe.should_use,
+        ]
+    }
+}
 /// A material with "standard" properties used in PBR lighting
 /// Standard property values with pictures here
 /// <https://google.github.io/filament/Material%20Properties.pdf>.
@@ -72,11 +92,56 @@ pub struct StandardMaterial {
     pub depth_bias: f32,
     #[uniform(12)]
     pub time: f32,
+    #[uniform(13)]
+    pub stripe_one: Stripe,
+    #[uniform(14)]
+    pub stripe_two: Stripe,
+    #[uniform(15)]
+    pub stripe_three: Stripe,
+    #[uniform(16)]
+    pub stripe_four: Stripe,
+    #[uniform(17)]
+    pub stripe_five: Stripe,
+    pub stripe_color_one: Color,
+    pub stripe_color_two: Color,
+    pub stripe_color_three: Color,
+    pub stripe_color_four: Color,
+    pub stripe_color_five: Color,
 }
 
 impl Default for StandardMaterial {
     fn default() -> Self {
         StandardMaterial {
+            stripe_one: Stripe {
+                frequency: 0.0,
+                minimum_value: 0.0,
+                power_value: 0.0,
+                should_use: 0.0,
+            },
+            stripe_two: Stripe {
+                frequency: 0.0,
+                minimum_value: 0.0,
+                power_value: 0.0,
+                should_use: 0.0,
+            },
+            stripe_three: Stripe {
+                frequency: 0.0,
+                minimum_value: 0.0,
+                power_value: 0.0,
+                should_use: 0.0,
+            },
+            stripe_four: Stripe {
+                frequency: 0.0,
+                minimum_value: 0.0,
+                power_value: 0.0,
+                should_use: 0.0,
+            },
+            stripe_five: Stripe {
+                frequency: 0.0,
+                minimum_value: 0.0,
+                power_value: 0.0,
+                should_use: 0.0,
+            },
             base_color: Color::rgb(1.0, 1.0, 1.0),
             base_color_texture: None,
             emissive: Color::BLACK,
@@ -104,6 +169,11 @@ impl Default for StandardMaterial {
             alpha_mode: AlphaMode::Opaque,
             depth_bias: 0.0,
             time: 0.,
+            stripe_color_one: Color::RED,
+            stripe_color_two: Color::RED,
+            stripe_color_three: Color::RED,
+            stripe_color_four: Color::RED,
+            stripe_color_five: Color::RED,
         }
     }
 }
@@ -154,6 +224,16 @@ bitflags::bitflags! {
 /// The GPU representation of the uniform data of a [`StandardMaterial`].
 #[derive(Clone, Default, ShaderType)]
 pub struct StandardMaterialUniform {
+    pub stripe_one: Stripe,
+    pub stripe_two: Stripe,
+    pub stripe_three: Stripe,
+    pub stripe_four: Stripe,
+    pub stripe_five: Stripe,
+    pub stripe_color_one: Vec4,
+    pub stripe_color_two: Vec4,
+    pub stripe_color_three: Vec4,
+    pub stripe_color_four: Vec4,
+    pub stripe_color_five: Vec4,
     pub time: f32,
     /// Doubles as diffuse albedo for non-metallic, specular for metallic and a mix for everything
     /// in between.
@@ -245,6 +325,31 @@ impl AsBindGroupShaderType<StandardMaterialUniform>
 
         StandardMaterialUniform {
             time: self.time,
+            stripe_one: self.stripe_one,
+            stripe_two: self.stripe_two,
+            stripe_three: self.stripe_three,
+            stripe_four: self.stripe_four,
+            stripe_five: self.stripe_five,
+            stripe_color_one: self
+                .stripe_color_one
+                .as_linear_rgba_f32()
+                .into(),
+            stripe_color_two: self
+                .stripe_color_two
+                .as_linear_rgba_f32()
+                .into(),
+            stripe_color_three: self
+                .stripe_color_three
+                .as_linear_rgba_f32()
+                .into(),
+            stripe_color_four: self
+                .stripe_color_four
+                .as_linear_rgba_f32()
+                .into(),
+            stripe_color_five: self
+                .stripe_color_five
+                .as_linear_rgba_f32()
+                .into(),
             base_color: self
                 .base_color
                 .as_linear_rgba_f32()
