@@ -1,6 +1,5 @@
 [dependencies.bevy]
-git = "https://github.com/bevyengine/bevy.git"
-rev = "959f3b1186b20a5066bfb51b9b71542705db76d8"
+version = "0.8"
 
 [package]
 description = "A utility package that provides a series of noise functions and other utilities for use in wgpu shaders."

@@ -8,5 +8,4 @@ edition = "2021"
 [dependencies]
 
 [dependencies.bevy]
-git = "https://github.com/bevyengine/bevy.git"
-rev = "959f3b1186b20a5066bfb51b9b71542705db76d8"
+version = "0.8"
