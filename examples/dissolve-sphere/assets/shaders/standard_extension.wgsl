@@ -112,7 +112,6 @@ fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
         // Prepare a 'processed' StandardMaterial by sampling all textures to resolve
         // the material members
         var pbr_input: PbrInput;
-
         pbr_input.material.base_color = output_color;
         pbr_input.material.reflectance = material.reflectance;
         pbr_input.material.flags = material.flags;

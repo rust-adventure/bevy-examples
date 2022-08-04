@@ -26,8 +26,14 @@ fn main() {
             MaterialPlugin::<CustomMaterial>::default(),
         )
         .add_startup_system(setup)
-        .add_system(change_color)
-        .add_system(mod_scene)
+        .add_system(update_time_for_custom_material)
+        // for the time to update in the shader,
+        // this mod_scene must run before we try to update the time
+        // TODO: figure out why in more detail.
+        .add_system(
+            mod_scene
+                .before(update_time_for_custom_material),
+        )
         .run();
 }
 
@@ -58,7 +64,7 @@ fn setup(
     });
 }
 
-fn change_color(
+fn update_time_for_custom_material(
     mut materials: ResMut<Assets<CustomMaterial>>,
     time: Res<Time>,
 ) {

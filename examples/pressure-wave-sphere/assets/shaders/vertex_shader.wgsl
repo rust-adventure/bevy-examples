@@ -1,9 +1,6 @@
 #import bevy_pbr::mesh_view_bindings
 #import bevy_pbr::mesh_bindings
-
-// NOTE: Bindings must come before functions that use them!
 #import bevy_pbr::mesh_functions
-
 #import bevy_shader_utils::simplex_noise_3d
 #import bevy_shader_utils::simplex_noise_2d
 #import bevy_pbr::utils
