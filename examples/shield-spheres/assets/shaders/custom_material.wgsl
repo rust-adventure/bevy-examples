@@ -30,7 +30,7 @@ fn fragment(
     @location(7) view_inverse_position: vec4<f32>,
 ) -> @location(0) vec4<f32> {
     // return material.color * textureSample(base_color_texture, base_color_sampler, uv);
-    var input: vec3<f32> = vec3<f32>(uv.x * 40.0, uv.y * 40.0, 1.);
+    // var input: vec3<f32> = vec3<f32>(uv.x * 40.0, uv.y * 40.0, 1.);
     var noise = simplexNoise3(vec3<f32>(world_normal.xy * 400.2, material.time));
     var alpha = (noise + 1.0) / 2.0;
     // return material.color * textureSample(base_color_texture, base_color_sampler, uv) * vec4<f32>(1.0, 1.0, 1.0, alpha);
@@ -69,7 +69,7 @@ fn fragment(
 
     // return vec4(0.941, 0.043, 0.843, 1.0 - result);
 
-    return vec4(vec3(0.941, 0.043, 0.843) * fresnel, smoothstep(-0.2, 1.0, fresnel));
+    return vec4(vec3(0.941, 0.043, 0.843) * fresnel, 1.0 - fresnel);
     // smoothstep(0.0, 2.0, 1.0 - fresnel));
 
     // return vec4<f32>(position_diff, position_diff, position_diff, smoothstep(0.0, 3.0, world_normal.z));

@@ -30,10 +30,7 @@ fn main() {
         )
         .add_startup_system(setup)
         .add_system(update_time_for_custom_material)
-        .add_system(
-            mod_scene
-                .before(update_time_for_custom_material),
-        )
+        .add_system(mod_scene)
         .add_system(animate_light_direction)
         .run();
 }
