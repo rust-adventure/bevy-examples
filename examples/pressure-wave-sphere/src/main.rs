@@ -30,10 +30,7 @@ fn main() {
         // for the time to update in the shader,
         // this mod_scene must run before we try to update the time
         // TODO: figure out why in more detail.
-        .add_system(
-            mod_scene
-                .before(update_time_for_custom_material),
-        )
+        .add_system(mod_scene)
         .run();
 }
 
@@ -159,5 +156,6 @@ fn mod_scene(
             .entity(sphere.0)
             .remove::<Handle<StandardMaterial>>();
         commands.entity(sphere.0).insert(custom_material);
+        commands.entity(sphere.0).insert(Inserted);
     }
 }
