@@ -1,0 +1,10 @@
+[dependencies.bevy]
+version = "0.8"
+
+[dependencies.bevy_shader_utils]
+path = "../../libs/bevy_shader_utils"
+
+[package]
+edition = "2021"
+name = "shield-spheres"
+version = "0.1.0"
