@@ -1,5 +1,9 @@
+
+[dependencies]
+itertools = "0.10.3"
 [dependencies.bevy]
 version = "0.8"
+features = ["jpeg"]
 
 [dependencies.bevy_shader_utils]
 path = "../../libs/bevy_shader_utils"

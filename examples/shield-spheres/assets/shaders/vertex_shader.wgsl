@@ -1,5 +1,6 @@
 #import bevy_pbr::mesh_view_bindings
 #import bevy_pbr::mesh_bindings
+#import bevy_shader_utils::mock_fresnel
 
 // NOTE: Bindings must come before functions that use them!
 #import bevy_pbr::mesh_functions
@@ -104,8 +105,10 @@ fn vertex(vertex: Vertex) -> VertexOutput {
 
     out.color = out.clip_position;
 
+
     out.view_inverse_position = view.inverse_view * out.world_position;
     out.view_position = view.view * out.world_position;
+
     // out.view_inverse_position = view.inverse_view_proj * out.world_position;
     return out;
 }

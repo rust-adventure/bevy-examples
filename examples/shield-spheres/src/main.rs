@@ -1,4 +1,5 @@
 use bevy::{
+    ecs::system::Command,
     pbr::{
         MaterialPipeline, MaterialPipelineKey,
         NotShadowCaster,
@@ -10,13 +11,13 @@ use bevy::{
             MeshVertexBufferLayout, VertexAttributeValues,
         },
         render_resource::{
-            AsBindGroup, Face, RenderPipelineDescriptor,
+            AsBindGroup, RenderPipelineDescriptor,
             ShaderRef, SpecializedMeshPipelineError,
         },
     },
-    scene::SceneInstance,
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
+use itertools::Itertools;
 
 fn main() {
     App::new()
@@ -78,92 +79,50 @@ fn setup(
         },
         ..default()
     });
-    let subject_transform =
-        Transform::from_xyz(-2.5, 0.0, 0.0);
-    // commands
-    //     .spawn_bundle(SceneBundle {
-    //         scene: asset_server.load(
-    //             "hex-sphere-5-subdivisions.glb#Scene0",
-    //         ),
-    //         transform: subject_transform,
-    //         ..default()
-    //     })
-    //     .insert(GLTFScene);
 
-    let mesh = Mesh::from(shape::Cube { size: 1.0 });
-    commands
-        .spawn()
-        .insert_bundle(MaterialMeshBundle {
-            mesh: meshes.add(mesh),
-            transform: subject_transform,
-            material: materials.add(StandardMaterial {
-                base_color: Color::TEAL,
-                ..default()
-            }),
-            ..default()
-        })
-        .insert(NotShadowCaster);
-
-    // TWO
-    let subject_transform =
-        Transform::from_xyz(0.0, 0.0, 0.0);
-    commands
-        .spawn_bundle(SceneBundle {
-            scene: asset_server.load(
-                "hex-sphere-5-subdivisions.glb#Scene0",
+    // ground plane
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes
+            .add(Mesh::from(shape::Plane { size: 100.0 })),
+        material: materials.add(StandardMaterial {
+            base_color: Color::rgb(1.0, 1.0, 1.0),
+            base_color_texture: Some(
+                asset_server.load(
+                    "concrete/sekjcawb_2K_Albedo.jpg",
+                ),
             ),
-            transform: subject_transform,
-            ..default()
-        })
-        .insert(GLTFScene);
-
-    let mesh = Mesh::from(shape::Cube { size: 1.0 });
-    commands
-        .spawn()
-        .insert_bundle(MaterialMeshBundle {
-            mesh: meshes.add(mesh),
-            transform: subject_transform,
-            material: materials.add(StandardMaterial {
-                base_color: Color::TEAL,
-                ..default()
-            }),
-            ..default()
-        })
-        .insert(NotShadowCaster);
-
-    // THREE
-
-    let subject_transform =
-        Transform::from_xyz(2.5, 0.0, 0.0);
-    commands
-        .spawn_bundle(SceneBundle {
-            scene: asset_server.load(
-                "hex-sphere-5-subdivisions.glb#Scene0",
+            normal_map_texture: Some(
+                asset_server.load(
+                    "concrete/sekjcawb_2K_Normal.jpg",
+                ),
             ),
-            transform: subject_transform,
             ..default()
-        })
-        .insert(GLTFScene);
+        }),
+        transform: Transform::from_xyz(0.0, -0.3, 0.0),
+        ..default()
+    });
 
-    let mesh = Mesh::from(shape::Cube { size: 1.0 });
-    commands
-        .spawn()
-        .insert_bundle(MaterialMeshBundle {
-            mesh: meshes.add(mesh),
+    let shield: Handle<Scene> = asset_server
+        .load("hex-sphere-5-subdivisions.glb#Scene0");
+    let ferris: Handle<Scene> =
+        asset_server.load("ferris3d_v1.0.glb#Scene0");
+
+    let num_ferris = 20;
+    for (y, x) in
+        (0..num_ferris).cartesian_product(0..num_ferris)
+    {
+        let subject_transform = Transform::from_xyz(
+            -x as f32 * 2.5 + 5.0,
+            0.0,
+            -y as f32 * 2.5 + 2.5,
+        );
+        commands.add(SpawnShieldedFerris {
             transform: subject_transform,
-            material: materials.add(StandardMaterial {
-                base_color: Color::TEAL,
-                ..default()
-            }),
-            ..default()
-        })
-        .insert(NotShadowCaster);
-    // camera
-    // commands.spawn_bundle(Camera3dBundle {
-    //     transform: Transform::from_xyz(0.0, 0.0, 5.0)
-    //         .looking_at(Vec3::ZERO, Vec3::Y),
-    //     ..default()
-    // });
+            shield: shield.clone(),
+            ferris: ferris.clone(),
+        });
+    }
+
     commands.spawn_bundle(Camera3dBundle {
         transform: Transform::from_xyz(2.5, 2.5, 5.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
@@ -201,7 +160,7 @@ impl Material for CustomMaterial {
         _layout: &MeshVertexBufferLayout,
         key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
-        descriptor.primitive.cull_mode = None;
+        // descriptor.primitive.cull_mode = None;
         if let Some(label) = &mut descriptor.label {
             *label = format!("shield_{}", *label).into();
         }
@@ -231,21 +190,12 @@ fn mod_scene(
     >,
     mut meshes: ResMut<Assets<Mesh>>,
     mut custom_materials: ResMut<Assets<CustomMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
-    for sphere in spheres.iter() {
-        commands.entity(sphere.0).add_children(|parent| {
-            // child light
-            parent.spawn_bundle(PointLightBundle {
-                point_light: PointLight {
-                    intensity: 10000.0,
-                    radius: 1.0,
-                    color: Color::rgb(1.0, 1.0, 1.0),
-                    ..default()
-                },
-                ..default()
-            });
-        });
+    for sphere in spheres
+        .iter()
+        .filter(|s| s.2 == &Name::new("Icosphere"))
+    {
+        commands.entity(sphere.0);
         let mesh = meshes.get_mut(sphere.1).unwrap();
         if let Some(VertexAttributeValues::Float32x3(
             positions,
@@ -278,7 +228,10 @@ fn mod_scene(
             .entity(sphere.0)
             .remove::<Handle<StandardMaterial>>();
         commands.entity(sphere.0).insert(custom_material);
-        commands.entity(sphere.0).insert(Inserted);
+        commands
+            .entity(sphere.0)
+            .insert(Inserted)
+            .insert(NotShadowCaster);
     }
 }
 fn animate_light_direction(
@@ -290,5 +243,30 @@ fn animate_light_direction(
 ) {
     for mut transform in query.iter_mut() {
         transform.rotate_y(time.delta_seconds() * 0.5);
+    }
+}
+
+pub struct SpawnShieldedFerris {
+    pub transform: Transform,
+    pub shield: Handle<Scene>,
+    pub ferris: Handle<Scene>,
+}
+
+impl Command for SpawnShieldedFerris {
+    fn write(self, world: &mut World) {
+        world
+            .spawn()
+            .insert_bundle(SceneBundle {
+                scene: self.shield,
+                transform: self.transform.clone(),
+                ..default()
+            })
+            .insert(GLTFScene);
+
+        world.spawn().insert_bundle(SceneBundle {
+            scene: self.ferris,
+            transform: self.transform.clone(),
+            ..default()
+        });
     }
 }
