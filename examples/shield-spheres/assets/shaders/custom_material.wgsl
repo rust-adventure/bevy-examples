@@ -36,7 +36,7 @@ fn fragment(
 
     let highlight = smoothstep(0.0, 1.0, position_diff + 1.0);
 
-    let fresnel = mock_fresnel(view.world_position.xyz, world_position.xyz, world_normal, 1.0, 1.0);
+    let fresnel = mock_fresnel(view.world_position.xyz, world_position.xyz, world_normal, 2.0, 2.0);
 
 
     // let rate_x = dpdx(view_position.xyz);

@@ -1,4 +1,5 @@
 use bevy::{
+    asset::AssetServerSettings,
     ecs::system::Command,
     pbr::{
         MaterialPipeline, MaterialPipelineKey,
@@ -24,6 +25,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("071f3c").unwrap(),
         ))
+        .insert_resource(AssetServerSettings {
+            watch_for_changes: true,
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
@@ -81,9 +86,12 @@ fn setup(
     });
 
     // ground plane
+
+    let mut plane_mesh =
+        Mesh::from(shape::Plane { size: 100.0 });
+    plane_mesh.generate_tangents().unwrap();
     commands.spawn_bundle(PbrBundle {
-        mesh: meshes
-            .add(Mesh::from(shape::Plane { size: 100.0 })),
+        mesh: meshes.add(plane_mesh),
         material: materials.add(StandardMaterial {
             base_color: Color::rgb(1.0, 1.0, 1.0),
             base_color_texture: Some(
@@ -108,13 +116,13 @@ fn setup(
         asset_server.load("ferris3d_v1.0.glb#Scene0");
 
     let num_ferris = 20;
-    for (y, x) in
+    for (z, x) in
         (0..num_ferris).cartesian_product(0..num_ferris)
     {
         let subject_transform = Transform::from_xyz(
             -x as f32 * 2.5 + 5.0,
             0.0,
-            -y as f32 * 2.5 + 2.5,
+            -z as f32 * 2.5 + 2.5,
         );
         commands.add(SpawnShieldedFerris {
             transform: subject_transform,
