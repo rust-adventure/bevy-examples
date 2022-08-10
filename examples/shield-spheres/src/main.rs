@@ -17,6 +17,7 @@ use bevy::{
         },
     },
 };
+use bevy_asset_loader::prelude::*;
 use bevy_shader_utils::ShaderUtilsPlugin;
 use itertools::Itertools;
 
@@ -34,24 +35,31 @@ fn main() {
         .add_plugin(
             MaterialPlugin::<CustomMaterial>::default(),
         )
-        .add_startup_system(setup)
         .add_system(update_time_for_custom_material)
-        .add_system(mod_scene)
+        .add_loading_state(
+            LoadingState::new(MyStates::AssetLoading)
+                .continue_to_state(MyStates::Next)
+                .with_collection::<MyAssets>(),
+        )
+        .add_state(MyStates::AssetLoading)
+        .add_system_set(
+            SystemSet::on_enter(MyStates::Next)
+                .with_system(setup),
+        )
         .add_system(animate_light_direction)
         .run();
 }
-
-#[derive(Component)]
-struct GLTFScene;
 
 #[derive(Component)]
 struct Inserted;
 
 /// set up a simple 3D scene
 fn setup(
+    assets: Res<MyAssets>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut custom_materials: ResMut<Assets<CustomMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
     // ambient light
@@ -110,11 +118,35 @@ fn setup(
         ..default()
     });
 
-    let shield: Handle<Scene> = asset_server
-        .load("hex-sphere-5-subdivisions.glb#Scene0");
-    let ferris: Handle<Scene> =
-        asset_server.load("ferris3d_v1.0.glb#Scene0");
+    let mesh = meshes.get_mut(&assets.hex_sphere).unwrap();
+    if let Some(VertexAttributeValues::Float32x3(
+        positions,
+    )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
+    {
+        let colors: Vec<[f32; 4]> = positions
+            .iter()
+            .map(|[r, g, b]| {
+                [
+                    (1. - *r) / 2.,
+                    (1. - *g) / 2.,
+                    (1. - *b) / 2.,
+                    1.,
+                ]
+            })
+            .collect();
+        mesh.insert_attribute(
+            Mesh::ATTRIBUTE_COLOR,
+            colors,
+        );
+    }
 
+    let custom_material =
+        custom_materials.add(CustomMaterial {
+            color: Color::BLUE,
+            color_texture: None,
+            alpha_mode: AlphaMode::Blend,
+            time: 0.5,
+        });
     let num_ferris = 20;
     for (z, x) in
         (0..num_ferris).cartesian_product(0..num_ferris)
@@ -126,8 +158,9 @@ fn setup(
         );
         commands.add(SpawnShieldedFerris {
             transform: subject_transform,
-            shield: shield.clone(),
-            ferris: ferris.clone(),
+            shield: assets.hex_sphere.clone(),
+            ferris: assets.ferris.clone(),
+            shield_material: custom_material.clone(),
         });
     }
 
@@ -190,58 +223,6 @@ pub struct CustomMaterial {
     alpha_mode: AlphaMode,
 }
 
-fn mod_scene(
-    mut commands: Commands,
-    spheres: Query<
-        (Entity, &Handle<Mesh>, &Name),
-        Without<Inserted>,
-    >,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut custom_materials: ResMut<Assets<CustomMaterial>>,
-) {
-    for sphere in spheres
-        .iter()
-        .filter(|s| s.2 == &Name::new("Icosphere"))
-    {
-        commands.entity(sphere.0);
-        let mesh = meshes.get_mut(sphere.1).unwrap();
-        if let Some(VertexAttributeValues::Float32x3(
-            positions,
-        )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
-        {
-            let colors: Vec<[f32; 4]> = positions
-                .iter()
-                .map(|[r, g, b]| {
-                    [
-                        (1. - *r) / 2.,
-                        (1. - *g) / 2.,
-                        (1. - *b) / 2.,
-                        1.,
-                    ]
-                })
-                .collect();
-            mesh.insert_attribute(
-                Mesh::ATTRIBUTE_COLOR,
-                colors,
-            );
-        }
-        let custom_material =
-            custom_materials.add(CustomMaterial {
-                color: Color::BLUE,
-                color_texture: None,
-                alpha_mode: AlphaMode::Blend,
-                time: 0.5,
-            });
-        commands
-            .entity(sphere.0)
-            .remove::<Handle<StandardMaterial>>();
-        commands.entity(sphere.0).insert(custom_material);
-        commands
-            .entity(sphere.0)
-            .insert(Inserted)
-            .insert(NotShadowCaster);
-    }
-}
 fn animate_light_direction(
     time: Res<Time>,
     mut query: Query<
@@ -256,20 +237,23 @@ fn animate_light_direction(
 
 pub struct SpawnShieldedFerris {
     pub transform: Transform,
-    pub shield: Handle<Scene>,
+    pub shield: Handle<Mesh>,
     pub ferris: Handle<Scene>,
+    pub shield_material: Handle<CustomMaterial>,
 }
 
 impl Command for SpawnShieldedFerris {
     fn write(self, world: &mut World) {
         world
             .spawn()
-            .insert_bundle(SceneBundle {
-                scene: self.shield,
+            .insert_bundle(MaterialMeshBundle {
+                mesh: self.shield,
+                material: self.shield_material,
                 transform: self.transform.clone(),
+                visibility: Visibility::visible(),
                 ..default()
             })
-            .insert(GLTFScene);
+            .insert(NotShadowCaster);
 
         world.spawn().insert_bundle(SceneBundle {
             scene: self.ferris,
@@ -277,4 +261,20 @@ impl Command for SpawnShieldedFerris {
             ..default()
         });
     }
+}
+
+#[derive(AssetCollection)]
+struct MyAssets {
+    #[asset(
+        path = "hex-sphere-5-subdivisions.glb#Mesh0/Primitive0"
+    )]
+    hex_sphere: Handle<Mesh>,
+    #[asset(path = "ferris3d_v1.0.glb#Scene0")]
+    ferris: Handle<Scene>,
+}
+
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+enum MyStates {
+    AssetLoading,
+    Next,
 }
