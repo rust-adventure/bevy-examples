@@ -9,3 +9,5 @@ This repo is a selection of contained examples using the Bevy game engine, often
 ![](examples/dissolve-sphere-standard-material-extensions/readme/demo.png)
 
 ![](examples/spacecraft-noiseland/readme/demo.png)
+
+![](examples/cube-wave/readme/demo.gif)
