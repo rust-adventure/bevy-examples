@@ -148,7 +148,7 @@ fn queue_bind_group(
     gpu_images: Res<RenderAssets<Image>>,
     game_of_life_image: Res<GameOfLifeImage>,
     render_device: Res<RenderDevice>,
-    mut time_meta: ResMut<TimeMeta>,
+    time_meta: ResMut<TimeMeta>,
 ) {
     let view = &gpu_images[&game_of_life_image.0];
     let bind_group = render_device.create_bind_group(
