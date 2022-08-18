@@ -1136,6 +1136,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "compute-with-time"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
