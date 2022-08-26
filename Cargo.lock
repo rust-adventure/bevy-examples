@@ -1136,6 +1136,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "compute-3d"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "compute-with-time"
 version = "0.1.0"
 dependencies = [
