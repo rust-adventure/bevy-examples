@@ -1,0 +1,15 @@
+[package]
+name = "rotating-column"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.8.1"
+itertools = "0.10.3"
+bevy-inspector-egui = "0.12.1"
+bevy_tweening = "0.5.0"
+
+[dependencies.bevy_shader_utils]
+path = "../../libs/bevy_shader_utils"
