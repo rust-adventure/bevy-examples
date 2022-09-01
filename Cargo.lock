@@ -346,6 +346,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_basic_camera"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_core"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2882,6 +2889,16 @@ dependencies = [
  "crc32fast",
  "deflate 1.0.0",
  "miniz_oxide 0.5.3",
+]
+
+[[package]]
+name = "pointcloud"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_basic_camera",
+ "bevy_shader_utils",
+ "itertools",
 ]
 
 [[package]]
