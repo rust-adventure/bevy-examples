@@ -1,4 +1,4 @@
-use crate::time::TimeMeta;
+use crate::{fog::VolumetricImage, time::TimeMeta};
 use bevy::{
     prelude::*,
     render::{
@@ -14,35 +14,10 @@ use bevy::{
 };
 use std::borrow::Cow;
 
-const SIZE: (u32, u32) = (720, 720);
-const WORKGROUP_SIZE: u32 = 8;
+// HAS TO MATCH SIZE IN MAIN
+pub const SIZE: (u32, u32, u32) = (720, 720, 720);
+const WORKGROUP_SIZE: u32 = 10;
 
-pub fn generate_image(
-    commands: &mut Commands,
-    mut images: ResMut<Assets<Image>>,
-) -> Handle<Image> {
-    let mut image = Image::new_fill(
-        Extent3d {
-            width: SIZE.0,
-            height: SIZE.1,
-            depth_or_array_layers: 10,
-        },
-        TextureDimension::D3,
-        &[0, 0, 0, 255],
-        TextureFormat::Rgba8Unorm,
-    );
-
-    image.texture_descriptor.usage = TextureUsages::COPY_DST
-        | TextureUsages::STORAGE_BINDING
-        | TextureUsages::TEXTURE_BINDING;
-
-    let image_handle = images.add(image);
-    commands.insert_resource(CloudGeneratorImage(
-        image_handle.clone(),
-    ));
-
-    image_handle
-}
 pub struct CloudGeneratorComputePlugin;
 
 impl Plugin for CloudGeneratorComputePlugin {
@@ -79,7 +54,7 @@ impl Plugin for CloudGeneratorComputePlugin {
 // #[derive(Resource, Clone, Deref,
 // ExtractResource)]
 #[derive(Clone, Deref, ExtractResource)]
-struct CloudGeneratorImage(Handle<Image>);
+pub struct CloudGeneratorImage(pub Handle<Image>);
 
 // #[derive(Resource)]
 struct CloudGeneratorImageBindGroup(BindGroup);
@@ -284,7 +259,7 @@ impl render_graph::Node for CloudGeneratorNode {
                 pass.dispatch_workgroups(
                     SIZE.0 / WORKGROUP_SIZE,
                     SIZE.1 / WORKGROUP_SIZE,
-                    1,
+                    SIZE.2 / WORKGROUP_SIZE,
                 );
             }
             CloudGeneratorState::Update => {
@@ -297,7 +272,7 @@ impl render_graph::Node for CloudGeneratorNode {
                 pass.dispatch_workgroups(
                     SIZE.0 / WORKGROUP_SIZE,
                     SIZE.1 / WORKGROUP_SIZE,
-                    1,
+                    SIZE.2 / WORKGROUP_SIZE,
                 );
             }
         }

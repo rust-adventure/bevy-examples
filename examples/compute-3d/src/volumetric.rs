@@ -51,29 +51,6 @@ pub struct VolumetricMaterial {
     pub fog: Handle<Image>,
 }
 
-// impl Material for VolumetricMaterial {
-//     fn vertex_shader() -> ShaderRef {
-//         "shaders/animate_shader.wgsl".into()
-//     }
-
-//     fn fragment_shader() -> ShaderRef {
-//         "shaders/animate_shader.wgsl".into()
-//     }
-
-//     fn alpha_mode(&self) -> AlphaMode {
-//         AlphaMode::Blend
-//     }
-
-// fn specialize(
-//     pipeline: &bevy::pbr::MaterialPipeline<Self>,
-//     descriptor: &mut RenderPipelineDescriptor,
-//     layout: &MeshVertexBufferLayout,
-//     key: bevy::pbr::MaterialPipelineKey<Self>,
-// ) -> Result<(), SpecializedMeshPipelineError> {
-//     Ok(())
-// }
-// }
-
 pub struct VolumetricMaterialPlugin;
 
 // the VolumetricMaterialPlugin depends on the TimePlugin

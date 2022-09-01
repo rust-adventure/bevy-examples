@@ -1,42 +1,6 @@
 use bevy::{
-    asset::AssetServerSettings,
-    core_pipeline::core_3d::Transparent3d,
-    ecs::system::{
-        lifetimeless::{Read, SRes},
-        SystemParamItem,
-    },
-    pbr::{
-        DrawMesh, MeshPipeline, MeshPipelineKey,
-        MeshUniform, SetMaterialBindGroup,
-        SetMeshBindGroup, SetMeshViewBindGroup,
-    },
-    prelude::*,
-    reflect::TypeUuid,
-    render::{
-        extract_component::{
-            ExtractComponent, ExtractComponentPlugin,
-            UniformComponentPlugin,
-        },
-        extract_resource::{
-            ExtractResource, ExtractResourcePlugin,
-        },
-        mesh::MeshVertexBufferLayout,
-        render_asset::RenderAssets,
-        render_graph::{self, RenderGraph},
-        render_phase::{
-            AddRenderCommand, DrawFunctions,
-            EntityRenderCommand, RenderCommandResult,
-            RenderPhase, SetItemPipeline,
-            TrackedRenderPass,
-        },
-        render_resource::*,
-        renderer::{
-            RenderContext, RenderDevice, RenderQueue,
-        },
-        view::ExtractedView,
-        RenderApp, RenderStage,
-    },
-    window::WindowDescriptor,
+    asset::AssetServerSettings, prelude::*,
+    render::render_resource::*, window::WindowDescriptor,
 };
 mod bevy_basic_camera;
 use bevy_basic_camera::{
@@ -45,12 +9,17 @@ use bevy_basic_camera::{
 use bevy_shader_utils::ShaderUtilsPlugin;
 use compute_3d::{
     compute::{
-        generate_image, CloudGeneratorComputePlugin,
+        CloudGeneratorComputePlugin, CloudGeneratorImage,
+        SIZE,
     },
+    fog::{FogPlugin, VolumetricImage},
     time::GpuTimePlugin,
-    volumetric::{
+    volumetric_single::{
         VolumetricMaterial, VolumetricMaterialPlugin,
     },
+    // volumetric::{
+    //     VolumetricMaterial, VolumetricMaterialPlugin,
+    // },
 };
 use std::borrow::Cow;
 
@@ -68,9 +37,11 @@ fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
+        .init_resource::<FogImageSetup>()
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(GpuTimePlugin)
         .add_plugin(CloudGeneratorComputePlugin)
+        .add_plugin(FogPlugin)
         .add_plugin(VolumetricMaterialPlugin)
         .add_plugin(CameraControllerPlugin)
         .add_startup_system(setup)
@@ -78,19 +49,57 @@ fn main() {
         .run();
 }
 
+struct FogImageSetup;
+impl FromWorld for FogImageSetup {
+    fn from_world(world: &mut World) -> Self {
+        let mut image = Image::new_fill(
+            Extent3d {
+                width: SIZE.0,
+                height: SIZE.1,
+                depth_or_array_layers: SIZE.2,
+            },
+            TextureDimension::D3,
+            &[0, 0, 0, 255],
+            TextureFormat::Rgba8Unorm,
+        );
+
+        image.texture_descriptor.usage =
+            TextureUsages::COPY_DST
+                | TextureUsages::STORAGE_BINDING
+                | TextureUsages::TEXTURE_BINDING;
+        let image_handle = {
+            let mut images = world
+                .get_resource_mut::<Assets<Image>>()
+                .unwrap();
+            images.add(image)
+        };
+        world.insert_resource(CloudGeneratorImage(
+            image_handle.clone(),
+        ));
+        world.insert_resource(VolumetricImage(
+            image_handle.clone(),
+        ));
+
+        FogImageSetup
+    }
+}
+
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     // mut materials: ResMut<Assets<VolumetricMaterial>>,
-    images: ResMut<Assets<Image>>,
+    // images: ResMut<Assets<Image>>,
+    volume_image: Res<VolumetricImage>,
 ) {
-    let image = generate_image(&mut commands, images);
+    // let image = generate_image(&mut commands, images);
 
     // cube
     commands.spawn_bundle((
         meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
         Transform::from_xyz(0.0, 0.5, 0.0),
-        VolumetricMaterial { fog: image.clone() },
+        VolumetricMaterial {
+            fog: volume_image.0.clone(),
+        },
         GlobalTransform::default(),
         Visibility::default(),
         ComputedVisibility::default(),

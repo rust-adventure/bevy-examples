@@ -1,3 +1,4 @@
 pub mod compute;
+pub mod fog;
 pub mod time;
-pub mod volumetric;
+pub mod volumetric_single;
