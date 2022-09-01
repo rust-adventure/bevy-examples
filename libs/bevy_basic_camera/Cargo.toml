@@ -1,0 +1,10 @@
+[dependencies.bevy]
+version = "0.8"
+
+[package]
+description = ""
+edition = "2021"
+keywords = ["bevy"]
+license = "MIT"
+name = "bevy_basic_camera"
+version = "0.1.0"
