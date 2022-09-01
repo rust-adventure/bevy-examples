@@ -70,9 +70,6 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(GpuTimePlugin)
-        // .add_plugin(UniformComponentPlugin::<
-        //     VolumetricMaterial,
-        // >::default())
         .add_plugin(CloudGeneratorComputePlugin)
         .add_plugin(VolumetricMaterialPlugin)
         .add_plugin(CameraControllerPlugin)

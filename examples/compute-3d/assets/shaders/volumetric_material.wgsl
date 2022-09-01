@@ -66,7 +66,8 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     let coord = in.clip_position;
     // let pos = coord.xyz;
     let color = textureSample(fog, fog_sampler, vec3(coord.xy * 0.0002, tenths), vec3<i32>(0,0,0));
-    return vec4(color.rgb, 1.0);
+    return vec4(1.0,1.0,1.0, 1.0);
+    // return vec4(color.rgb, 1.0);
     // return vec4(coord.xyz, 1.0);
     // return vec4(in.uv, 0.0, 1.0);
     // let noise = simplexNoise2(vec2(0.0,time.time_since_startup * 200.2));
