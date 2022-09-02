@@ -1,6 +1,8 @@
 use bevy::{
-    asset::AssetServerSettings, prelude::*,
-    render::render_resource::*, window::WindowDescriptor,
+    asset::AssetServerSettings,
+    prelude::*,
+    render::{primitives::Aabb, render_resource::*},
+    window::WindowDescriptor,
 };
 mod bevy_basic_camera;
 use bevy_basic_camera::{
@@ -94,8 +96,11 @@ fn setup(
     // let image = generate_image(&mut commands, images);
 
     // cube
+    let mesh = Mesh::from(shape::Cube { size: 1.0 });
+    let aabb = mesh.compute_aabb().unwrap();
+    info!(?aabb, "we're cheating. Make sure shader bounding box matches");
     commands.spawn_bundle((
-        meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        meshes.add(mesh),
         Transform::from_xyz(0.0, 0.0, 0.0),
         VolumetricMaterial {
             fog: volume_image.0.clone(),
@@ -103,7 +108,7 @@ fn setup(
         GlobalTransform::default(),
         Visibility::default(),
         ComputedVisibility::default(),
-        Movable,
+        aabb,
     ));
 
     // camera

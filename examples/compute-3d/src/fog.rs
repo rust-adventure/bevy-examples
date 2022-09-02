@@ -18,19 +18,6 @@ pub struct FogPlugin;
 
 impl Plugin for FogPlugin {
     fn build(&self, app: &mut App) {
-        let render_device =
-            app.world.resource::<RenderDevice>();
-
-        // let buffer = render_device.create_buffer(
-        //     &BufferDescriptor {
-        //         label: Some("fog texture buffer"),
-        //         size: std::mem::size_of::<f32>() as u64,
-        //         usage: BufferUsages::UNIFORM
-        //             | BufferUsages::COPY_DST,
-        //         mapped_at_creation: false,
-        //     },
-        // );
-
         app.add_plugin(
             ExtractResourcePlugin::<ExtractedFog>::default(
             ),
@@ -80,14 +67,6 @@ pub struct FogMeta {
 fn prepare_fog(
     extracted_fog: Res<ExtractedFog>,
     mut fog_meta: ResMut<FogMeta>,
-    // render_queue: Res<RenderQueue>,
 ) {
-    // write `time.seconds_since_startup` as a `&[u8]`
-    // into the time buffer at offset 0.
-    // render_queue.write_buffer(
-    //     &fog_meta.buffer,
-    //     0,
-    //     bevy::core::cast_slice(&[extracted_fog]),
-    // );
     fog_meta.image = extracted_fog.image.clone();
 }

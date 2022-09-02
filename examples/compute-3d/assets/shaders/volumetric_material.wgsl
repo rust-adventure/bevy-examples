@@ -54,6 +54,8 @@ struct VertexOutput {
     #import bevy_pbr::mesh_vertex_output
     @location(5) vertex_position: vec3<f32>,
     @location(6) view_position: vec4<f32>,
+    @location(7) cheating_lower_bound: vec4<f32>,
+    @location(8) cheating_upper_bound: vec4<f32>,
 };
 @vertex
 fn vertex(vertex: Vertex) -> VertexOutput {
@@ -79,6 +81,9 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     out.clip_position = mesh_position_world_to_clip(out.world_position);
     out.vertex_position = vertex.position;
     out.view_position = view.inverse_view * out.world_position;
+
+    out.cheating_lower_bound = view.inverse_view * vec4(-0.5, -0.5, -0.5, 1.0);
+    out.cheating_upper_bound = view.inverse_view * vec4(0.5, 0.5, 0.5, 1.0);
 
     return out;
 }
@@ -145,11 +150,9 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     // 0,0.1,0.2, etc
     // let tenths = fract(round(time.time_since_startup * 100.0) / 100.0);
     let ray_dir = normalize(in.view_position);
-    let lower_bound = vec3<f32>(-0.5,-0.5,-0.5);
-    let upper_bound = vec3<f32>(0.5,0.5,0.5);
     let ray_box_info = ray_box_dst(
-        lower_bound,
-        upper_bound,
+        in.cheating_lower_bound.xyz,
+        in.cheating_upper_bound.xyz,
         vec3(0.0,0.0,0.0),
         ray_dir.xyz,
     );
