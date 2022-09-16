@@ -29,5 +29,8 @@ fn fragment(
         1.0
     );
 
-    return output_color;
+let y = distance(vec2(0.5,0.5), uv);
+    
+let x_grid = (40.0 % view.width);
+    return vec4(output_color.xyz * sin((y + offset_r.x) * 1200.0) * x_grid, 1.0);
 }

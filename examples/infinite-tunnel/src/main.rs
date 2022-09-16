@@ -4,18 +4,25 @@
 //! edge detection, blur, pixelization, vignette... and countless others.
 
 use bevy::{
+    asset::AssetServerSettings,
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
 };
+use bevy_shader_utils::ShaderUtilsPlugin;
 use post_processing::PostProcessingCamera;
 mod post_processing;
 
 fn main() {
     let mut app = App::new();
-    app.add_plugins(DefaultPlugins)
-        .add_plugin(post_processing::PostProcessingPlugin)
-        .add_startup_system(setup)
-        .add_system(main_camera_cube_rotator_system);
+    app.insert_resource(AssetServerSettings {
+        watch_for_changes: true,
+        ..default()
+    })
+    .add_plugins(DefaultPlugins)
+    .add_plugin(ShaderUtilsPlugin)
+    .add_plugin(post_processing::PostProcessingPlugin)
+    .add_startup_system(setup)
+    .add_system(main_camera_cube_rotator_system);
 
     app.run();
 }

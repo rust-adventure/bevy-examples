@@ -88,8 +88,7 @@ fn update_material(
         let mut mat = materials.get_mut(handle).unwrap();
 
         mat.offset_r = Vec2::new(
-            -0.01f32
-                * time.seconds_since_startup().sin() as f32,
+            -0.01f32 * time.seconds_since_startup() as f32,
             0f32,
         );
         mat.offset_g = Vec2::new(
@@ -119,6 +118,7 @@ fn setup_new_post_processing_cameras(
         (Entity, &mut Camera),
         Added<PostProcessingCamera>,
     >,
+    asset_server: Res<AssetServer>,
 ) {
     for (entity, mut camera) in &mut cameras {
         let original_target = camera.target.clone();
@@ -213,7 +213,9 @@ fn setup_new_post_processing_cameras(
         // This material has the texture that has been rendered.
         let material_handle = post_processing_materials
             .add(PostProcessingMaterial {
-                source_image: image_handle.clone(),
+                // source_image: image_handle.clone(),
+                source_image: asset_server
+                    .load("textures/uvchecker.png"),
                 offset_r: Vec2::new(0.1f32, 0.1f32),
                 offset_g: Vec2::new(0.1f32, -0.1f32),
                 offset_b: Vec2::new(-0.1f32, -0.1f32),
@@ -285,9 +287,12 @@ struct PostProcessingMaterial {
 }
 
 impl Material2d for PostProcessingMaterial {
+    // fn fragment_shader() -> ShaderRef {
+    //     "shaders/custom_material_chromatic_aberration.wgsl"
+    //         .into()
+    // }
     fn fragment_shader() -> ShaderRef {
-        "shaders/custom_material_chromatic_aberration.wgsl"
-            .into()
+        "shaders/tunnel.wgsl".into()
     }
     fn vertex_shader() -> ShaderRef {
         "shaders/screen_vertex.wgsl".into()
