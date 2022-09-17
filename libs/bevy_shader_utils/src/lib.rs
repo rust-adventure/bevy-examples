@@ -12,8 +12,10 @@ pub const SIMPLEX_NOISE_2D: &str =
 pub const SIMPLEX_NOISE_3D: &str =
     include_str!("../shaders/simplex_noise_3d.wgsl");
 pub const FBM: &str = include_str!("../shaders/fbm.wgsl");
-pub const VORO_NOISE_2D: &str =
-    include_str!("../shaders/voro_noise_2d.wgsl");
+pub const VORONOISE: &str =
+    include_str!("../shaders/voronoise.wgsl");
+// pub const WORLEY_NOISE_3D: &str =
+//     include_str!("../shaders/worley_noise_3d.wgsl");
 // other utility functions
 pub const MOCK_FRESNEL: &str =
     include_str!("../shaders/mock_fresnel.wgsl");
@@ -30,7 +32,7 @@ struct ShaderUtils {
     simplex_noise_2d: HandleId,
     simplex_noise_3d: HandleId,
     fbm: HandleId,
-    voro_noise_2d: HandleId,
+    voronoise: HandleId,
     mock_fresnel: HandleId,
 }
 
@@ -62,10 +64,10 @@ impl FromWorld for ShaderUtils {
                 SIMPLEX_NOISE_3D,
             ),
             fbm: load_shader(&mut shaders, "fbm", FBM),
-            voro_noise_2d: load_shader(
+            voronoise: load_shader(
                 &mut shaders,
-                "voro_noise_2d",
-                VORO_NOISE_2D,
+                "voronoise",
+                VORONOISE,
             ),
             mock_fresnel: load_shader(
                 &mut shaders,
