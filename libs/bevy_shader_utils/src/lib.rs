@@ -14,8 +14,6 @@ pub const SIMPLEX_NOISE_3D: &str =
 pub const FBM: &str = include_str!("../shaders/fbm.wgsl");
 pub const VORONOISE: &str =
     include_str!("../shaders/voronoise.wgsl");
-// pub const WORLEY_NOISE_3D: &str =
-//     include_str!("../shaders/worley_noise_3d.wgsl");
 // other utility functions
 pub const MOCK_FRESNEL: &str =
     include_str!("../shaders/mock_fresnel.wgsl");
@@ -26,6 +24,8 @@ impl Plugin for ShaderUtilsPlugin {
         app.init_resource::<ShaderUtils>();
     }
 }
+
+#[allow(dead_code)]
 struct ShaderUtils {
     perlin_noise_2d: HandleId,
     perlin_noise_3d: HandleId,

@@ -36,7 +36,6 @@ fn setup(
     mut materials: ResMut<Assets<CustomMaterial>>,
     time: Res<Time>,
 ) {
-    // Build a default quad mesh
     let mesh = Mesh::from(shape::Quad::default());
 
     // Spawn camera
@@ -79,8 +78,8 @@ impl Material2d for CustomMaterial {
 
     fn specialize(
         descriptor: &mut RenderPipelineDescriptor,
-        layout: &MeshVertexBufferLayout,
-        key: Material2dKey<Self>,
+        _layout: &MeshVertexBufferLayout,
+        _key: Material2dKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         descriptor
             .vertex
