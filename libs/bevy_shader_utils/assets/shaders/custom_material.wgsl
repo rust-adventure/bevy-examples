@@ -73,7 +73,10 @@ fn fragment(
 
     var p: vec2<f32> = 0.5 - 0.5*cos( material.time + vec2(1.0,0.5) );
     p.y = 0.0;
-    // var p = vec2(0.5,0.0);
+    // var p = vec2(0.0,0.0);
+    // var p = vec2(1.0,0.0);
+    // var p = vec2(0.0,1.0);
+    // var p = vec2(1.0,1.0);
 
     let f: f32 = voronoise(50.0 * (in.uv + material.time / 10.0), p.x, p.y);
 

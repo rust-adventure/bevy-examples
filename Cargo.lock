@@ -749,8 +749,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_shader_utils"
+name = "bevy_shader_floor"
 version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
+name = "bevy_shader_utils"
+version = "0.3.0"
 dependencies = [
  "bevy",
 ]
@@ -2902,6 +2909,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "postprocessing-pr-5902"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "pp-rs"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3296,6 +3311,14 @@ checksum = "246bfa38fe3db3f1dfc8ca5a2cdeb7348c78be2112740cc0ec8ef18b6d94f830"
 dependencies = [
  "bitflags",
  "num-traits",
+]
+
+[[package]]
+name = "splitscreen-voronoi"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "noise",
 ]
 
 [[package]]

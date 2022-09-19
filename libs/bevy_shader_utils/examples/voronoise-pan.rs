@@ -2,6 +2,7 @@
 //! Adds a texture and colored vertices, giving per-vertex tinting.
 
 use bevy::{
+    asset::AssetServerSettings,
     prelude::*,
     reflect::TypeUuid,
     render::{
@@ -20,6 +21,10 @@ use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
+        .insert_resource(AssetServerSettings {
+            watch_for_changes: true,
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
@@ -47,7 +52,7 @@ fn setup(
         transform: Transform::from_translation(Vec3::new(
             0., 0., 0.,
         ))
-        .with_scale(Vec3::splat(1024.)),
+        .with_scale(Vec3::splat(4024.)),
         material: materials.add(CustomMaterial {
             color: Color::RED,
             time: time.seconds_since_startup() as f32,
