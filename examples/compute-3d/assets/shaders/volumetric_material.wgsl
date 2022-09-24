@@ -82,8 +82,8 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     out.vertex_position = vertex.position;
     out.view_position = view.inverse_view * out.world_position;
 
-    out.cheating_lower_bound = view.inverse_view * vec4(-0.5, -0.5, -0.5, 1.0);
-    out.cheating_upper_bound = view.inverse_view * vec4(0.5, 0.5, 0.5, 1.0);
+    out.cheating_lower_bound = vec4(-0.5, -0.5, -0.5, 1.0);
+    out.cheating_upper_bound = vec4(0.5, 0.5, 0.5, 1.0);
 
     return out;
 }
@@ -149,28 +149,32 @@ fn sample_density(position: vec3<f32>) -> f32 {
 fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     // 0,0.1,0.2, etc
     // let tenths = fract(round(time.time_since_startup * 100.0) / 100.0);
-    let ray_dir = normalize(in.view_position);
+    let ray_direction = normalize(in.view_position);
+    let ray_start_position = view.world_position; // world space camera position
     let ray_box_info = ray_box_dst(
         in.cheating_lower_bound.xyz,
         in.cheating_upper_bound.xyz,
-        vec3(0.0,0.0,0.0),
-        ray_dir.xyz,
+        ray_start_position,
+        in.world_position.xyz,
+        // -ray_direction.xyz, // pixel position?
     );
 
     let dst_to_box = ray_box_info.x;
-    let dst_inside_box = ray_box_info.y;
+    return vec4(vec3(dst_to_box) , 1.0);
+    // let dst_inside_box = ray_box_info.y;
+    // return vec4(vec3(dst_inside_box), 1.0);
 
-    let ray_hit_box: bool = dst_inside_box > 0.0;
+    // let ray_hit_box: bool = dst_inside_box > 0.0;
     
-    let color = textureSample(
-        fog,
-        fog_sampler,
-        vec3(in.vertex_position.xy + 0.5, (in.vertex_position.z + 0.5)),
-        vec3<i32>(0,0,0)
-    );
+    // let color = textureSample(
+    //     fog,
+    //     fog_sampler,
+    //     vec3(in.vertex_position.xy + 0.5, (in.vertex_position.z + 0.5)),
+    //     vec3<i32>(0,0,0)
+    // );
 
     // if ray_hit_box {
-        return vec4(color.rgb, 1.0);
+        // return vec4(color.rgb, 1.0);
     // } else {
     //     return vec4(1.0,1.0,1.0,1.0);
     // }
