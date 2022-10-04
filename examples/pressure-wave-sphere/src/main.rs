@@ -7,11 +7,10 @@ use bevy::{
             MeshVertexBufferLayout, VertexAttributeValues,
         },
         render_resource::{
-            AsBindGroup, Face, RenderPipelineDescriptor,
+            AsBindGroup, RenderPipelineDescriptor,
             ShaderRef, SpecializedMeshPipelineError,
         },
     },
-    scene::SceneInstance,
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
 
@@ -26,10 +25,6 @@ fn main() {
             MaterialPlugin::<CustomMaterial>::default(),
         )
         .add_startup_system(setup)
-        .add_system(update_time_for_custom_material)
-        // for the time to update in the shader,
-        // this mod_scene must run before we try to update the time
-        // TODO: figure out why in more detail.
         .add_system(mod_scene)
         .run();
 }
@@ -45,30 +40,21 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    commands
-        .spawn_bundle(SceneBundle {
+    commands.spawn((
+        SceneBundle {
             scene: asset_server.load(
                 "hex-sphere-5-subdivisions.glb#Scene0",
             ),
             ..default()
-        })
-        .insert(GLTFScene);
+        },
+        GLTFScene,
+    ));
     // camera
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(-2.0, 2.5, 5.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
-}
-
-fn update_time_for_custom_material(
-    mut materials: ResMut<Assets<CustomMaterial>>,
-    time: Res<Time>,
-) {
-    for material in materials.iter_mut() {
-        material.1.time =
-            time.seconds_since_startup() as f32;
-    }
 }
 
 /// The Material trait is very configurable, but comes with sensible defaults for all methods.
@@ -89,7 +75,7 @@ impl Material for CustomMaterial {
         _pipeline: &MaterialPipeline<Self>,
         descriptor: &mut RenderPipelineDescriptor,
         _layout: &MeshVertexBufferLayout,
-        key: MaterialPipelineKey<Self>,
+        _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         descriptor.primitive.cull_mode = None;
         if let Some(label) = &mut descriptor.label {
@@ -103,8 +89,6 @@ impl Material for CustomMaterial {
 #[derive(AsBindGroup, TypeUuid, Debug, Clone)]
 #[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
 pub struct CustomMaterial {
-    #[uniform(0)]
-    time: f32,
     #[uniform(1)]
     color: Color,
     #[texture(2)]
@@ -121,7 +105,6 @@ fn mod_scene(
     >,
     mut meshes: ResMut<Assets<Mesh>>,
     mut custom_materials: ResMut<Assets<CustomMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
     for sphere in spheres.iter() {
         let mesh = meshes.get_mut(sphere.1).unwrap();
@@ -150,7 +133,6 @@ fn mod_scene(
                 color: Color::BLUE,
                 color_texture: None,
                 alpha_mode: AlphaMode::Blend,
-                time: 0.5,
             });
         commands
             .entity(sphere.0)
