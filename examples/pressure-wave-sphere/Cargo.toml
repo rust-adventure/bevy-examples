@@ -1,5 +1,6 @@
 [dependencies.bevy]
-version = "0.8"
+git = "https://github.com/bevyengine/bevy"
+rev = "8a268129f9efbe0b35a53622e5ff59053ace457f"
 
 [dependencies.bevy_shader_utils]
 path = "../../libs/bevy_shader_utils"
