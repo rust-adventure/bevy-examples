@@ -1,7 +1,3 @@
-[dependencies.bevy]
-git = "https://github.com/bevyengine/bevy"
-rev = "8a268129f9efbe0b35a53622e5ff59053ace457f"
-
 [dependencies.bevy_shader_utils]
 path = "../../libs/bevy_shader_utils"
 
@@ -9,3 +5,6 @@ path = "../../libs/bevy_shader_utils"
 edition = "2021"
 name = "pressure-wave-sphere"
 version = "0.1.0"
+
+[dependencies]
+bevy = "0.9.0"
