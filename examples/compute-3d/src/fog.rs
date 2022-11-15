@@ -13,6 +13,7 @@ use bevy::{
     },
 };
 
+#[derive(Resource)]
 pub struct VolumetricImage(pub Handle<Image>);
 pub struct FogPlugin;
 
@@ -40,8 +41,7 @@ impl Plugin for FogPlugin {
     }
 }
 
-// #[derive(Resource, Default)]
-#[derive(Default)]
+#[derive(Resource, Default)]
 struct ExtractedFog {
     image: Handle<Image>,
 }
@@ -56,7 +56,7 @@ impl ExtractResource for ExtractedFog {
     }
 }
 
-// #[derive(Resource)]
+#[derive(Resource)]
 pub struct FogMeta {
     pub image: Handle<Image>,
     pub bind_group: Option<BindGroup>,

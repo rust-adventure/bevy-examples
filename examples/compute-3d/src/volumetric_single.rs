@@ -194,6 +194,7 @@ fn queue_fog_bind_group(
 
     fog_meta.bind_group = Some(bind_group);
 }
+#[derive(Resource)]
 pub struct VolumetricPipeline {
     shader: Handle<Shader>,
     mesh_pipeline: MeshPipeline,

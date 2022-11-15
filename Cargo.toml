@@ -4,7 +4,7 @@ license = "MIT OR Apache-2.0"
 members = [
   # "examples/*",
   "examples/candy-cane",
-  # "examples/compute-3d",
+  "examples/compute-3d",
   # "examples/compute-with-time",
   # "examples/cube-wave",
   # "examples/dissolve-sphere",

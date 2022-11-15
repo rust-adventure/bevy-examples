@@ -181,6 +181,7 @@ fn queue_time_bind_group(
     time_meta.bind_group = Some(bind_group);
 }
 
+#[derive(Resource)]
 pub struct VolumetricPipeline {
     shader: Handle<Shader>,
     mesh_pipeline: MeshPipeline,

@@ -1049,6 +1049,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "compute-3d"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "1.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
