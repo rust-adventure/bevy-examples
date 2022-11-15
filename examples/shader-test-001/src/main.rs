@@ -7,7 +7,10 @@ use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            watch_for_changes: true,
+            ..default()
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<CustomMaterial>::default(),
@@ -28,7 +31,7 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     // cube
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes
             .add(Mesh::from(shape::Cube { size: 1.0 })),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
@@ -44,7 +47,7 @@ fn setup(
     });
 
     // camera
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(-2.0, 2.5, 5.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
@@ -57,9 +60,7 @@ fn change_color(
 ) {
     for material in materials.iter_mut() {
         material.1.color =
-            if time.seconds_since_startup().floor() % 2.
-                == 0.
-            {
+            if time.elapsed_seconds().floor() % 2. == 0. {
                 Color::BISQUE
             } else {
                 Color::DARK_GRAY

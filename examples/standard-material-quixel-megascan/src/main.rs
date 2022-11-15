@@ -1,4 +1,4 @@
-use bevy::{asset::AssetServerSettings, prelude::*};
+use bevy::prelude::*;
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
@@ -6,7 +6,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("071f3c").unwrap(),
         ))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            watch_for_changes: true,
+            ..default()
+        }))
         .add_startup_system(setup)
         .add_system(change_color)
         .add_system(animate_light_direction)
@@ -33,7 +36,7 @@ fn setup(
     let id: Handle<bevy::prelude::Image> = asset_server
         .load("concrete/sekjcawb_2K_Roughness.jpg");
 
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(Mesh::from(shape::UVSphere {
             radius: 1.0,
             ..default()
@@ -64,13 +67,14 @@ fn setup(
     // .insert(Cube { id: normal_map_id });
 
     // camera
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0)
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        })
-        .insert(Movable);
+        },
+        Movable,
+    ));
     // // ground plane
     // commands.spawn_bundle(PbrBundle {
     //     mesh: meshes
@@ -185,7 +189,7 @@ fn setup(
 
     // directional 'sun' light
     const HALF_SIZE: f32 = 20.0;
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             // Configure the projection to better fit the scene
             shadow_projection: OrthographicProjection {

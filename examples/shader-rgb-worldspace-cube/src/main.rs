@@ -10,7 +10,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("071f3c").unwrap(),
         ))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            watch_for_changes: true,
+            ..default()
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<CustomMaterial>::default(),
@@ -32,9 +35,8 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     // cube
-    commands
-        .spawn()
-        .insert_bundle(MaterialMeshBundle {
+    commands.spawn((
+        MaterialMeshBundle {
             mesh: meshes
                 .add(Mesh::from(shape::Cube { size: 1.0 })),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
@@ -43,11 +45,12 @@ fn setup(
                 alpha_mode: AlphaMode::Blend,
             }),
             ..default()
-        })
-        .insert(Movable);
+        },
+        Movable,
+    ));
 
     // camera
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(-2.0, 2.5, 5.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
@@ -59,8 +62,7 @@ fn change_color(
     time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
-        material.1.time =
-            time.seconds_since_startup() as f32;
+        material.1.time = time.elapsed_seconds();
     }
 }
 
