@@ -2,7 +2,7 @@ use bevy::asset::Handle;
 use bevy::math::Vec4;
 use bevy::pbr::{
     AlphaMode, Material, MaterialPipeline,
-    MaterialPipelineKey, PBR_SHADER_HANDLE,
+    MaterialPipelineKey,
 };
 use bevy::reflect::TypeUuid;
 use bevy::render::{

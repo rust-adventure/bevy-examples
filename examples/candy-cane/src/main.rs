@@ -31,14 +31,7 @@ fn setup(
     mut custom_materials: ResMut<
         Assets<candy_cane::StandardMaterial>,
     >,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
-    // let mut mesh = Mesh::from(shape::UVSphere {
-    //     radius: 1.0,
-    //     ..default()
-    // });
-    // let mut mesh = Mesh::from(shape::Cube { size: 1.0 });
     let mut mesh = Mesh::from(shape::Capsule {
         radius: 1.0,
         depth: 10.0,
@@ -232,18 +225,6 @@ fn setup(
         },
         ..default()
     });
-}
-
-fn animate_light_direction(
-    time: Res<Time>,
-    mut query: Query<
-        &mut Transform,
-        With<DirectionalLight>,
-    >,
-) {
-    for mut transform in query.iter_mut() {
-        transform.rotate_y(time.delta_seconds() * 0.5);
-    }
 }
 
 fn change_color(
