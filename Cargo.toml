@@ -6,7 +6,7 @@ members = [
   "examples/candy-cane",
   "examples/compute-3d",
   "examples/compute-with-time",
-  # "examples/cube-wave",
+  "examples/cube-wave",
   # "examples/dissolve-sphere",
   # "examples/dissolve-sphere-standard-material-extensions",
   # "examples/fresnel-effect",

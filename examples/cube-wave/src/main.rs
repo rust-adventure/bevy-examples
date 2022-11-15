@@ -1,5 +1,4 @@
 use bevy::{
-    asset::AssetServerSettings,
     pbr::{
         MaterialPipeline, MaterialPipelineKey,
         NotShadowCaster,
@@ -28,11 +27,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("e3eefc").unwrap(),
         ))
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<CustomMaterial>::default(),
@@ -48,9 +46,7 @@ fn main() {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
     mut custom_materials: ResMut<Assets<CustomMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
     // ambient light
     commands.insert_resource(AmbientLight {
@@ -58,7 +54,7 @@ fn setup(
         brightness: 0.02,
     });
     const HALF_SIZE: f32 = 10.0;
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             // Configure the projection to better fit the scene
             shadow_projection: OrthographicProjection {
@@ -122,13 +118,8 @@ fn setup(
                     .abs(),
                 color: Color::rgb(0.92, 0.90, 0.73),
             });
-        println!(
-            "{} {}",
-            cube_size * x as f32 - num_squares as f32 / 2.0,
-            cube_size * z as f32 - num_squares as f32 / 2.0
-        );
         commands
-            .spawn_bundle(MaterialMeshBundle {
+            .spawn(MaterialMeshBundle {
                 mesh: mesh_handle.clone(),
                 material: material.clone(),
                 transform: Transform::from_xyz(
@@ -140,27 +131,17 @@ fn setup(
                         - num_squares as f32 * cube_size
                             / 2.0,
                 ),
-                // visibility: Visibility::visible(),
                 ..default()
             })
             .insert(NotShadowCaster);
     }
 
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(2.0, 2.0, 2.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
         projection: Projection::Orthographic(
             OrthographicProjection {
-                // left: -num_squares as f32,
-                // right: num_squares as f32,
-                // bottom: 0.0,
-                // top: 20.0,
-                // near: todo!(),
-                // far: todo!(),
-                // window_origin: todo!(),
-                // scaling_mode: todo!(),
                 scale: 0.008,
-                // depth_calculation: todo!(),
                 ..Default::default()
             },
         ),
@@ -185,8 +166,7 @@ fn update_time_for_custom_material(
     time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
-        material.1.time =
-            time.seconds_since_startup() as f32;
+        material.1.time = time.elapsed_seconds();
     }
 }
 
@@ -216,7 +196,7 @@ impl Material for CustomMaterial {
         _pipeline: &MaterialPipeline<Self>,
         descriptor: &mut RenderPipelineDescriptor,
         _layout: &MeshVertexBufferLayout,
-        key: MaterialPipelineKey<Self>,
+        _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         // descriptor.primitive.cull_mode = None;
         if let Some(label) = &mut descriptor.label {
@@ -239,7 +219,7 @@ impl AsBindGroupShaderType<CustomMaterialUniform>
 {
     fn as_bind_group_shader_type(
         &self,
-        images: &RenderAssets<Image>,
+        _images: &RenderAssets<Image>,
     ) -> CustomMaterialUniform {
         CustomMaterialUniform {
             time: self.time,
