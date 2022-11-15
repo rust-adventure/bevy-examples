@@ -1,5 +1,5 @@
-[dependencies.bevy]
-version = "0.8"
+[dependencies]
+bevy = "0.9.0"
 
 [package]
 description = ""
