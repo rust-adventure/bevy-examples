@@ -2733,6 +2733,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pointcloud"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_basic_camera",
+ "bevy_shader_utils",
+ "itertools",
+]
+
+[[package]]
 name = "postprocessing-pr-5902"
 version = "0.1.0"
 dependencies = [

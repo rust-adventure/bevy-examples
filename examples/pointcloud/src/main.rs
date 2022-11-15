@@ -1,5 +1,4 @@
 use bevy::{
-    asset::AssetServerSettings,
     prelude::*,
     reflect::TypeUuid,
     render::{
@@ -20,11 +19,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("590059").unwrap(),
         ))
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(CameraControllerPlugin)
         .add_plugin(
@@ -40,17 +38,18 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ParticlesMaterial>>,
 ) {
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        Camera3dBundle {
             transform: Transform::from_xyz(2.5, 2.5, 2.0)
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        })
-        .insert(CameraController {
+        },
+        CameraController {
             orbit_mode: true,
             orbit_focus: Vec3::new(0.0, 0.5, 0.0),
             ..default()
-        });
+        },
+    ));
 
     let mut particles =
         Mesh::from(Particles { num_particles: 100 });
@@ -75,7 +74,7 @@ fn setup(
         );
     }
 
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(particles),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         material: materials
@@ -155,7 +154,6 @@ fn update_time_for_particles_material(
     time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
-        material.1.time =
-            time.seconds_since_startup() as f32;
+        material.1.time = time.elapsed_seconds() as f32;
     }
 }

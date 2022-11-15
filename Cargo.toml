@@ -10,7 +10,7 @@ members = [
   "examples/dissolve-sphere-standard-material-extensions",
   "examples/fresnel-effect",
   "examples/infinite-tunnel",
-  # "examples/pointcloud",
+  "examples/pointcloud",
   # "examples/pressure-wave-sphere",
   # "examples/rotating-column",
   # "examples/shader-rgb-worldspace-cube",
