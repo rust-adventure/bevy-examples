@@ -1,9 +1,4 @@
-use bevy::{
-    asset::AssetServerSettings,
-    prelude::*,
-    render::{primitives::Aabb, render_resource::*},
-    window::WindowDescriptor,
-};
+use bevy::{prelude::*, render::render_resource::*};
 mod bevy_basic_camera;
 use bevy_basic_camera::{
     CameraController, CameraControllerPlugin,
@@ -19,26 +14,16 @@ use compute_3d::{
     volumetric_single::{
         VolumetricMaterial, VolumetricMaterialPlugin,
     },
-    // volumetric::{
-    //     VolumetricMaterial, VolumetricMaterialPlugin,
-    // },
 };
 use std::borrow::Cow;
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::DARK_GRAY))
-        .insert_resource(WindowDescriptor {
-            // uncomment for unthrottled FPS
-            // present_mode:
-            // bevy::window::PresentMode::AutoNoVsync,
-            ..default()
-        })
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .init_resource::<FogImageSetup>()
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(GpuTimePlugin)
@@ -51,6 +36,7 @@ fn main() {
         .run();
 }
 
+#[derive(Resource)]
 struct FogImageSetup;
 impl FromWorld for FogImageSetup {
     fn from_world(world: &mut World) -> Self {
@@ -99,7 +85,7 @@ fn setup(
     let mesh = Mesh::from(shape::Cube { size: 1.0 });
     let aabb = mesh.compute_aabb().unwrap();
     info!(?aabb, "we're cheating. Make sure shader bounding box matches");
-    commands.spawn_bundle((
+    commands.spawn((
         meshes.add(mesh),
         Transform::from_xyz(0.0, 0.0, 0.0),
         VolumetricMaterial {
@@ -112,17 +98,18 @@ fn setup(
     ));
 
     // camera
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        Camera3dBundle {
             transform: Transform::from_xyz(-20.0, 2.5, 5.0)
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        })
-        .insert(CameraController {
+        },
+        CameraController {
             orbit_mode: true,
             orbit_focus: Vec3::new(0.0, 0.5, 0.0),
             ..default()
-        });
+        },
+    ));
 }
 
 #[derive(Component)]

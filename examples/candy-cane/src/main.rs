@@ -1,9 +1,5 @@
 use bevy::{
-    asset::AssetServerSettings,
-    prelude::*,
-    render::{
-        mesh::VertexAttributeValues, render_resource::Face,
-    },
+    prelude::*, render::mesh::VertexAttributeValues,
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
 use candy_cane::Stripe;
@@ -13,11 +9,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("66b1c3").unwrap(),
         ))
-        // .insert_resource(AssetServerSettings {
-        //     watch_for_changes: true,
-        //     ..default()
-        // })
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            watch_for_changes: true,
+            ..default()
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(MaterialPlugin::<
             candy_cane::StandardMaterial,
@@ -36,14 +31,7 @@ fn setup(
     mut custom_materials: ResMut<
         Assets<candy_cane::StandardMaterial>,
     >,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
-    // let mut mesh = Mesh::from(shape::UVSphere {
-    //     radius: 1.0,
-    //     ..default()
-    // });
-    // let mut mesh = Mesh::from(shape::Cube { size: 1.0 });
     let mut mesh = Mesh::from(shape::Capsule {
         radius: 1.0,
         depth: 10.0,
@@ -70,7 +58,7 @@ fn setup(
         );
     }
 
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(mesh.clone()),
         transform: Transform::from_xyz(-5.0, 0.5, 0.0),
         material: custom_materials.add(
@@ -94,7 +82,7 @@ fn setup(
         ..default()
     });
 
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(mesh.clone()),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         material: custom_materials.add(
@@ -143,7 +131,7 @@ fn setup(
         // }),
         ..default()
     });
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(mesh.clone()),
         transform: Transform::from_xyz(5.0, 0.5, 0.0),
         material: custom_materials.add(
@@ -194,15 +182,16 @@ fn setup(
         ..default()
     });
     // camera
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        Camera3dBundle {
             transform: Transform::from_xyz(
                 -2.0, 10.0, 15.0,
             )
             .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        })
-        .insert(Movable);
+        },
+        Movable,
+    ));
 
     // ambient light
     commands.insert_resource(AmbientLight {
@@ -212,7 +201,7 @@ fn setup(
 
     // directional 'sun' light
     const HALF_SIZE: f32 = 10.0;
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             // Configure the projection to better fit the scene
             shadow_projection: OrthographicProjection {
@@ -238,18 +227,6 @@ fn setup(
     });
 }
 
-fn animate_light_direction(
-    time: Res<Time>,
-    mut query: Query<
-        &mut Transform,
-        With<DirectionalLight>,
-    >,
-) {
-    for mut transform in query.iter_mut() {
-        transform.rotate_y(time.delta_seconds() * 0.5);
-    }
-}
-
 fn change_color(
     mut materials: ResMut<
         Assets<candy_cane::StandardMaterial>,
@@ -257,9 +234,7 @@ fn change_color(
     time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
-        // material.1.base_color = Color::rgb(0.4,0.4,0.4);
-        material.1.time =
-            time.seconds_since_startup() as f32;
+        material.1.time = time.elapsed_seconds();
     }
 }
 

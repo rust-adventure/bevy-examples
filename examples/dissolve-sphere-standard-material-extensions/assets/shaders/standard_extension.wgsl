@@ -154,9 +154,9 @@ fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
 
         pbr_input.is_orthographic = view.projection[3].w == 1.0;
 
-        pbr_input.N = prepare_normal(
+        pbr_input.N = apply_normal_mapping(
             material.flags,
-            in.world_normal,
+            pbr_input.world_normal,
 #ifdef VERTEX_TANGENTS
 #ifdef STANDARDMATERIAL_NORMAL_MAP
             in.world_tangent,
@@ -165,7 +165,6 @@ fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
 #ifdef VERTEX_UVS
             in.uv,
 #endif
-            in.is_front,
         );
         pbr_input.V = calculate_view(in.world_position, pbr_input.is_orthographic);
 

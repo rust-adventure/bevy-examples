@@ -5,27 +5,6 @@
 #import bevy_shader_utils::simplex_noise_2d
 #import bevy_pbr::utils
 
-struct CustomMaterial {
-    time: f32,
-    // color: vec4<f32>,
-    // base_color: vec4<f32>;
-    // emissive: vec4<f32>;
-    // perceptual_roughness: f32;
-    // metallic: f32;
-    // reflectance: f32;
-    // // 'flags' is a bit field indicating various options. u32 is 32 bits so we have up to 32 options.
-    // flags: u32;
-    // alpha_cutoff: f32;
-};
-
-@group(1) @binding(0)
-var<uniform> material: CustomMaterial;
-
-// @group(1) @binding(3)
-// var base_color_texture: texture_2d<f32>;
-// @group(1) @binding(4)
-// var base_color_sampler: sampler;
-
 struct Vertex {
     @location(0) position: vec3<f32>,
     @location(1) normal: vec3<f32>,
@@ -66,10 +45,8 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     // higher is shorter
     let how_long_to_stay_in_opposite_state = 30.0;
     let frequency = 2.0;
-    // let position_diff = pow(sin(2.0 * material.time), 1.0);
-    let position_diff = 1.0 - pow(thickness * sin(frequency * material.time + vertex.position.y + vertex.position.z), how_long_to_stay_in_opposite_state);
+    let position_diff = 1.0 - pow(thickness * sin(frequency * globals.time + vertex.position.y + vertex.position.z), how_long_to_stay_in_opposite_state);
 
-    // let smooth_diff = smoothstep(0.0, 1.0, position_diff);
     let position = (vertex.normal * (smoothstep(0.0, 1.0, position_diff)) * 0.02) + vertex.position;
 
     var out: VertexOutput;
@@ -96,7 +73,5 @@ fn vertex(vertex: Vertex) -> VertexOutput {
 
     out.color = out.clip_position;
 
-    // out.view_position = view.inverse_view * out.world_position;
-    // out.view_position = view.inverse_view_proj * out.clip_position;
     return out;
 }

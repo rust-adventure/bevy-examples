@@ -15,9 +15,6 @@ use bevy::{
         extract_component::{
             ExtractComponent, ExtractComponentPlugin,
         },
-        extract_resource::{
-            ExtractResource, ExtractResourcePlugin,
-        },
         mesh::MeshVertexBufferLayout,
         render_asset::RenderAssets,
         render_phase::{
@@ -194,6 +191,7 @@ fn queue_fog_bind_group(
 
     fog_meta.bind_group = Some(bind_group);
 }
+#[derive(Resource)]
 pub struct VolumetricPipeline {
     shader: Handle<Shader>,
     mesh_pipeline: MeshPipeline,

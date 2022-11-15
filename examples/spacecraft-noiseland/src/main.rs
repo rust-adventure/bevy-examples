@@ -2,9 +2,7 @@
 
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
-    pbr::wireframe::{
-        Wireframe, WireframeConfig, WireframePlugin,
-    },
+    pbr::wireframe::WireframePlugin,
     prelude::*,
     reflect::TypeUuid,
     render::{
@@ -22,7 +20,6 @@ use bevy::{
             TextureFormat, TextureUsages, WgpuFeatures,
         },
         settings::WgpuSettings,
-        view::ViewDepthTexture,
     },
     sprite::{
         Material2d, Material2dPlugin, MaterialMesh2dBundle,
@@ -31,6 +28,9 @@ use bevy::{
 use bevy_shader_utils::ShaderUtilsPlugin;
 use itertools::Itertools;
 use noise::{BasicMulti, NoiseFn};
+
+#[derive(Resource)]
+struct MyNoise(BasicMulti);
 
 fn main() {
     App::new()
@@ -48,8 +48,11 @@ fn main() {
             features: WgpuFeatures::POLYGON_MODE_LINE,
             ..default()
         })
-        .insert_resource(BasicMulti::new())
-        .add_plugins(DefaultPlugins)
+        .insert_resource(MyNoise(BasicMulti::new()))
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            watch_for_changes: true,
+            ..default()
+        }))
         .add_plugin(WireframePlugin)
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(Material2dPlugin::<
@@ -112,7 +115,7 @@ fn setup(
     let image_handle = images.add(image);
 
     // commands
-    //     .spawn_bundle(Camera3dBundle {
+    //     .spawn(Camera3dBundle {
     //         transform: Transform::from_xyz(0.0, 1.5, 2.0)
     //             .looking_at(
     //                 Vec3::new(0.0, 1.5, 0.0),
@@ -122,7 +125,7 @@ fn setup(
     //     })
     //     .insert(Movable);
     commands
-        .spawn_bundle(Camera3dBundle {
+        .spawn(Camera3dBundle {
             camera_3d: Camera3d {
                 clear_color: ClearColorConfig::Custom(
                     Color::WHITE,
@@ -165,7 +168,7 @@ fn setup(
     );
 
     const HALF_SIZE: f32 = 1.0;
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             shadow_projection: OrthographicProjection {
                 left: -HALF_SIZE,
@@ -208,7 +211,7 @@ fn setup(
         );
     }
 
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(land),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         material: materials.add(LandMaterial {
@@ -225,8 +228,8 @@ fn setup(
     });
     // .insert(Wireframe);
 
-    commands
-        .spawn_bundle(SceneBundle {
+    commands.spawn((
+        SceneBundle {
             scene: asset_server
                 .load("craft/craft_miner.glb#Scene0"),
             transform: Transform::from_xyz(
@@ -238,13 +241,14 @@ fn setup(
             // scene: asset_server
             //     .load("racecar/raceCarGreen.glb/#Scene0"),
             ..default()
-        })
-        .insert(Ship)
-        .insert(Movable);
+        },
+        Ship,
+        Movable,
+    ));
 
     // Post processing 2d quad, with material using the render texture done by the main camera, with a custom shader.
-    commands
-        .spawn_bundle(MaterialMesh2dBundle {
+    commands.spawn((
+        MaterialMesh2dBundle {
             mesh: quad_handle.into(),
             material: material_handle,
             transform: Transform {
@@ -252,20 +256,22 @@ fn setup(
                 ..default()
             },
             ..default()
-        })
-        .insert(post_processing_pass_layer);
+        },
+        post_processing_pass_layer,
+    ));
 
     // The post-processing pass camera.
-    commands
-        .spawn_bundle(Camera2dBundle {
+    commands.spawn((
+        Camera2dBundle {
             camera: Camera {
                 // renders after the first main camera which has default value: 0.
                 priority: 1,
                 ..default()
             },
             ..Camera2dBundle::default()
-        })
-        .insert(post_processing_pass_layer);
+        },
+        post_processing_pass_layer,
+    ));
 }
 
 fn animate_light_direction(
@@ -279,7 +285,7 @@ fn animate_light_direction(
         transform.rotation = Quat::from_euler(
             EulerRot::ZYX,
             0.0,
-            time.seconds_since_startup() as f32
+            time.elapsed_seconds() as f32
                 * std::f32::consts::TAU
                 / 10.0,
             -std::f32::consts::FRAC_PI_4,
@@ -292,27 +298,26 @@ fn update_time_uniform(
     time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
-        material.1.time =
-            time.seconds_since_startup() as f32;
+        material.1.time = time.elapsed_seconds() as f32;
     }
 }
 
 fn change_position(
     mut materials: ResMut<Assets<LandMaterial>>,
     mut ship: Query<&mut Transform, With<Ship>>,
-    noise: Res<BasicMulti>,
+    noise: Res<MyNoise>,
     time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
         let mut ship = ship.single_mut();
         material.1.ship_position = ship.translation;
-        let new_x = noise.get([
+        let new_x = noise.0.get([
             ship.translation.z as f64 * 0.02,
-            time.seconds_since_startup() * 0.02,
+            time.elapsed_seconds_f64() * 0.02,
         ]);
-        let new_y = noise.get([
+        let new_y = noise.0.get([
             ship.translation.z as f64 * 0.2,
-            time.seconds_since_startup() * 0.2,
+            time.elapsed_seconds_f64() * 0.2,
         ]);
         ship.translation.x = new_x as f32;
         ship.translation.y = new_y as f32 * 0.2 + 1.0;

@@ -1,4 +1,4 @@
-use crate::{fog::VolumetricImage, time::TimeMeta};
+use crate::time::TimeMeta;
 use bevy::{
     prelude::*,
     render::{
@@ -51,12 +51,10 @@ impl Plugin for CloudGeneratorComputePlugin {
 }
 
 // Resource is opt-in in main branch
-// #[derive(Resource, Clone, Deref,
-// ExtractResource)]
-#[derive(Clone, Deref, ExtractResource)]
+#[derive(Resource, Clone, Deref, ExtractResource)]
 pub struct CloudGeneratorImage(pub Handle<Image>);
 
-// #[derive(Resource)]
+#[derive(Resource)]
 struct CloudGeneratorImageBindGroup(BindGroup);
 
 fn queue_bind_group(
@@ -94,7 +92,7 @@ fn queue_bind_group(
     ));
 }
 
-// #[derive(Resource)]
+#[derive(Resource)]
 pub struct CloudGeneratorPipeline {
     texture_bind_group_layout: BindGroupLayout,
     init_pipeline: CachedComputePipelineId,

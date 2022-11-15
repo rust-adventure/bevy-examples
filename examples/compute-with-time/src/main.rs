@@ -4,7 +4,6 @@
 //! is rendered to the screen.
 
 use bevy::{
-    asset::AssetServerSettings,
     prelude::*,
     render::{
         extract_resource::{
@@ -30,16 +29,10 @@ const WORKGROUP_SIZE: u32 = 8;
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
-        .insert_resource(WindowDescriptor {
-            // uncomment for unthrottled FPS
-            // present_mode: bevy::window::PresentMode::AutoNoVsync,
-            ..default()
-        })
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(GameOfLifeComputePlugin)
         .add_startup_system(setup)
@@ -65,7 +58,7 @@ fn setup(
         | TextureUsages::TEXTURE_BINDING;
     let image = images.add(image);
 
-    commands.spawn_bundle(SpriteBundle {
+    commands.spawn(SpriteBundle {
         sprite: Sprite {
             custom_size: Some(Vec2::new(
                 SIZE.0 as f32,
@@ -76,7 +69,7 @@ fn setup(
         texture: image.clone(),
         ..default()
     });
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     commands.insert_resource(GameOfLifeImage(image));
 }
@@ -135,11 +128,10 @@ impl Plugin for GameOfLifeComputePlugin {
 }
 
 // Resource is opt-in in main branch
-// #[derive(Resource, Clone, Deref, ExtractResource)]
-#[derive(Clone, Deref, ExtractResource)]
+#[derive(Resource, Clone, Deref, ExtractResource)]
 struct GameOfLifeImage(Handle<Image>);
 
-// #[derive(Resource)]
+#[derive(Resource)]
 struct GameOfLifeImageBindGroup(BindGroup);
 
 fn queue_bind_group(
@@ -176,7 +168,7 @@ fn queue_bind_group(
     ));
 }
 
-// #[derive(Resource)]
+#[derive(Resource)]
 pub struct GameOfLifePipeline {
     texture_bind_group_layout: BindGroupLayout,
     init_pipeline: CachedComputePipelineId,
@@ -355,8 +347,7 @@ impl render_graph::Node for GameOfLifeNode {
     }
 }
 
-// #[derive(Resource, Default)]
-#[derive(Default)]
+#[derive(Resource, Default)]
 struct ExtractedTime {
     seconds_since_startup: f32,
 }
@@ -366,14 +357,12 @@ impl ExtractResource for ExtractedTime {
 
     fn extract_resource(time: &Self::Source) -> Self {
         ExtractedTime {
-            seconds_since_startup: time
-                .seconds_since_startup()
-                as f32,
+            seconds_since_startup: time.elapsed_seconds(),
         }
     }
 }
 
-// #[derive(Resource)]
+#[derive(Resource)]
 struct TimeMeta {
     buffer: Buffer,
     bind_group: Option<BindGroup>,

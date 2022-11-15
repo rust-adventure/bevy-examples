@@ -1,7 +1,6 @@
 //! A shader and a material that uses it.
 
 use bevy::{
-    asset::AssetServerSettings,
     ecs::system::Command,
     prelude::*,
     reflect::TypeUuid,
@@ -18,11 +17,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("071f3c").unwrap(),
         ))
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugin(CameraControllerPlugin)
         .add_plugin(MaterialPlugin::<
             NormalVisualizerMaterial,
@@ -74,21 +72,22 @@ fn setup(
     }
 
     // camera
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        Camera3dBundle {
             transform: Transform::from_xyz(0.0, 0.0, 15.0)
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        })
-        .insert(CameraController {
+        },
+        CameraController {
             orbit_mode: true,
             orbit_focus: Vec3::new(0.0, 0.5, 0.0),
             ..default()
-        });
+        },
+    ));
 
     // directional 'sun' light
     const HALF_SIZE: f32 = 10.0;
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             // Configure the projection to better fit the scene
             shadow_projection: OrthographicProjection {
@@ -181,50 +180,48 @@ impl Command for SpawnSphere {
         };
 
         // Sphere
-        world
-            .spawn()
-            .insert_bundle(MaterialMeshBundle {
-                mesh: sphere,
-                transform: self.transform,
-                material: self.material,
-                ..default()
-            });
-            // .with_children(|builder| {
-            //     // X
-            //     builder.spawn().insert_bundle(
-            //         MaterialMeshBundle {
-            //             mesh: cube.clone(),
-            //             transform: Transform::from_xyz(
-            //                 2.0, 0.0, 0.0,
-            //             ),
-            //             material: red,
-            //             ..default()
-            //         },
-            //     );
+        world.spawn(MaterialMeshBundle {
+            mesh: sphere,
+            transform: self.transform,
+            material: self.material,
+            ..default()
+        });
+        // .with_children(|builder| {
+        //     // X
+        //     builder.spawn().insert_bundle(
+        //         MaterialMeshBundle {
+        //             mesh: cube.clone(),
+        //             transform: Transform::from_xyz(
+        //                 2.0, 0.0, 0.0,
+        //             ),
+        //             material: red,
+        //             ..default()
+        //         },
+        //     );
 
-            //     // Y
-            //     builder.spawn().insert_bundle(
-            //         MaterialMeshBundle {
-            //             mesh: cube.clone(),
-            //             transform: Transform::from_xyz(
-            //                 0.0, 2.0, 0.0,
-            //             ),
-            //             material: green,
-            //             ..default()
-            //         },
-            //     );
+        //     // Y
+        //     builder.spawn().insert_bundle(
+        //         MaterialMeshBundle {
+        //             mesh: cube.clone(),
+        //             transform: Transform::from_xyz(
+        //                 0.0, 2.0, 0.0,
+        //             ),
+        //             material: green,
+        //             ..default()
+        //         },
+        //     );
 
-            //     // Z
-            //     builder.spawn().insert_bundle(
-            //         MaterialMeshBundle {
-            //             mesh: cube,
-            //             transform: Transform::from_xyz(
-            //                 0.0, 0.0, 2.0,
-            //             ),
-            //             material: blue,
-            //             ..default()
-            //         },
-            //     );
-            // });
+        //     // Z
+        //     builder.spawn().insert_bundle(
+        //         MaterialMeshBundle {
+        //             mesh: cube,
+        //             transform: Transform::from_xyz(
+        //                 0.0, 0.0, 2.0,
+        //             ),
+        //             material: blue,
+        //             ..default()
+        //         },
+        //     );
+        // });
     }
 }

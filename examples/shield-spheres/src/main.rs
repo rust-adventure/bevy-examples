@@ -1,5 +1,4 @@
 use bevy::{
-    asset::AssetServerSettings,
     ecs::system::Command,
     pbr::{
         MaterialPipeline, MaterialPipelineKey,
@@ -26,11 +25,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("071f3c").unwrap(),
         ))
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<CustomMaterial>::default(),

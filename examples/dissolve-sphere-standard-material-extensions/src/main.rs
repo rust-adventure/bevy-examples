@@ -1,9 +1,5 @@
 use bevy::{
-    asset::AssetServerSettings,
-    prelude::*,
-    render::{
-        mesh::VertexAttributeValues, render_resource::Face,
-    },
+    prelude::*, render::mesh::VertexAttributeValues,
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
 
@@ -12,11 +8,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("071f3c").unwrap(),
         ))
-        // .insert_resource(AssetServerSettings {
-        //     watch_for_changes: true,
-        //     ..default()
-        // })
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            watch_for_changes: true,
+            ..default()
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<dissolve_sphere_standard_material_extension::StandardMaterial>::default(),
@@ -65,7 +60,7 @@ fn setup(
         );
     }
 
-    commands.spawn().insert_bundle(MaterialMeshBundle {
+    commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(mesh),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
         material: custom_materials.add(dissolve_sphere_standard_material_extension::StandardMaterial {
@@ -92,14 +87,14 @@ fn setup(
 
     // camera
     commands
-        .spawn_bundle(Camera3dBundle {
+        .spawn(Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0)
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         })
         .insert(Movable);
     // ground plane
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes
             .add(Mesh::from(shape::Plane { size: 10.0 })),
         material: materials.add(StandardMaterial {
@@ -112,7 +107,7 @@ fn setup(
     // left wall
     let mut transform = Transform::from_xyz(2.5, 2.5, 0.0);
     transform.rotate_z(std::f32::consts::FRAC_PI_2);
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Box::new(
             5.0, 0.15, 5.0,
         ))),
@@ -127,7 +122,7 @@ fn setup(
     // // back (right) wall
     let mut transform = Transform::from_xyz(0.0, 2.5, -2.5);
     transform.rotate_x(std::f32::consts::FRAC_PI_2);
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Box::new(
             5.0, 0.15, 5.0,
         ))),
@@ -148,7 +143,7 @@ fn setup(
 
     // red point light
     commands
-        .spawn_bundle(PointLightBundle {
+        .spawn(PointLightBundle {
             // transform: Transform::from_xyz(5.0, 8.0, 2.0),
             transform: Transform::from_xyz(1.0, 2.0, 0.0),
             point_light: PointLight {
@@ -160,7 +155,7 @@ fn setup(
             ..default()
         })
         .with_children(|builder| {
-            builder.spawn_bundle(PbrBundle {
+            builder.spawn(PbrBundle {
                 mesh: meshes.add(Mesh::from(
                     shape::UVSphere {
                         radius: 0.1,
@@ -180,7 +175,7 @@ fn setup(
 
     // blue point light
     commands
-        .spawn_bundle(PointLightBundle {
+        .spawn(PointLightBundle {
             // transform: Transform::from_xyz(5.0, 8.0, 2.0),
             transform: Transform::from_xyz(0.0, 4.0, 0.0),
             point_light: PointLight {
@@ -192,7 +187,7 @@ fn setup(
             ..default()
         })
         .with_children(|builder| {
-            builder.spawn_bundle(PbrBundle {
+            builder.spawn(PbrBundle {
                 mesh: meshes.add(Mesh::from(
                     shape::UVSphere {
                         radius: 0.1,
@@ -212,7 +207,7 @@ fn setup(
 
     // directional 'sun' light
     const HALF_SIZE: f32 = 10.0;
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             // Configure the projection to better fit the scene
             shadow_projection: OrthographicProjection {
@@ -256,8 +251,7 @@ fn change_color(
 ) {
     for material in materials.iter_mut() {
         // material.1.base_color = Color::rgb(0.4,0.4,0.4);
-        material.1.time =
-            time.seconds_since_startup() as f32;
+        material.1.time = time.elapsed_seconds();
     }
 }
 

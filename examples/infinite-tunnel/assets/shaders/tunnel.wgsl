@@ -180,7 +180,7 @@ fn fragment(
     #import bevy_sprite::mesh2d_vertex_output
 ) -> @location(0) vec4<f32> {
     // Get screen position with coordinates from 0 to 1
-    let uv = position.xy / vec2<f32>(view.width, view.height);
+    let uv = position.xy / vec2<f32>(view.viewport.z, view.viewport.w);
     let coord = vec3(uv * 2.0 - 1.0, 0.0);
     let l = length(coord) / 2.0;
     let multiply_add_coord = coord * l + (l + offset_r.x);

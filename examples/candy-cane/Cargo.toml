@@ -2,7 +2,7 @@
 bitflags = "1.3.2"
 
 [dependencies.bevy]
-version = "0.8"
+workspace = true
 features = ["jpeg"]
 
 [dependencies.bevy_shader_utils]
