@@ -4,11 +4,7 @@ use bevy::{
         extract_resource::{
             ExtractResource, ExtractResourcePlugin,
         },
-        render_resource::{
-            BindGroup, Buffer, BufferDescriptor,
-            BufferUsages,
-        },
-        renderer::{RenderDevice, RenderQueue},
+        render_resource::BindGroup,
         RenderApp, RenderStage,
     },
 };

@@ -1,4 +1,4 @@
-use crate::{fog::VolumetricImage, time::TimeMeta};
+use crate::time::TimeMeta;
 use bevy::{
     prelude::*,
     render::{

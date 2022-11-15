@@ -15,9 +15,6 @@ use bevy::{
         extract_component::{
             ExtractComponent, ExtractComponentPlugin,
         },
-        extract_resource::{
-            ExtractResource, ExtractResourcePlugin,
-        },
         mesh::MeshVertexBufferLayout,
         render_asset::RenderAssets,
         render_phase::{
