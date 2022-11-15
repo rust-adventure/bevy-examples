@@ -4,7 +4,6 @@
 //! edge detection, blur, pixelization, vignette... and countless others.
 
 use bevy::{
-    asset::AssetServerSettings,
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
 };
@@ -14,11 +13,10 @@ mod post_processing;
 
 fn main() {
     let mut app = App::new();
-    app.insert_resource(AssetServerSettings {
+    app.add_plugins(DefaultPlugins.set(AssetPlugin {
         watch_for_changes: true,
         ..default()
-    })
-    .add_plugins(DefaultPlugins)
+    }))
     .add_plugin(ShaderUtilsPlugin)
     .add_plugin(post_processing::PostProcessingPlugin)
     .add_startup_system(setup)
@@ -35,10 +33,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
-    asset_server.watch_for_changes().unwrap();
-
     let cube_handle =
         meshes.add(Mesh::from(shape::Cube { size: 4.0 }));
     let cube_material_handle =
@@ -50,20 +45,21 @@ fn setup(
         });
 
     // The cube that will be rendered to the texture.
-    commands
-        .spawn_bundle(PbrBundle {
+    commands.spawn((
+        PbrBundle {
             mesh: cube_handle,
             material: cube_material_handle,
             transform: Transform::from_translation(
                 Vec3::new(0.0, 0.0, 1.0),
             ),
             ..default()
-        })
-        .insert(MainCube);
+        },
+        MainCube,
+    ));
 
     // Light
     // NOTE: Currently lights are ignoring render layers - see https://github.com/bevyengine/bevy/issues/3462
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         transform: Transform::from_translation(Vec3::new(
             0.0, 0.0, 10.0,
         )),
@@ -71,8 +67,8 @@ fn setup(
     });
 
     // Main camera, first to render
-    commands
-        .spawn_bundle(Camera3dBundle {
+    commands.spawn((
+        Camera3dBundle {
             camera_3d: Camera3d {
                 clear_color: ClearColorConfig::Custom(
                     Color::WHITE,
@@ -84,8 +80,9 @@ fn setup(
             )
             .looking_at(Vec3::default(), Vec3::Y),
             ..default()
-        })
-        .insert(PostProcessingCamera);
+        },
+        PostProcessingCamera,
+    ));
 }
 
 /// Rotates the cube rendered by the main camera

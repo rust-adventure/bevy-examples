@@ -2733,6 +2733,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "postprocessing-pr-5902"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "pp-rs"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

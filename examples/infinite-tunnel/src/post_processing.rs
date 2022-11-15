@@ -88,19 +88,16 @@ fn update_material(
         let mut mat = materials.get_mut(handle).unwrap();
 
         mat.offset_r = Vec2::new(
-            -0.01f32 * time.seconds_since_startup() as f32,
+            -0.01f32 * time.elapsed_seconds() as f32,
             0f32,
         );
         mat.offset_g = Vec2::new(
-            0.02f32
-                * time.seconds_since_startup().sin() as f32,
-            0.02f32
-                * time.seconds_since_startup().cos() as f32,
+            0.02f32 * time.elapsed_seconds().sin() as f32,
+            0.02f32 * time.elapsed_seconds().cos() as f32,
         );
         mat.offset_b = Vec2::new(
             0f32,
-            -0.01f32
-                * time.seconds_since_startup().cos() as f32,
+            -0.01f32 * time.elapsed_seconds().cos() as f32,
         );
     }
 }
