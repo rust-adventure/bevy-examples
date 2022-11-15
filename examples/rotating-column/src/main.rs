@@ -1,5 +1,4 @@
 use bevy::{
-    asset::AssetServerSettings,
     pbr::NotShadowCaster,
     prelude::*,
     render::{
@@ -20,11 +19,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("e3eefc").unwrap(),
         ))
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .add_plugin(TweeningPlugin)
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(CubeMaterialPlugin)
@@ -72,7 +70,7 @@ fn setup(
         });
 
         commands
-            .spawn_bundle(MaterialMeshBundle {
+            .spawn(MaterialMeshBundle {
                 mesh: mesh_handle.clone(),
                 material: material.clone(),
                 transform: Transform::from_xyz(
@@ -87,7 +85,7 @@ fn setup(
     }
 
     commands.add(SpawnCube);
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(2.0, 2.0, 2.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
         projection: Projection::Orthographic(

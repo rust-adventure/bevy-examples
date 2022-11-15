@@ -76,8 +76,6 @@ impl Command for SpawnCube {
         let tween = Tween::new(
             // Use a quadratic easing on both endpoints.
             EaseFunction::BounceOut,
-            // Loop animation back and forth.
-            TweeningType::Once,
             // Animation time (one way only; for ping-pong it takes 2 seconds
             // to come back to start).
             Duration::from_secs(2),
@@ -88,13 +86,12 @@ impl Command for SpawnCube {
                 start: Quat::default(),
                 end: Quat::from_rotation_y(FRAC_PI_2),
             },
-        );
+        )
+        .with_repeat_count(RepeatCount::Finite(1));
 
         let tween2 = Tween::new(
             // Use a quadratic easing on both endpoints.
             EaseFunction::BounceOut,
-            // Loop animation back and forth.
-            TweeningType::Once,
             // Animation time (one way only; for ping-pong it takes 2 seconds
             // to come back to start).
             Duration::from_secs(2),
@@ -106,6 +103,7 @@ impl Command for SpawnCube {
                 end: Vec3::ZERO,
             },
         )
+        .with_repeat_count(RepeatCount::Finite(1))
         .with_completed_event(
             TweenEvents::SpawnNewCube as u64,
         );
@@ -113,8 +111,6 @@ impl Command for SpawnCube {
         let tween3 = Tween::new(
             // Use a quadratic easing on both endpoints.
             EaseFunction::QuadraticInOut,
-            // Loop animation back and forth.
-            TweeningType::Once,
             // Animation time (one way only; for ping-pong it takes 2 seconds
             // to come back to start).
             Duration::from_secs(1),
@@ -126,6 +122,7 @@ impl Command for SpawnCube {
                 end: Vec3::new(0.0, -1.0, 0.0),
             },
         )
+        .with_repeat_count(RepeatCount::Finite(1))
         .with_completed_event(
             TweenEvents::DespawnSelf as u64,
         );
@@ -133,25 +130,24 @@ impl Command for SpawnCube {
         let material = custom_materials.add(CubeMaterial {
             color: Color::rgb(0.92, 0.90, 0.73),
         });
-        world
-            .spawn()
-            .insert_bundle(MaterialMeshBundle {
+        world.spawn((
+            MaterialMeshBundle {
                 mesh: mesh_handle.clone(),
                 material: material.clone(),
                 transform: Transform::from_xyz(
                     0.0, 2.0, 0.0,
                 ),
-                // visibility: Visibility::visible(),
                 ..default()
-            })
-            .insert(NotShadowCaster)
-            .insert(Animator::new(Tracks::new([
+            },
+            NotShadowCaster,
+            Animator::new(Tracks::new([
                 Sequence::from_single(tween),
                 tween2
                     .then(Delay::new(
                         Duration::from_millis(200),
                     ))
                     .then(tween3),
-            ])));
+            ])),
+        ));
     }
 }

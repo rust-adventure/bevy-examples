@@ -19,7 +19,10 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("071f3c").unwrap(),
         ))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            watch_for_changes: true,
+            ..default()
+        }))
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<CustomMaterial>::default(),

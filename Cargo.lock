@@ -847,6 +847,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_tweening"
+version = "0.6.0"
+source = "git+https://github.com/djeedai/bevy_tweening?rev=30bc490b03f2c2a81050e99d2bf39fd81e42cd46#30bc490b03f2c2a81050e99d2bf39fd81e42cd46"
+dependencies = [
+ "bevy",
+ "interpolation",
+]
+
+[[package]]
 name = "bevy_ui"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1967,6 +1976,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "interpolation"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3b7357d2bbc5ee92f8e899ab645233e43d21407573cceb37fed8bc3dede2c02"
+
+[[package]]
 name = "io-kit-sys"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2760,6 +2775,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pressure-wave-sphere"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "pretty-type-name"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2896,6 +2919,17 @@ dependencies = [
  "base64",
  "bitflags",
  "serde",
+]
+
+[[package]]
+name = "rotating-column"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy-inspector-egui",
+ "bevy_shader_utils",
+ "bevy_tweening",
+ "itertools",
 ]
 
 [[package]]

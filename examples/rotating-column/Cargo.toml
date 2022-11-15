@@ -6,10 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.8.1"
 itertools = "0.10.3"
-bevy-inspector-egui = "0.12.1"
-bevy_tweening = "0.5.0"
+bevy-inspector-egui = "0.14.0"
+bevy_tweening = { git = "https://github.com/djeedai/bevy_tweening", rev = "30bc490b03f2c2a81050e99d2bf39fd81e42cd46" }
+
+[dependencies.bevy]
+workspace = true
 
 [dependencies.bevy_shader_utils]
 path = "../../libs/bevy_shader_utils"
