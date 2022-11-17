@@ -10,32 +10,13 @@
 #import bevy_pbr::utils
 
 struct CustomMaterial {
-    time: f32,
+    // time: f32,
     offset: f32,
     color: vec4<f32>,
-    // color: vec4<f32>,
-    // base_color: vec4<f32>;
-    // emissive: vec4<f32>;
-    // perceptual_roughness: f32;
-    // metallic: f32;
-    // reflectance: f32;
-    // // 'flags' is a bit field indicating various options. u32 is 32 bits so we have up to 32 options.
-    // flags: u32;
-    // alpha_cutoff: f32;
 };
 
 @group(1) @binding(0)
 var<uniform> material: CustomMaterial;
-
-// @group(1) @binding(1)
-// var offsetasf: f32;
-// @group(1) @binding(2)
-// var base_color_sampler: sampler;
-
-// @group(1) @binding(3)
-// var base_color_texture: texture_2d<f32>;
-// @group(1) @binding(4)
-// var base_color_sampler: sampler;
 
 struct Vertex {
     @location(0) position: vec3<f32>,
@@ -101,7 +82,7 @@ fn vertex(vertex: Vertex) -> VertexOutput {
 #endif
 
     // let new_world_position = mesh_position_local_to_world(model, vec4<f32>(vertex.position, 1.0));
-    let y = abs(sin(material.time + material.offset / 3.0));
+    let y = abs(sin(globals.time + material.offset / 3.0));
 
     var position = vec3(vertex.position.x, vertex.position.y + y + 0.4, vertex.position.z);
 
@@ -135,7 +116,7 @@ fn vertex(vertex: Vertex) -> VertexOutput {
         out.view_inverse_position = view.inverse_view * out.world_position;
         out.view_position = view.view * out.world_position;
 
-        let position = vertex.position * vec3(1.0, abs(sin(material.time + vertex.position.x + vertex.position.z)), 1.0);
+        // let position = vertex.position * vec3(1.0, abs(sin(globals.time + vertex.position.x + vertex.position.z)), 1.0);
 
     // out.view_inverse_position = view.inverse_view_proj * out.world_position;
         return out;

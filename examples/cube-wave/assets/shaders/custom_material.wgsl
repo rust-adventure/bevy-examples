@@ -5,7 +5,7 @@
 #import bevy_pbr::lighting
 
 struct CustomMaterial {
-    time: f32,
+    // time: f32,
     offset: f32,
     color: vec4<f32>,
 };

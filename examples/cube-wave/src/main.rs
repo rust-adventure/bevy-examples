@@ -111,7 +111,7 @@ fn setup(
     {
         let material =
             custom_materials.add(CustomMaterial {
-                time: 0.0,
+                // time: 0.0,
                 offset: ((f32::abs((x - half) as f32)
                     + f32::abs((z - half) as f32))
                     as f32)
@@ -165,9 +165,9 @@ fn update_time_for_custom_material(
     mut materials: ResMut<Assets<CustomMaterial>>,
     time: Res<Time>,
 ) {
-    for material in materials.iter_mut() {
-        material.1.time = time.elapsed_seconds();
-    }
+    // for material in materials.iter_mut() {
+    //     material.1.time = time.elapsed_seconds();
+    // }
 }
 
 // This is the struct that will be passed to your shader
@@ -176,7 +176,7 @@ fn update_time_for_custom_material(
 // #[bind_group_data(StandardMaterialKey)]
 #[uniform(0, CustomMaterialUniform)]
 pub struct CustomMaterial {
-    time: f32,
+    // time: f32,
     offset: f32,
     color: Color,
 }
@@ -209,7 +209,7 @@ impl Material for CustomMaterial {
 /// The GPU representation of the uniform data of a [`StandardMaterial`].
 #[derive(Clone, Default, ShaderType)]
 pub struct CustomMaterialUniform {
-    pub time: f32,
+    // pub time: f32,
     pub offset: f32,
     pub color: Vec4,
 }
@@ -222,7 +222,7 @@ impl AsBindGroupShaderType<CustomMaterialUniform>
         _images: &RenderAssets<Image>,
     ) -> CustomMaterialUniform {
         CustomMaterialUniform {
-            time: self.time,
+            // time: self.time,
             offset: self.offset,
             color: self.color.as_linear_rgba_f32().into(),
         }
