@@ -3036,6 +3036,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "shield-with-depth"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_asset_loader",
+ "bevy_basic_camera",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "shlex"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

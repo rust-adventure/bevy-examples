@@ -16,6 +16,7 @@ members = [
   "examples/shader-rgb-worldspace-cube",
   "examples/shader-test-001",
   "examples/shield-spheres",
+  "examples/shield-with-depth",
   # "examples/spacecraft-noiseland",
   "examples/standard-material-quixel-megascan",
   "libs/*",
@@ -37,3 +38,6 @@ opt-level = 3
 [workspace.dependencies]
 bevy = "0.10"
 bevy-inspector-egui = "0.18.0"
+bevy_asset_loader = "0.15.0"
+bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
+bevy_shader_utils = { path = "./libs/bevy_shader_utils" }

@@ -2,13 +2,15 @@
 //! Adds a texture and colored vertices, giving per-vertex tinting.
 
 use bevy::{
+    pbr::{MAX_CASCADES_PER_LIGHT, MAX_DIRECTIONAL_LIGHTS},
     prelude::*,
     reflect::TypeUuid,
     render::{
         mesh::MeshVertexBufferLayout,
         render_resource::{
             AsBindGroup, RenderPipelineDescriptor,
-            ShaderRef, SpecializedMeshPipelineError,
+            ShaderDefVal, ShaderRef,
+            SpecializedMeshPipelineError,
         },
     },
     sprite::{
@@ -26,7 +28,6 @@ fn main() {
             Material2dPlugin::<CustomMaterial>::default(),
         )
         .add_startup_system(setup)
-        .add_system(update_time_in_shader)
         .run();
 }
 
@@ -34,7 +35,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<CustomMaterial>>,
-    time: Res<Time>,
+    // time: Res<Time>,
 ) {
     let mesh = Mesh::from(shape::Quad::default());
 
@@ -54,40 +55,11 @@ fn setup(
     });
 }
 
-fn update_time_in_shader(
-    time: Res<Time>,
-    mut materials: ResMut<Assets<CustomMaterial>>,
-) {
-    for material in materials.iter_mut() {
-        material.1.time =
-            time.seconds_since_startup() as f32;
-    }
-}
-
 /// The Material trait is very configurable, but comes with sensible defaults for all methods.
 /// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
 impl Material2d for CustomMaterial {
     fn fragment_shader() -> ShaderRef {
         "shaders/custom_material.wgsl".into()
-    }
-    fn vertex_shader() -> ShaderRef {
-        "shaders/custom_material.wgsl".into()
-    }
-
-    fn specialize(
-        descriptor: &mut RenderPipelineDescriptor,
-        _layout: &MeshVertexBufferLayout,
-        _key: Material2dKey<Self>,
-    ) -> Result<(), SpecializedMeshPipelineError> {
-        descriptor
-            .vertex
-            .shader_defs
-            .push("VERTEX_UVS".to_string());
-        let fragment =
-            descriptor.fragment.as_mut().unwrap();
-        fragment.shader_defs.push("VERTEX_UVS".to_string());
-
-        Ok(())
     }
 }
 
