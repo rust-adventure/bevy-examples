@@ -4,13 +4,6 @@
 #import bevy_pbr::mesh_view_bindings
 #import bevy_pbr::lighting
 
-struct CustomMaterial {
-    // color: vec4<f32>,
-    time: f32,
-};
-
-@group(1) @binding(0)
-var<uniform> material: CustomMaterial;
 @group(1) @binding(1)
 var base_color_texture: texture_2d<f32>;
 @group(1) @binding(2)
@@ -31,7 +24,7 @@ fn fragment(
     @location(7) view_inverse_position: vec4<f32>,
 ) -> @location(0) vec4<f32> {
 
-    var noise = simplexNoise3(vec3<f32>(world_normal.xy * 400.2, material.time));
+    var noise = simplexNoise3(vec3<f32>(world_normal.xy * 400.2, globals.time));
     var alpha = (noise + 1.0) / 2.0;
 
     let highlight = smoothstep(0.0, 1.0, position_diff + 1.0);

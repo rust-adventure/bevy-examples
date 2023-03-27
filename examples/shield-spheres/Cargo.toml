@@ -1,9 +1,9 @@
 
 [dependencies]
 itertools = "0.10.3"
-bevy_asset_loader = "0.12.0"
+bevy_asset_loader = "0.15.0"
 [dependencies.bevy]
-version = "0.8"
+workspace = true
 features = ["jpeg"]
 
 [dependencies.bevy_shader_utils]

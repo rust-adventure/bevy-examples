@@ -29,20 +29,20 @@ fn main() {
             watch_for_changes: true,
             ..default()
         }))
+        .add_state::<MyStates>()
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
             MaterialPlugin::<CustomMaterial>::default(),
         )
-        .add_system(update_time_for_custom_material)
         .add_loading_state(
             LoadingState::new(MyStates::AssetLoading)
-                .continue_to_state(MyStates::Next)
-                .with_collection::<MyAssets>(),
+                .continue_to_state(MyStates::Next),
         )
-        .add_state(MyStates::AssetLoading)
-        .add_system_set(
-            SystemSet::on_enter(MyStates::Next)
-                .with_system(setup),
+        .add_collection_to_loading_state::<_, MyAssets>(
+            MyStates::AssetLoading,
+        )
+        .add_system(
+            setup.in_schedule(OnEnter(MyStates::Next)),
         )
         .add_system(animate_light_direction)
         .run();
@@ -66,21 +66,8 @@ fn setup(
         brightness: 0.02,
     });
     const HALF_SIZE: f32 = 10.0;
-    commands.spawn_bundle(DirectionalLightBundle {
-        directional_light: DirectionalLight {
-            // Configure the projection to better fit the scene
-            shadow_projection: OrthographicProjection {
-                left: -HALF_SIZE,
-                right: HALF_SIZE,
-                bottom: -HALF_SIZE,
-                top: HALF_SIZE,
-                near: -10.0 * HALF_SIZE,
-                far: 10.0 * HALF_SIZE,
-                ..default()
-            },
-            shadows_enabled: true,
-            ..default()
-        },
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight { ..default() },
         transform: Transform {
             translation: Vec3::new(0.0, 2.0, 0.0),
             rotation: Quat::from_rotation_x(
@@ -93,10 +80,12 @@ fn setup(
 
     // ground plane
 
-    let mut plane_mesh =
-        Mesh::from(shape::Plane { size: 100.0 });
+    let mut plane_mesh = Mesh::from(shape::Plane {
+        size: 100.0,
+        ..default()
+    });
     plane_mesh.generate_tangents().unwrap();
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes.add(plane_mesh),
         material: materials.add(StandardMaterial {
             base_color: Color::rgb(1.0, 1.0, 1.0),
@@ -162,21 +151,11 @@ fn setup(
         });
     }
 
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(2.5, 2.5, 5.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
-}
-
-fn update_time_for_custom_material(
-    mut materials: ResMut<Assets<CustomMaterial>>,
-    time: Res<Time>,
-) {
-    for material in materials.iter_mut() {
-        material.1.time =
-            time.seconds_since_startup() as f32;
-    }
 }
 
 /// The Material trait is very configurable, but comes with sensible defaults for all methods.
@@ -243,17 +222,16 @@ pub struct SpawnShieldedFerris {
 impl Command for SpawnShieldedFerris {
     fn write(self, world: &mut World) {
         world
-            .spawn()
-            .insert_bundle(MaterialMeshBundle {
+            .spawn(MaterialMeshBundle {
                 mesh: self.shield,
                 material: self.shield_material,
                 transform: self.transform.clone(),
-                visibility: Visibility::visible(),
+                visibility: Visibility::Visible,
                 ..default()
             })
             .insert(NotShadowCaster);
 
-        world.spawn().insert_bundle(SceneBundle {
+        world.spawn(SceneBundle {
             scene: self.ferris,
             transform: self.transform.clone(),
             ..default()
@@ -261,7 +239,7 @@ impl Command for SpawnShieldedFerris {
     }
 }
 
-#[derive(AssetCollection)]
+#[derive(AssetCollection, Resource)]
 struct MyAssets {
     #[asset(
         path = "hex-sphere-5-subdivisions.glb#Mesh0/Primitive0"
@@ -271,8 +249,11 @@ struct MyAssets {
     ferris: Handle<Scene>,
 }
 
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(
+    Default, Clone, Eq, PartialEq, Debug, Hash, States,
+)]
 enum MyStates {
+    #[default]
     AssetLoading,
     Next,
 }
