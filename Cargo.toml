@@ -3,22 +3,21 @@ license = "MIT OR Apache-2.0"
 [workspace]
 members = [
   # "examples/*",
-  "examples/bloom-2d",
-  "examples/candy-cane",
-  "examples/compute-3d",
-  "examples/compute-with-time",
-  "examples/cube-wave",
-  "examples/dissolve-sphere-standard-material-extensions",
+  # "examples/candy-cane",
+  # "examples/compute-3d",
+  # "examples/compute-with-time",
+  # "examples/cube-wave",
+  # "examples/dissolve-sphere-standard-material-extensions",
   "examples/fresnel-effect",
-  "examples/infinite-tunnel",
-  "examples/pointcloud",
-  "examples/pressure-wave-sphere",
+  # "examples/infinite-tunnel",
+  # "examples/pointcloud",
+  # "examples/pressure-wave-sphere",
   "examples/rotating-column",
   "examples/shader-rgb-worldspace-cube",
   "examples/shader-test-001",
   # "examples/shield-spheres",
-  "examples/spacecraft-noiseland",
-  "examples/standard-material-quixel-megascan",
+  # "examples/spacecraft-noiseland",
+  # "examples/standard-material-quixel-megascan",
   "libs/*",
   # "vendor/bevy_asset_loader/bevy_asset_loader_derive",
   # "vendor/bevy_asset_loader/bevy_asset_loader",
@@ -36,4 +35,5 @@ opt-level = 3
 
 
 [workspace.dependencies]
-bevy = "0.9"
+bevy = "0.10"
+bevy-inspector-egui = "0.18.0"

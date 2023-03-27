@@ -5,7 +5,7 @@ use bevy::{
         camera::Projection, mesh::VertexAttributeValues,
     },
 };
-use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_shader_utils::ShaderUtilsPlugin;
 use bevy_tweening::*;
 

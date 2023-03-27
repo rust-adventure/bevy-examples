@@ -2,7 +2,6 @@
 //! Adds a texture and colored vertices, giving per-vertex tinting.
 
 use bevy::{
-    asset::AssetServerSettings,
     prelude::*,
     reflect::TypeUuid,
     render::{
@@ -21,10 +20,6 @@ use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .insert_resource(AssetServerSettings {
-            watch_for_changes: true,
-            ..default()
-        })
         .add_plugins(DefaultPlugins)
         .add_plugin(ShaderUtilsPlugin)
         .add_plugin(
@@ -44,19 +39,17 @@ fn setup(
     let mesh = Mesh::from(shape::Quad::default());
 
     // Spawn camera
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     // Spawn the quad with vertex colors
-    commands.spawn_bundle(MaterialMesh2dBundle {
+    commands.spawn(MaterialMesh2dBundle {
         mesh: meshes.add(mesh).into(),
         transform: Transform::from_translation(Vec3::new(
             0., 0., 0.,
         ))
         .with_scale(Vec3::splat(4024.)),
-        material: materials.add(CustomMaterial {
-            color: Color::RED,
-            time: time.seconds_since_startup() as f32,
-        }),
+        material: materials
+            .add(CustomMaterial { color: Color::RED }),
         ..default()
     });
 }
@@ -104,6 +97,4 @@ impl Material2d for CustomMaterial {
 pub struct CustomMaterial {
     #[uniform(0)]
     color: Color,
-    #[uniform(0)]
-    time: f32,
 }

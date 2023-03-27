@@ -1,11 +1,5 @@
 #import bevy_shader_utils::perlin_noise_2d
-
-struct CustomMaterial {
-    time: f32,
-};
-
-@group(1) @binding(0)
-var<uniform> material: CustomMaterial;
+#import bevy_pbr::mesh_view_bindings
 
 @fragment
 fn fragment(
@@ -14,9 +8,9 @@ fn fragment(
     @location(1) normals: vec3<f32>,
     @location(2) uv: vec2<f32>
 ) -> @location(0) vec4<f32> {
-    var input1: vec2<f32> = vec2<f32>(world_position.x, material.time);
-    var input2: vec2<f32> = vec2<f32>(world_position.y, material.time);
-    var input3: vec2<f32> = vec2<f32>(world_position.z, material.time);
+    var input1: vec2<f32> = vec2<f32>(world_position.x, globals.time);
+    var input2: vec2<f32> = vec2<f32>(world_position.y, globals.time);
+    var input3: vec2<f32> = vec2<f32>(world_position.z, globals.time);
 
     var noise1 = perlinNoise2(input1);
     var noise2 = perlinNoise2(input2);
