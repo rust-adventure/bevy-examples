@@ -17,7 +17,7 @@ fn main() {
             MaterialPlugin::<dissolve_sphere_standard_material_extension::StandardMaterial>::default(),
         )
         .add_startup_system(setup)
-        .add_system(change_color)
+        // .add_system(change_color)
         .add_system(animate_light_direction)
         .add_system(movement)
         .run();
@@ -95,8 +95,10 @@ fn setup(
         .insert(Movable);
     // ground plane
     commands.spawn(PbrBundle {
-        mesh: meshes
-            .add(Mesh::from(shape::Plane { size: 10.0 })),
+        mesh: meshes.add(Mesh::from(shape::Plane {
+            size: 10.0,
+            ..default()
+        })),
         material: materials.add(StandardMaterial {
             base_color: Color::WHITE,
             perceptual_roughness: 1.0,
@@ -210,15 +212,6 @@ fn setup(
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             // Configure the projection to better fit the scene
-            shadow_projection: OrthographicProjection {
-                left: -HALF_SIZE,
-                right: HALF_SIZE,
-                bottom: -HALF_SIZE,
-                top: HALF_SIZE,
-                near: -10.0 * HALF_SIZE,
-                far: 10.0 * HALF_SIZE,
-                ..default()
-            },
             shadows_enabled: true,
             ..default()
         },
@@ -245,15 +238,15 @@ fn animate_light_direction(
     }
 }
 
-fn change_color(
-    mut materials: ResMut<Assets<dissolve_sphere_standard_material_extension::StandardMaterial>>,
-    time: Res<Time>,
-) {
-    for material in materials.iter_mut() {
-        // material.1.base_color = Color::rgb(0.4,0.4,0.4);
-        material.1.time = time.elapsed_seconds();
-    }
-}
+// fn change_color(
+//     mut materials: ResMut<Assets<dissolve_sphere_standard_material_extension::StandardMaterial>>,
+//     time: Res<Time>,
+// ) {
+//     for material in materials.iter_mut() {
+//         // material.1.base_color = Color::rgb(0.4,0.4,0.4);
+//         material.1.time = time.elapsed_seconds();
+//     }
+// }
 
 #[derive(Component)]
 struct Movable;
