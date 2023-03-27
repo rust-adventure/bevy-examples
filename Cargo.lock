@@ -2743,6 +2743,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pressure-wave-sphere"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "pretty-type-name"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

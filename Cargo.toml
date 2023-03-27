@@ -11,7 +11,7 @@ members = [
   "examples/fresnel-effect",
   # "examples/infinite-tunnel",
   # "examples/pointcloud",
-  # "examples/pressure-wave-sphere",
+  "examples/pressure-wave-sphere",
   "examples/rotating-column",
   "examples/shader-rgb-worldspace-cube",
   "examples/shader-test-001",
