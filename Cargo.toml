@@ -17,7 +17,7 @@ members = [
   "examples/shader-test-001",
   "examples/shield-spheres",
   # "examples/spacecraft-noiseland",
-  # "examples/standard-material-quixel-megascan",
+  "examples/standard-material-quixel-megascan",
   "libs/*",
   # "vendor/bevy_asset_loader/bevy_asset_loader_derive",
   # "vendor/bevy_asset_loader/bevy_asset_loader",
