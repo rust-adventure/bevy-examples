@@ -144,7 +144,7 @@ fn setup(
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        transform: Transform::from_xyz(-4.0, 8.0, 4.0),
         ..default()
     });
 
@@ -168,33 +168,13 @@ fn setup(
 
         ..default()
     });
-    // let mesh = meshes.get_mut(&assets.hex_sphere).unwrap();
-    // if let Some(VertexAttributeValues::Float32x3(
-    //     positions,
-    // )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
-    // {
-    //     let colors: Vec<[f32; 4]> = positions
-    //         .iter()
-    //         .map(|[r, g, b]| {
-    //             [
-    //                 (1. - *r) / 2.,
-    //                 (1. - *g) / 2.,
-    //                 (1. - *b) / 2.,
-    //                 1.,
-    //             ]
-    //         })
-    //         .collect();
-    //     mesh.insert_attribute(
-    //         Mesh::ATTRIBUTE_COLOR,
-    //         colors,
-    //     );
-    // }
 
+    let transform = Transform::from_xyz(0.0, 0.5, 0.0);
     // cube
     commands.spawn((
         MaterialMeshBundle {
             mesh: assets.hex_sphere.clone(),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+            transform: transform,
             material: materials.add(CustomMaterial {
                 color: Color::BLUE,
                 alpha_mode: AlphaMode::Blend,
@@ -203,6 +183,14 @@ fn setup(
         },
         NotShadowCaster,
     ));
+
+    commands.spawn(SceneBundle {
+        scene: assets.ferris.clone(),
+        transform: transform.clone().with_rotation(
+            Quat::from_rotation_y(-FRAC_PI_2),
+        ),
+        ..default()
+    });
 }
 
 /// The Material trait is very configurable, but comes with sensible defaults for all methods.
