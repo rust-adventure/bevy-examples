@@ -124,12 +124,19 @@ fn fragment(
     } else {
         intersection *= intersection_intensity / 2.0;
     }
+    // var a = intersection;
+
+    // if is_front {
+    //     a += fresnel
+    // }
     // return vec4(intersection,intersection,intersection,1.0);
 
     // let depth = prepass_depth(frag_coord, sample_index);
     // return vec4(mix(world_normal, vec3(0.991, 0.093, 0.893), highlight), smoothstep(0.0, 1.5, fresnel)) + vec4(0.0,0.0,0.0, depth * 55.0 - 0.9);
     // return vec4(mix(world_normal, vec3(0.991, 0.093, 0.893), highlight), smoothstep(0.0, 1.5, fresnel)) + vec4(0.0,0.0,0.0,intersection);
-    return vec4(fresnel,fresnel,fresnel,1.0);
+    // return vec4(fresnel,fresnel,fresnel,1.0);
+    let color = mix(vec3(1.00, 0.455, 0.827), vec3(1.00, 0.555, 0.927), highlight);
+    return vec4(color, fresnel + intersection + highlight * 0.2);
 
     // return vec4(1.0,1.0, 1.0, depth * 65.0 - 1.0);
         //     let normal = prepass_normal(frag_coord, sample_index);

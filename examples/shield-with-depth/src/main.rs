@@ -160,27 +160,27 @@ fn setup(
 
         ..default()
     });
-    let mesh = meshes.get_mut(&assets.hex_sphere).unwrap();
-    if let Some(VertexAttributeValues::Float32x3(
-        positions,
-    )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
-    {
-        let colors: Vec<[f32; 4]> = positions
-            .iter()
-            .map(|[r, g, b]| {
-                [
-                    (1. - *r) / 2.,
-                    (1. - *g) / 2.,
-                    (1. - *b) / 2.,
-                    1.,
-                ]
-            })
-            .collect();
-        mesh.insert_attribute(
-            Mesh::ATTRIBUTE_COLOR,
-            colors,
-        );
-    }
+    // let mesh = meshes.get_mut(&assets.hex_sphere).unwrap();
+    // if let Some(VertexAttributeValues::Float32x3(
+    //     positions,
+    // )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
+    // {
+    //     let colors: Vec<[f32; 4]> = positions
+    //         .iter()
+    //         .map(|[r, g, b]| {
+    //             [
+    //                 (1. - *r) / 2.,
+    //                 (1. - *g) / 2.,
+    //                 (1. - *b) / 2.,
+    //                 1.,
+    //             ]
+    //         })
+    //         .collect();
+    //     mesh.insert_attribute(
+    //         Mesh::ATTRIBUTE_COLOR,
+    //         colors,
+    //     );
+    // }
 
     // cube
     commands.spawn((
