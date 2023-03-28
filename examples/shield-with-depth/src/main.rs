@@ -3,7 +3,10 @@
 use std::f32::consts::FRAC_PI_2;
 
 use bevy::{
-    core_pipeline::prepass::{DepthPrepass, NormalPrepass},
+    core_pipeline::{
+        bloom::BloomSettings,
+        prepass::{DepthPrepass, NormalPrepass},
+    },
     pbr::{
         MaterialPipeline, MaterialPipelineKey,
         NotShadowCaster,
@@ -114,6 +117,10 @@ fn setup(
     // end Debug
     commands.spawn((
         Camera3dBundle {
+            camera: Camera {
+                hdr: true,
+                ..default()
+            },
             transform: Transform::from_xyz(-2.0, 3., 5.0)
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
@@ -128,6 +135,7 @@ fn setup(
             orbit_focus: Vec3::new(0.0, 0.5, 0.0),
             ..default()
         },
+        BloomSettings::default(),
     ));
 
     commands.spawn(PointLightBundle {

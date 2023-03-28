@@ -104,7 +104,7 @@ fn fragment(
     @location(5) position_diff: f32,
 ) -> @location(0) vec4<f32> {
     // return color;
-     var noise = simplexNoise3(vec3<f32>(world_normal.xy * 400.2, globals.time));
+     var noise = simplexNoise3(vec3<f32>(world_normal.xy * 4.2, globals.time));
     var alpha = (noise + 1.0) / 2.0;
 
     let highlight = smoothstep(0.0, 1.0, position_diff + 1.0);
@@ -112,11 +112,12 @@ fn fragment(
     let fresnel = fresnel(view.world_position.xyz, world_position.xyz, world_normal, 2.0, 1.0);
 
     let offset = 0.82;
-        let intersection_intensity = 10.0;
+    let intersection_intensity = 10.0;
 
-        let depth = prepass_depth(frag_coord, sample_index);
-// thanks to https://github.com/IceSentry for this line in particular,
-// which I was having trouble landing on
+    let depth = prepass_depth(frag_coord, sample_index);
+
+    // thanks to https://github.com/IceSentry for this line in particular,
+    // which I was having trouble landing on
     var intersection = 1.0 - ((frag_coord.z - depth) * 100.0) - offset;
     intersection = smoothstep(0.0, 1.0, intersection);
     if is_front{
@@ -124,29 +125,11 @@ fn fragment(
     } else {
         intersection *= intersection_intensity / 2.0;
     }
-    // var a = intersection;
 
-    // if is_front {
-    //     a += fresnel
-    // }
-    // return vec4(intersection,intersection,intersection,1.0);
-
-    // let depth = prepass_depth(frag_coord, sample_index);
-    // return vec4(mix(world_normal, vec3(0.991, 0.093, 0.893), highlight), smoothstep(0.0, 1.5, fresnel)) + vec4(0.0,0.0,0.0, depth * 55.0 - 0.9);
-    // return vec4(mix(world_normal, vec3(0.991, 0.093, 0.893), highlight), smoothstep(0.0, 1.5, fresnel)) + vec4(0.0,0.0,0.0,intersection);
-    // return vec4(fresnel,fresnel,fresnel,1.0);
-    let color = mix(vec3(1.00, 0.455, 0.827), vec3(1.00, 0.555, 0.927), highlight);
-    return vec4(color, fresnel + intersection + highlight * 0.2);
-
-    // return vec4(1.0,1.0, 1.0, depth * 65.0 - 1.0);
-        //     let normal = prepass_normal(frag_coord, sample_index);
-        // return vec4(normal, 1.0);
+    let color = mix(vec3(1.00, 0.455, 0.827), vec3(1.00, 0.555, 0.927), highlight) * (alpha+0.5) * 5.0;
+    if is_front {
+        return vec4(color * (10.0 * highlight + 1.0) , fresnel*0.4 + intersection + highlight * 0.003);
+    } else {
+        return vec4(color,intersection);
+    }
 }
-
-// // This function will give you the tex_coord of the screen texture for the current fragment position
-// fn get_screen_coord(in: FullscreenVertexOutput) -> vec2<f32> {
-//     let resolution = vec2<f32>(textureDimensions(screen_texture));
-//     let frag_coord = in.position.xy;
-//     let inverse_screen_size = 1.0 / resolution.xy;
-//     return frag_coord * inverse_screen_size;
-// }
