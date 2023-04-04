@@ -4,6 +4,7 @@ license = "MIT OR Apache-2.0"
 members = [
   # "examples/*",
   # "examples/candy-cane",
+  "examples/cartoon-water",
   # "examples/compute-3d",
   # "examples/compute-with-time",
   # "examples/cube-wave",
@@ -38,6 +39,6 @@ opt-level = 3
 [workspace.dependencies]
 bevy = "0.10"
 bevy-inspector-egui = "0.18.0"
-bevy_asset_loader = "0.15.0"
+bevy_asset_loader = "0.16.0"
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }

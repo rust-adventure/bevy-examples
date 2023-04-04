@@ -313,9 +313,9 @@ dependencies = [
 
 [[package]]
 name = "bevy-inspector-egui"
-version = "0.18.1"
+version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94f7ebaedaa0083df7c3679094e25eccebbaa9c4c60c3a5e74337f6402af2291"
+checksum = "7bda61dd72f879e8d4b0f57e94b86bd163bf558ac2e7ddea9ea075a47bdcd9af"
 dependencies = [
  "bevy-inspector-egui-derive",
  "bevy_app",
@@ -431,7 +431,18 @@ checksum = "118490c65031cecd6586e6b2cbd16f05bc161438dd0d30c42e307638eab7daba"
 dependencies = [
  "anyhow",
  "bevy",
- "bevy_asset_loader_derive",
+ "bevy_asset_loader_derive 0.15.0",
+]
+
+[[package]]
+name = "bevy_asset_loader"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f32463c4be049c9535661f2debcd76a6ee7fc5c0e0c2335214bda671607ae7d9"
+dependencies = [
+ "anyhow",
+ "bevy",
+ "bevy_asset_loader_derive 0.16.0",
 ]
 
 [[package]]
@@ -439,6 +450,17 @@ name = "bevy_asset_loader_derive"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac452d5861a4f9e69625b9a6d63a846dc9ee0e3c5ee32fe2d9c5b8cd59b916ba"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "bevy_asset_loader_derive"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2921646f30d11ae14b85e4957242dcb98c37b748987b00b84473fcd390c561dd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -762,6 +784,14 @@ dependencies = [
  "bitflags",
  "bytemuck",
  "radsort",
+]
+
+[[package]]
+name = "bevy_prepass_debug"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy-inspector-egui",
 ]
 
 [[package]]
@@ -1192,6 +1222,16 @@ name = "bytes"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec8a7b6a70fde80372154c65702f00a0f56f3e1c36abbc6c440484be248856db"
+
+[[package]]
+name = "cartoon-water"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_asset_loader 0.16.0",
+ "bevy_basic_camera",
+ "bevy_shader_utils",
+]
 
 [[package]]
 name = "cc"
@@ -3030,7 +3070,7 @@ name = "shield-spheres"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_asset_loader",
+ "bevy_asset_loader 0.15.0",
  "bevy_shader_utils",
  "itertools",
 ]
@@ -3040,7 +3080,7 @@ name = "shield-with-depth"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_asset_loader",
+ "bevy_asset_loader 0.16.0",
  "bevy_basic_camera",
  "bevy_shader_utils",
 ]

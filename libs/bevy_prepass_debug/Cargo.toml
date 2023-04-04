@@ -1,0 +1,11 @@
+[package]
+name = "bevy_prepass_debug"
+description = "Debug tooling integrating with bevy_inspector_egui"
+edition = "2021"
+keywords = ["bevy"]
+license = "MIT"
+version = "0.1.0"
+
+[dependencies]
+bevy = "0.10.0"
+bevy-inspector-egui = "0.18.3"
