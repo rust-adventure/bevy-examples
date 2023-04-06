@@ -1,10 +1,16 @@
 use bevy::{
-    pbr::NotShadowCaster, prelude::*, reflect::TypeUuid,
+    asset::load_internal_asset, pbr::NotShadowCaster,
+    prelude::*, reflect::TypeUuid,
     render::render_resource::*,
 };
 use bevy_inspector_egui::prelude::*;
 use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 
+const SHOW_PREPASS_SHADER_HANDLE: HandleUntyped =
+    HandleUntyped::weak_from_u64(
+        Shader::TYPE_UUID,
+        3253086272234592509,
+    );
 /// Debug depth/normal/
 /// In order to function, the [`PrepassDebug`] component should be attached to the camera entity.
 #[derive(Default)]
@@ -12,6 +18,23 @@ pub struct PrepassDebugPlugin;
 
 impl Plugin for PrepassDebugPlugin {
     fn build(&self, app: &mut App) {
+        load_internal_asset!(
+            app,
+            SHOW_PREPASS_SHADER_HANDLE,
+            "../assets/shaders/show_prepass.wgsl",
+            Shader::from_wgsl
+        );
+
+        app.world
+            .resource_mut::<Assets<ColorMaterial>>()
+            .set_untracked(
+                Handle::<ColorMaterial>::default(),
+                ColorMaterial {
+                    color: Color::rgb(1.0, 0.0, 1.0),
+                    ..Default::default()
+                },
+            );
+
         app.init_resource::<PrepassSettings>()
             .register_type::<PrepassSettings>()
             .add_plugin(ResourceInspectorPlugin::<
@@ -99,7 +122,7 @@ pub struct PrepassOutputMaterial {
 
 impl Material for PrepassOutputMaterial {
     fn fragment_shader() -> ShaderRef {
-        "shaders/show_prepass.wgsl".into()
+        SHOW_PREPASS_SHADER_HANDLE.typed().into()
     }
 
     // This needs to be transparent in order to show the scene behind the mesh

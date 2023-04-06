@@ -42,3 +42,4 @@ bevy-inspector-egui = "0.18.0"
 bevy_asset_loader = "0.16.0"
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
+bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
