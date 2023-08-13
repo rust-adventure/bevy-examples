@@ -1,9 +1,11 @@
+#define_import_path bevy_shader_utils::simplex_noise_3d
+
 //  MIT License. © Ian McEwan, Stefan Gustavson, Munrocket
 //
-fn permute4(x: vec4<f32>) -> vec4<f32> { return ((x * 34. + 1.) * x) % vec4<f32>(289.); }
-fn taylorInvSqrt4(r: vec4<f32>) -> vec4<f32> { return 1.79284291400159 - 0.85373472095314 * r; }
+fn permute_four(x: vec4<f32>) -> vec4<f32> { return ((x * 34. + 1.) * x) % vec4<f32>(289.); }
+fn taylor_inv_sqrt_four(r: vec4<f32>) -> vec4<f32> { return 1.79284291400159 - 0.85373472095314 * r; }
 
-fn simplexNoise3(v: vec3<f32>) -> f32 {
+fn simplex_noise_3d(v: vec3<f32>) -> f32 {
   let C = vec2<f32>(1. / 6., 1. / 3.);
   let D = vec4<f32>(0., 0.5, 1., 2.);
 
@@ -24,7 +26,7 @@ fn simplexNoise3(v: vec3<f32>) -> f32 {
 
   // Permutations
   i = i % vec3<f32>(289.);
-  let p = permute4(permute4(permute4(
+  let p = permute_four(permute_four(permute_four(
       i.z + vec4<f32>(0., i1.z, i2.z, 1. )) +
       i.y + vec4<f32>(0., i1.y, i2.y, 1. )) +
       i.x + vec4<f32>(0., i1.x, i2.x, 1. ));
@@ -54,11 +56,13 @@ fn simplexNoise3(v: vec3<f32>) -> f32 {
 
   var p0: vec3<f32> = vec3<f32>(a0.xy, h.x);
   var p1: vec3<f32> = vec3<f32>(a0.zw, h.y);
-  var p2: vec3<f32> = vec3<f32>(a1.xy, h.z);
+  #define_import_path bevy_shader_utils::simplex_noise_3d
+var p2: vec3<f32> = vec3<f32>
+  (a1.xy, h.z);
   var p3: vec3<f32> = vec3<f32>(a1.zw, h.w);
 
   // Normalise gradients
-  let norm = taylorInvSqrt4(vec4<f32>(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+  let norm = taylor_inv_sqrt_four(vec4<f32>(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
   p0 = p0 * norm.x;
   p1 = p1 * norm.y;
   p2 = p2 * norm.z;

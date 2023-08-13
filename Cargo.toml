@@ -4,22 +4,22 @@ license = "MIT OR Apache-2.0"
 members = [
   # "examples/*",
   # "examples/candy-cane",
-  "examples/cartoon-water",
+  # "examples/cartoon-water",
   # "examples/compute-3d",
   # "examples/compute-with-time",
   # "examples/cube-wave",
-  "examples/dissolve-sphere-standard-material-extensions",
-  "examples/fresnel-effect",
+  # "examples/dissolve-sphere-standard-material-extensions",
+  # "examples/fresnel-effect",
   # "examples/infinite-tunnel",
   # "examples/pointcloud",
-  "examples/pressure-wave-sphere",
-  "examples/rotating-column",
-  "examples/shader-rgb-worldspace-cube",
+  # "examples/pressure-wave-sphere",
+  # "examples/rotating-column",
+  # "examples/shader-rgb-worldspace-cube",
   "examples/shader-test-001",
-  "examples/shield-spheres",
-  "examples/shield-with-depth",
+  # "examples/shield-spheres",
+  # "examples/shield-with-depth",
   # "examples/spacecraft-noiseland",
-  "examples/standard-material-quixel-megascan",
+  # "examples/standard-material-quixel-megascan",
   "libs/*",
   # "vendor/bevy_asset_loader/bevy_asset_loader_derive",
   # "vendor/bevy_asset_loader/bevy_asset_loader",
@@ -37,9 +37,9 @@ opt-level = 3
 
 
 [workspace.dependencies]
-bevy = "0.10"
-bevy-inspector-egui = "0.18.0"
-bevy_asset_loader = "0.16.0"
+bevy = "0.11"
+bevy-inspector-egui = "0.19.0"
+bevy_asset_loader = "0.17.0"
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }

@@ -11,7 +11,7 @@ pub const SIMPLEX_NOISE_2D: &str =
     include_str!("../shaders/simplex_noise_2d.wgsl");
 pub const SIMPLEX_NOISE_3D: &str =
     include_str!("../shaders/simplex_noise_3d.wgsl");
-pub const FBM: &str = include_str!("../shaders/fbm.wgsl");
+// pub const FBM: &str = include_str!("../shaders/fbm.wgsl");
 pub const VORONOISE: &str =
     include_str!("../shaders/voronoise.wgsl");
 // other utility functions
@@ -32,7 +32,7 @@ struct ShaderUtils {
     perlin_noise_3d: HandleId,
     simplex_noise_2d: HandleId,
     simplex_noise_3d: HandleId,
-    fbm: HandleId,
+    // fbm: HandleId,
     voronoise: HandleId,
     mock_fresnel: HandleId,
 }
@@ -64,7 +64,11 @@ impl FromWorld for ShaderUtils {
                 "simplex_noise_3d",
                 SIMPLEX_NOISE_3D,
             ),
-            fbm: load_shader(&mut shaders, "fbm", FBM),
+            // TODO: no higher order functions, so
+            // how would we even implement fbm in wgsl?
+            // if you want it, copy/paste it from the
+            // fbm.wgsl file.
+            // fbm: load_shader(&mut shaders, "fbm", FBM),
             voronoise: load_shader(
                 &mut shaders,
                 "voronoise",
@@ -84,11 +88,7 @@ fn load_shader(
     name: &str,
     shader_str: &'static str,
 ) -> HandleId {
-    let mut shader = Shader::from_wgsl(shader_str);
-    shader.set_import_path(format!(
-        "bevy_shader_utils::{}",
-        name
-    ));
+    let shader = Shader::from_wgsl(shader_str, name);
     let id = HandleId::random::<Shader>();
     shaders.set_untracked(id, shader);
     id

@@ -1,10 +1,12 @@
+#define_import_path bevy_shader_utils::perlin_noise_3d
+
 // MIT License. © Stefan Gustavson, Munrocket
 //
-fn permute4(x: vec4<f32>) -> vec4<f32> { return ((x * 34. + 1.) * x) % vec4<f32>(289.); }
-fn taylorInvSqrt4(r: vec4<f32>) -> vec4<f32> { return 1.79284291400159 - 0.85373472095314 * r; }
-fn fade3(t: vec3<f32>) -> vec3<f32> { return t * t * t * (t * (t * 6. - 15.) + 10.); }
+fn permute_four(x: vec4<f32>) -> vec4<f32> { return ((x * 34. + 1.) * x) % vec4<f32>(289.); }
+fn taylor_inv_sqrt_four(r: vec4<f32>) -> vec4<f32> { return 1.79284291400159 - 0.85373472095314 * r; }
+fn fade_three(t: vec3<f32>) -> vec3<f32> { return t * t * t * (t * (t * 6. - 15.) + 10.); }
 
-fn perlinNoise3(P: vec3<f32>) -> f32 {
+fn perlin_noise_3d(P: vec3<f32>) -> f32 {
   var Pi0 : vec3<f32> = floor(P); // Integer part for indexing
   var Pi1 : vec3<f32> = Pi0 + vec3<f32>(1.); // Integer part + 1
   Pi0 = Pi0 % vec3<f32>(289.);
@@ -16,9 +18,9 @@ fn perlinNoise3(P: vec3<f32>) -> f32 {
   let iz0 = Pi0.zzzz;
   let iz1 = Pi1.zzzz;
 
-  let ixy = permute4(permute4(ix) + iy);
-  let ixy0 = permute4(ixy + iz0);
-  let ixy1 = permute4(ixy + iz1);
+  let ixy = permute_four(permute_four(ix) + iy);
+  let ixy0 = permute_four(ixy + iz0);
+  let ixy1 = permute_four(ixy + iz1);
 
   var gx0: vec4<f32> = ixy0 / 7.;
   var gy0: vec4<f32> = fract(floor(gx0) / 7.) - 0.5;
@@ -45,13 +47,13 @@ fn perlinNoise3(P: vec3<f32>) -> f32 {
   var g011: vec3<f32> = vec3<f32>(gx1.z, gy1.z, gz1.z);
   var g111: vec3<f32> = vec3<f32>(gx1.w, gy1.w, gz1.w);
 
-  let norm0 = taylorInvSqrt4(
+  let norm0 = taylor_inv_sqrt_four(
       vec4<f32>(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
   g000 = g000 * norm0.x;
   g010 = g010 * norm0.y;
   g100 = g100 * norm0.z;
   g110 = g110 * norm0.w;
-  let norm1 = taylorInvSqrt4(
+  let norm1 = taylor_inv_sqrt_four(
       vec4<f32>(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
   g001 = g001 * norm1.x;
   g011 = g011 * norm1.y;
@@ -67,7 +69,7 @@ fn perlinNoise3(P: vec3<f32>) -> f32 {
   let n011 = dot(g011, vec3<f32>(Pf0.x, Pf1.yz));
   let n111 = dot(g111, Pf1);
 
-  var fade_xyz: vec3<f32> = fade3(Pf0);
+  var fade_xyz: vec3<f32> = fade_three(Pf0);
   let temp = vec4<f32>(f32(fade_xyz.z)); // simplify after chrome bug fix
   let n_z = mix(vec4<f32>(n000, n100, n010, n110), vec4<f32>(n001, n101, n011, n111), temp);
   let n_yz = mix(n_z.xy, n_z.zw, vec2<f32>(f32(fade_xyz.y))); // simplify after chrome bug fix

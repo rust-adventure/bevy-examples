@@ -1,3 +1,5 @@
+#define_import_path bevy_shader_utils::fresnel
+
 fn mock_fresnel(
     camera_view_world_position: vec3<f32>,
     world_position: vec3<f32>,

@@ -2,32 +2,23 @@
 //! Adds a texture and colored vertices, giving per-vertex tinting.
 
 use bevy::{
-    pbr::{MAX_CASCADES_PER_LIGHT, MAX_DIRECTIONAL_LIGHTS},
     prelude::*,
-    reflect::TypeUuid,
-    render::{
-        mesh::MeshVertexBufferLayout,
-        render_resource::{
-            AsBindGroup, RenderPipelineDescriptor,
-            ShaderDefVal, ShaderRef,
-            SpecializedMeshPipelineError,
-        },
-    },
+    reflect::{TypePath, TypeUuid},
+    render::render_resource::{AsBindGroup, ShaderRef},
     sprite::{
-        Material2d, Material2dKey, Material2dPlugin,
-        MaterialMesh2dBundle,
+        Material2d, Material2dPlugin, MaterialMesh2dBundle,
     },
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugin(ShaderUtilsPlugin)
-        .add_plugin(
+        .add_plugins((
+            DefaultPlugins,
             Material2dPlugin::<CustomMaterial>::default(),
-        )
-        .add_startup_system(setup)
+            ShaderUtilsPlugin,
+        ))
+        .add_systems(Startup, setup)
         .run();
 }
 
@@ -35,7 +26,6 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<CustomMaterial>>,
-    // time: Res<Time>,
 ) {
     let mesh = Mesh::from(shape::Quad::default());
 
@@ -64,7 +54,7 @@ impl Material2d for CustomMaterial {
 }
 
 // This is the struct that will be passed to your shader
-#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
+#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
 #[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
 pub struct CustomMaterial {
     #[uniform(0)]
