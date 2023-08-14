@@ -13,7 +13,6 @@ var<uniform> material: Material;
 fn fragment(
     mesh: MeshVertexOutput
 ) -> @location(0) vec4<f32> {
-    let scale = 50.0;
     let f: f32 = perlin_noise_2d(material.scale * mesh.uv);
 
     let color_a = vec3(0.282, 0.51, 1.0);

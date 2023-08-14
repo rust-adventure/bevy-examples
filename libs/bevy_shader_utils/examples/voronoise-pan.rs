@@ -1,5 +1,7 @@
-//! Shows how to render a polygonal [`Mesh`], generated from a [`Quad`] primitive, in a 2D scene.
-//! Adds a texture and colored vertices, giving per-vertex tinting.
+//! Shows how to render a polygonal [`Mesh`],
+//! generated from a [`Quad`] primitive, in a 2D
+//! scene. Adds a texture and colored vertices,
+//! giving per-vertex tinting.
 
 use bevy::{
     prelude::*,
@@ -45,15 +47,19 @@ fn setup(
     });
 }
 
-/// The Material trait is very configurable, but comes with sensible defaults for all methods.
-/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
+/// The Material trait is very configurable, but
+/// comes with sensible defaults for all methods.
+/// You only need to implement functions for
+/// features that need non-default behavior. See
+/// the Material api docs for details!
 impl Material2d for CustomMaterial {
     fn fragment_shader() -> ShaderRef {
         "shaders/custom_material.wgsl".into()
     }
 }
 
-// This is the struct that will be passed to your shader
+// This is the struct that will be passed to your
+// shader
 #[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
 #[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
 pub struct CustomMaterial {

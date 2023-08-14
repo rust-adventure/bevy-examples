@@ -1,4 +1,5 @@
-//! An example showing how to save screenshots to disk
+//! An example showing how to save screenshots to
+//! disk
 
 use bevy::{
     prelude::*,
@@ -74,7 +75,17 @@ fn main() {
 }
 
 #[derive(Resource)]
-struct Examples(Vec<Entity>);
+struct Examples(Vec<Example>);
+
+struct Example {
+    camera_type: CameraType,
+    entity: Entity,
+}
+
+enum CameraType {
+    TwoD,
+    ThreeD,
+}
 
 fn example_navigation(
     mut commands: Commands,
@@ -83,10 +94,9 @@ fn example_navigation(
     mut example_index: Local<u32>,
     names: Query<&Name>,
     mut name_text: Query<&mut Text, With<ExampleName>>,
+    active_cameras: Query<Entity, With<ActiveCamera>>,
 ) {
-    let Some(examples) = examples else {
-        return
-    };
+    let Some(examples) = examples else { return };
     if input.just_pressed(KeyCode::Left) {
         match example_index.checked_sub(1) {
             Some(_) => {
@@ -101,11 +111,13 @@ fn example_navigation(
     if input.just_pressed(KeyCode::Right) {
         *example_index += 1;
     }
-    for entity in examples.0.iter() {
-        commands.entity(*entity).insert(Visibility::Hidden);
+    for example in examples.0.iter() {
+        commands
+            .entity(example.entity)
+            .insert(Visibility::Hidden);
     }
     let entity_to_display =
-        examples.0[*example_index as usize];
+        examples.0[*example_index as usize].entity;
     commands
         .entity(entity_to_display)
         .insert(Visibility::Visible);
@@ -114,13 +126,36 @@ fn example_navigation(
             text.sections[0].value = name.to_string();
         }
     }
+
+    for entity in active_cameras.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+    match examples.0[*example_index as usize].camera_type {
+        CameraType::TwoD => {
+            commands.spawn((
+                Camera2dBundle::default(),
+                ActiveCamera,
+            ));
+        }
+        CameraType::ThreeD => {
+            commands.spawn((
+                Camera3dBundle {
+                    transform: Transform::from_xyz(
+                        -2.0, 2.5, 5.0,
+                    )
+                    .looking_at(Vec3::ZERO, Vec3::Y),
+                    ..default()
+                },
+                ActiveCamera,
+            ));
+        }
+    }
 }
 
 fn screenshot_on_spacebar(
     input: Res<Input<KeyCode>>,
     main_window: Query<Entity, With<PrimaryWindow>>,
     mut screenshot_manager: ResMut<ScreenshotManager>,
-    mut counter: Local<u32>,
     name_text: Query<&Text, With<ExampleName>>,
 ) {
     if input.just_pressed(KeyCode::Space) {
@@ -128,7 +163,6 @@ fn screenshot_on_spacebar(
             "./screenshots/{}.png",
             name_text.single().sections[0].value
         );
-        *counter += 1;
         screenshot_manager
             .save_screenshot_to_disk(
                 main_window.single(),
@@ -137,6 +171,9 @@ fn screenshot_on_spacebar(
             .unwrap();
     }
 }
+
+#[derive(Component)]
+struct ActiveCamera;
 
 /// set up a simple 3D scene
 fn setup(
@@ -164,8 +201,9 @@ fn setup(
 ) {
     let mut entities = vec![];
 
-    entities.push(
-        commands
+    entities.push(Example {
+        camera_type: CameraType::TwoD,
+        entity: commands
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
@@ -185,8 +223,13 @@ fn setup(
                 Name::from("perlin-2d"),
             ))
             .id(),
-    );
-    entities.push(
+    });
+
+    commands
+        .spawn((Camera2dBundle::default(), ActiveCamera));
+    entities.push(Example {
+        camera_type: CameraType::ThreeD,
+        entity: 
         // cube
         commands
             .spawn((
@@ -206,10 +249,10 @@ fn setup(
                 },
                 Name::from("perlin-3d"),
             ))
-            .id(),
-    );
-    entities.push(
-        commands
+            .id()});
+    entities.push(Example {
+        camera_type: CameraType::TwoD,
+        entity: commands
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
@@ -231,8 +274,10 @@ fn setup(
                 Name::from("simplex-2d"),
             ))
             .id(),
-    );
-    entities.push(
+    });
+    entities.push(Example {
+        camera_type: CameraType::ThreeD,
+        entity: 
         // cube
         commands
             .spawn((
@@ -254,18 +299,19 @@ fn setup(
                 },
                 Name::from("simplex-3d"),
             ))
-            .id(),
-    );
+            .id()});
 
     // entities.push(
     //     // cube
     //     commands
     //         .spawn(PbrBundle {
-    //             mesh: meshes.add(Mesh::from(shape::Cube {
+    //             mesh:
+    // meshes.add(Mesh::from(shape::Cube {
     //                 size: 1.0,
     //             })),
-    //             material: screenshot_fresnel_materials
-    //                 .add(ScreenshotFresnelMaterial {}),
+    //             material:
+    // screenshot_fresnel_materials               
+    // .add(ScreenshotFresnelMaterial {}),
     //             transform: Transform::from_xyz(
     //                 0.0, 0.5, 0.0,
     //             ),
@@ -275,8 +321,9 @@ fn setup(
     //         .id(),
     // );
 
-    entities.push(
-        commands
+    entities.push(Example {
+        camera_type: CameraType::TwoD,
+        entity: commands
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
@@ -300,9 +347,10 @@ fn setup(
                 Name::from("voronoise"),
             ))
             .id(),
-    );
-    entities.push(
-        commands
+    });
+    entities.push(Example {
+        camera_type: CameraType::TwoD,
+        entity: commands
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
@@ -326,9 +374,10 @@ fn setup(
                 Name::from("voronoise"),
             ))
             .id(),
-    );
-    entities.push(
-        commands
+    });
+    entities.push(Example {
+        camera_type: CameraType::TwoD,
+        entity: commands
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
@@ -352,9 +401,10 @@ fn setup(
                 Name::from("voronoise"),
             ))
             .id(),
-    );
-    entities.push(
-        commands
+    });
+    entities.push(Example {
+        camera_type: CameraType::TwoD,
+        entity: commands
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
@@ -378,7 +428,7 @@ fn setup(
                 Name::from("voronoise"),
             ))
             .id(),
-    );
+    });
 
     commands.insert_resource(Examples(entities));
 
@@ -392,13 +442,6 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
-    // camera
-    // commands.spawn(Camera3dBundle {
-    //     transform: Transform::from_xyz(-2.0, 2.5, 5.0)
-    //         .looking_at(Vec3::ZERO, Vec3::Y),
-    //     ..default()
-    // });
-    commands.spawn(Camera2dBundle::default());
 
     commands.spawn(
         TextBundle::from_section(
@@ -489,14 +532,15 @@ impl Material for ScreenshotSimplex3dMaterial {
     }
 }
 
-// #[derive(AsBindGroup, TypeUuid,  Debug, Clone, Reflect)]
-// #[uuid = "0c0bf6dc-492b-43d4-89b0-70f2c5ae2166"]
-// pub struct ScreenshotFresnelMaterial {}
+// #[derive(AsBindGroup, TypeUuid,  Debug, Clone,
+// Reflect)]
+// #[uuid = "0c0bf6dc-492b-43d4-89b0-70f2c5ae2166"
+// ] pub struct ScreenshotFresnelMaterial {}
 
 // impl Material2d for ScreenshotFresnelMaterial {
 //     fn fragment_shader() -> ShaderRef {
-//         "shaders/screenshot_fresnel_material.wgsl".into()
-//     }
+//         "shaders/screenshot_fresnel_material.
+// wgsl".into()     }
 // }
 
 #[derive(AsBindGroup, TypeUuid, Debug, Clone, Reflect)]

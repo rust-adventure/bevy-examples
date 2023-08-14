@@ -11,7 +11,8 @@ pub const SIMPLEX_NOISE_2D: &str =
     include_str!("../shaders/simplex_noise_2d.wgsl");
 pub const SIMPLEX_NOISE_3D: &str =
     include_str!("../shaders/simplex_noise_3d.wgsl");
-// pub const FBM: &str = include_str!("../shaders/fbm.wgsl");
+// pub const FBM: &str =
+// include_str!("../shaders/fbm.wgsl");
 pub const VORONOISE: &str =
     include_str!("../shaders/voronoise.wgsl");
 // other utility functions
