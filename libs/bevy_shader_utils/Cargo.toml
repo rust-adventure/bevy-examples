@@ -1,10 +1,13 @@
 [package]
 description = "A utility package that provides a series of noise functions and other utilities for use in wgpu shaders."
 edition = "2021"
+readme = "README.md"
+repository = "https://github.com/rust-adventure/bevy-examples"
+homepage = "https://github.com/rust-adventure/bevy-examples/libs/bevy_shader_utils"
 keywords = ["bevy", "wgpu"]
 license = "MIT"
 name = "bevy_shader_utils"
-version = "0.5.1"
+version = "0.5.2"
 
 [dependencies]
 bevy = "0.11.0"
