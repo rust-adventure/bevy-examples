@@ -4,7 +4,7 @@ use bevy::{
         NotShadowCaster,
     },
     prelude::*,
-    reflect::TypeUuid,
+    reflect::{TypePath, TypeUuid},
     render::{
         camera::Projection,
         mesh::{
@@ -18,7 +18,7 @@ use bevy::{
         },
     },
 };
-use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_shader_utils::ShaderUtilsPlugin;
 use itertools::Itertools;
 
@@ -27,18 +27,16 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("e3eefc").unwrap(),
         ))
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            watch_for_changes: true,
-            ..default()
-        }))
-        .add_plugin(ShaderUtilsPlugin)
-        .add_plugin(
+        .add_plugins((
+            DefaultPlugins.set(AssetPlugin {
+                // watch_for_changes: true,
+                ..default()
+            }),
+            ShaderUtilsPlugin,
             MaterialPlugin::<CustomMaterial>::default(),
-        )
-        .add_system(update_time_for_custom_material)
-        .add_system(animate_light_direction)
-        .add_startup_system(setup)
-        .add_plugin(WorldInspectorPlugin::new())
+            WorldInspectorPlugin::new(),
+        ))
+        .add_systems(Startup, setup)
         .run();
 }
 
@@ -48,37 +46,6 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut custom_materials: ResMut<Assets<CustomMaterial>>,
 ) {
-    // ambient light
-    commands.insert_resource(AmbientLight {
-        color: Color::ORANGE_RED,
-        brightness: 0.02,
-    });
-    const HALF_SIZE: f32 = 10.0;
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
-            // Configure the projection to better fit the scene
-            shadow_projection: OrthographicProjection {
-                left: -HALF_SIZE,
-                right: HALF_SIZE,
-                bottom: -HALF_SIZE,
-                top: HALF_SIZE,
-                near: -10.0 * HALF_SIZE,
-                far: 10.0 * HALF_SIZE,
-                ..default()
-            },
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform {
-            translation: Vec3::new(0.0, 2.0, 0.0),
-            rotation: Quat::from_rotation_x(
-                -std::f32::consts::FRAC_PI_4,
-            ),
-            ..default()
-        },
-        ..default()
-    });
-
     let cube_size = 0.2;
     let mut mesh =
         Mesh::from(shape::Cube { size: cube_size });
@@ -149,40 +116,15 @@ fn setup(
     });
 }
 
-fn animate_light_direction(
-    time: Res<Time>,
-    mut query: Query<
-        &mut Transform,
-        With<DirectionalLight>,
-    >,
-) {
-    for mut transform in query.iter_mut() {
-        transform.rotate_y(time.delta_seconds() * 0.5);
-    }
-}
-
-fn update_time_for_custom_material(
-    mut materials: ResMut<Assets<CustomMaterial>>,
-    time: Res<Time>,
-) {
-    // for material in materials.iter_mut() {
-    //     material.1.time = time.elapsed_seconds();
-    // }
-}
-
-// This is the struct that will be passed to your shader
-#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
+#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
 #[uuid = "f690fdae-d598-42ab-8225-97e2a3f056e0"]
-// #[bind_group_data(StandardMaterialKey)]
-#[uniform(0, CustomMaterialUniform)]
 pub struct CustomMaterial {
-    // time: f32,
+    #[uniform(0)]
     offset: f32,
+    #[uniform(0)]
     color: Color,
 }
 
-/// The Material trait is very configurable, but comes with sensible defaults for all methods.
-/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
 impl Material for CustomMaterial {
     fn fragment_shader() -> ShaderRef {
         "shaders/custom_material.wgsl".into()
@@ -205,43 +147,3 @@ impl Material for CustomMaterial {
         Ok(())
     }
 }
-
-/// The GPU representation of the uniform data of a [`StandardMaterial`].
-#[derive(Clone, Default, ShaderType)]
-pub struct CustomMaterialUniform {
-    // pub time: f32,
-    pub offset: f32,
-    pub color: Vec4,
-}
-
-impl AsBindGroupShaderType<CustomMaterialUniform>
-    for CustomMaterial
-{
-    fn as_bind_group_shader_type(
-        &self,
-        _images: &RenderAssets<Image>,
-    ) -> CustomMaterialUniform {
-        CustomMaterialUniform {
-            // time: self.time,
-            offset: self.offset,
-            color: self.color.as_linear_rgba_f32().into(),
-        }
-    }
-}
-
-// #[derive(Clone, PartialEq, Eq, Hash)]
-// pub struct StandardMaterialKey {
-//     normal_map: bool,
-//     cull_mode: Option<Face>,
-// }
-
-// impl From<&StandardMaterial> for StandardMaterialKey {
-//     fn from(material: &StandardMaterial) -> Self {
-//         StandardMaterialKey {
-//             normal_map: material
-//                 .normal_map_texture
-//                 .is_some(),
-//             cull_mode: material.cull_mode,
-//         }
-//     }
-// }
