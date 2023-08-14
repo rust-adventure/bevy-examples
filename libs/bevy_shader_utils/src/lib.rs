@@ -18,6 +18,25 @@ pub const VORONOISE: &str =
 // other utility functions
 pub const MOCK_FRESNEL: &str =
     include_str!("../shaders/mock_fresnel.wgsl");
+
+/// To use the shader utility functions, add the plugin to your
+/// app.
+///
+/// ```rust
+/// App::new()
+///     .add_plugins((
+///         DefaultPlugins,
+///         ShaderUtilsPlugin,
+///     )
+/// );
+/// ```
+///
+/// then import the relevant function in your shader.
+///
+/// ```
+/// #import bevy_shader_utils::perlin_noise_2d perlin_noise_2d
+/// ```
+///
 pub struct ShaderUtilsPlugin;
 
 impl Plugin for ShaderUtilsPlugin {
