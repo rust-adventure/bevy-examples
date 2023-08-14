@@ -33,7 +33,7 @@ fn main() {
                 ..default()
             }),
             ShaderUtilsPlugin,
-            MaterialPlugin::<CustomMaterial>::default(),
+            MaterialPlugin::<CubeMaterial>::default(),
             WorldInspectorPlugin::new(),
         ))
         .add_systems(Startup, setup)
@@ -44,7 +44,7 @@ fn main() {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut custom_materials: ResMut<Assets<CustomMaterial>>,
+    mut custom_materials: ResMut<Assets<CubeMaterial>>,
 ) {
     let cube_size = 0.2;
     let mut mesh =
@@ -76,15 +76,14 @@ fn setup(
     for (z, x) in
         (0..num_squares).cartesian_product(0..num_squares)
     {
-        let material =
-            custom_materials.add(CustomMaterial {
-                // time: 0.0,
-                offset: ((f32::abs((x - half) as f32)
-                    + f32::abs((z - half) as f32))
-                    as f32)
-                    .abs(),
-                color: Color::rgb(0.92, 0.90, 0.73),
-            });
+        let material = custom_materials.add(CubeMaterial {
+            // time: 0.0,
+            offset: ((f32::abs((x - half) as f32)
+                + f32::abs((z - half) as f32))
+                as f32)
+                .abs(),
+            color: Color::rgb(0.92, 0.90, 0.73),
+        });
         commands
             .spawn(MaterialMeshBundle {
                 mesh: mesh_handle.clone(),
@@ -118,20 +117,20 @@ fn setup(
 
 #[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
 #[uuid = "f690fdae-d598-42ab-8225-97e2a3f056e0"]
-pub struct CustomMaterial {
+pub struct CubeMaterial {
     #[uniform(0)]
     offset: f32,
     #[uniform(0)]
     color: Color,
 }
 
-impl Material for CustomMaterial {
+impl Material for CubeMaterial {
     fn fragment_shader() -> ShaderRef {
-        "shaders/custom_material.wgsl".into()
+        "shaders/cube_material.wgsl".into()
     }
 
     fn vertex_shader() -> ShaderRef {
-        "shaders/vertex_shader.wgsl".into()
+        "shaders/cube_material.wgsl".into()
     }
 
     fn specialize(
