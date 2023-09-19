@@ -17,7 +17,7 @@ members = [
   # "examples/shader-rgb-worldspace-cube",
   # "examples/shader-test-001",
   # "examples/shield-spheres",
-  # "examples/shield-with-depth",
+   "examples/shield-with-depth",
   # "examples/spacecraft-noiseland",
   # "examples/standard-material-quixel-megascan",
   "libs/*",
