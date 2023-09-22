@@ -5,9 +5,7 @@
 #import bevy_pbr::mesh_functions as mesh_functions
 #import bevy_pbr::mesh_vertex_output MeshVertexOutput
 #import bevy_shader_utils::fresnel fresnel
-
-// NOTE: Bindings must come before functions that use them!
-#import bevy_pbr::prepass_utils
+#import bevy_pbr::prepass_utils prepass_depth
 
 struct Vertex {
 #ifdef VERTEX_POSITIONS
@@ -122,7 +120,7 @@ fn fragment(
     let intersection_intensity = 10.0;
     let sample_index = 0u;
 
-    let depth = bevy_pbr::prepass_utils::prepass_depth(mesh.position, sample_index);
+    let depth = prepass_depth(mesh.position, sample_index);
 
     // thanks to https://github.com/IceSentry for this line in particular,
     // which I was having trouble landing on
