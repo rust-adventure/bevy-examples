@@ -1,16 +1,13 @@
+use bevy::reflect::TypePath;
 use bevy::{
-    asset::load_internal_asset, pbr::NotShadowCaster,
-    prelude::*, reflect::TypeUuid,
+    asset::load_internal_asset, pbr::NotShadowCaster, prelude::*, reflect::TypeUuid,
     render::render_resource::*,
 };
 use bevy_inspector_egui::prelude::*;
 use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 
 const SHOW_PREPASS_SHADER_HANDLE: HandleUntyped =
-    HandleUntyped::weak_from_u64(
-        Shader::TYPE_UUID,
-        3253086272234592509,
-    );
+    HandleUntyped::weak_from_u64(Shader::TYPE_UUID, 3253086272234592509);
 /// Debug depth/normal/
 /// In order to function, the [`PrepassDebug`] component should be attached to the camera entity.
 #[derive(Default)]
@@ -37,50 +34,35 @@ impl Plugin for PrepassDebugPlugin {
 
         app.init_resource::<PrepassSettings>()
             .register_type::<PrepassSettings>()
-            .add_plugin(ResourceInspectorPlugin::<
-                PrepassSettings,
-            >::default())
-            .add_plugin(MaterialPlugin::<
-                PrepassOutputMaterial,
-            > {
-                // This material only needs to read the prepass textures,
-                // but the meshes using it should not contribute to the prepass render, so we can disable it.
-                prepass_enabled: false,
-                ..default()
-            })
-            .add_startup_system(setup_prepass_debug)
-            .add_system(toggle_prepass_view);
+            .add_plugin(ResourceInspectorPlugin::<PrepassSettings>::default())
+            .add_plugins(
+                (MaterialPlugin::<PrepassOutputMaterial> {
+                    // This material only needs to read the prepass textures,
+                    // but the meshes using it should not contribute to the prepass render, so we can disable it.
+                    prepass_enabled: false,
+                    ..default()
+                }),
+            )
+            .add_systems(Startup, setup_prepass_debug)
+            .add_systems(Update, toggle_prepass_view);
     }
 }
 
 fn setup_prepass_debug(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut depth_materials: ResMut<
-        Assets<PrepassOutputMaterial>,
-    >,
+    mut depth_materials: ResMut<Assets<PrepassOutputMaterial>>,
 ) {
     // A quad that shows the outputs of the prepass
     // To make it easy, we just draw a big quad right in front of the camera. For a real application, this isn't ideal.
     commands.spawn((
         MaterialMeshBundle {
-            mesh: meshes.add(
-                shape::Quad::new(Vec2::new(20.0, 20.0))
-                    .into(),
-            ),
-            material: depth_materials.add(
-                PrepassOutputMaterial {
-                    settings: ShowPrepassSettings::default(
-                    ),
-                },
-            ),
-            transform: Transform::from_xyz(
-                -0.75, 1.25, 3.0,
-            )
-            .looking_at(
-                Vec3::new(2.0, -2.5, -5.0),
-                Vec3::Y,
-            ),
+            mesh: meshes.add(shape::Quad::new(Vec2::new(20.0, 20.0)).into()),
+            material: depth_materials.add(PrepassOutputMaterial {
+                settings: ShowPrepassSettings::default(),
+            }),
+            transform: Transform::from_xyz(-0.75, 1.25, 3.0)
+                .looking_at(Vec3::new(2.0, -2.5, -5.0), Vec3::Y),
             ..default()
         },
         NotShadowCaster,
@@ -113,7 +95,7 @@ struct ShowPrepassSettings {
 }
 
 // This shader simply loads the prepass texture and outputs it directly
-#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
+#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
 #[uuid = "0af99895-b96e-4451-ba12-c6b1c1c52750"]
 pub struct PrepassOutputMaterial {
     #[uniform(0)]
@@ -147,11 +129,8 @@ fn toggle_prepass_view(
 
         let handle = material_handle.single();
         let mat = materials.get_mut(handle).unwrap();
-        mat.settings.show_depth =
-            (prepass_view == 1) as u32;
-        mat.settings.show_normals =
-            (prepass_view == 2) as u32;
-        mat.settings.show_motion_vectors =
-            (prepass_view == 3) as u32;
+        mat.settings.show_depth = (prepass_view == 1) as u32;
+        mat.settings.show_normals = (prepass_view == 2) as u32;
+        mat.settings.show_motion_vectors = (prepass_view == 3) as u32;
     }
 }

@@ -8,29 +8,27 @@ use bevy::{
         // MotionVectorPrepass,
         NormalPrepass,
     },
-    pbr::{NotShadowCaster, PbrPlugin},
+    pbr::PbrPlugin,
     prelude::*,
-    reflect::TypeUuid,
-    render::render_resource::{
-        AsBindGroup, ShaderRef, ShaderType,
-    },
+    reflect::{TypePath, TypeUuid},
+    render::render_resource::{AsBindGroup, ShaderRef, ShaderType},
 };
 use bevy_prepass_debug::PrepassDebugPlugin;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(PbrPlugin {
-            // The prepass is enabled by default on the StandardMaterial,
-            // but you can disable it if you need to.
-            //
-            // prepass_enabled: false,
-            ..default()
-        }))
-        .add_plugin(PrepassDebugPlugin)
-        .add_plugin(
+        .add_plugins((
+            DefaultPlugins.set(PbrPlugin {
+                // The prepass is enabled by default on the StandardMaterial,
+                // but you can disable it if you need to.
+                //
+                // prepass_enabled: false,
+                ..default()
+            }),
+            PrepassDebugPlugin,
             MaterialPlugin::<CustomMaterial>::default(),
-        )
-        .add_startup_system(setup)
+        ))
+        .add_systems(Startup, setup)
         .run();
 }
 
@@ -45,8 +43,7 @@ fn setup(
     // camera
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 3., 5.0)
-                .looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(-2.0, 3., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
         // To enable the prepass you need to add the components associated with the ones you need
@@ -61,32 +58,25 @@ fn setup(
 
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes
-            .add(shape::Plane::from_size(5.0).into()),
-        material: std_materials
-            .add(Color::rgb(0.3, 0.5, 0.3).into()),
+        mesh: meshes.add(shape::Plane::from_size(5.0).into()),
+        material: std_materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
 
     // Opaque cube using the StandardMaterial
     commands.spawn(PbrBundle {
-        mesh: meshes
-            .add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: std_materials
-            .add(Color::rgb(0.8, 0.7, 0.6).into()),
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: std_materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
         transform: Transform::from_xyz(-1.0, 0.5, 0.0),
         ..default()
     });
 
     // Cube with alpha mask
     commands.spawn(PbrBundle {
-        mesh: meshes
-            .add(Mesh::from(shape::Cube { size: 1.0 })),
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
         material: std_materials.add(StandardMaterial {
             alpha_mode: AlphaMode::Mask(1.0),
-            base_color_texture: Some(
-                asset_server.load("branding/icon.png"),
-            ),
+            base_color_texture: Some(asset_server.load("branding/icon.png")),
             ..default()
         }),
 
@@ -97,13 +87,10 @@ fn setup(
     // Cube with alpha blending.
     // Transparent materials are ignored by the prepass
     commands.spawn(MaterialMeshBundle {
-        mesh: meshes
-            .add(Mesh::from(shape::Cube { size: 1.0 })),
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
         material: materials.add(CustomMaterial {
             color: Color::WHITE,
-            color_texture: Some(
-                asset_server.load("branding/icon.png"),
-            ),
+            color_texture: Some(asset_server.load("branding/icon.png")),
             alpha_mode: AlphaMode::Blend,
         }),
         transform: Transform::from_xyz(1.0, 0.5, 0.0),
@@ -123,7 +110,7 @@ fn setup(
 }
 
 // This is the struct that will be passed to your shader
-#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
+#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
 #[uuid = "f690fdae-d598-45ab-8425-97e2a3f056e0"]
 pub struct CustomMaterial {
     #[uniform(0)]
