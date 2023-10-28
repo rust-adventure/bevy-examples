@@ -1,7 +1,11 @@
-#import bevy_pbr::mesh_view_bindings  globals
-#import bevy_pbr::mesh_bindings       mesh
-#import bevy_pbr::mesh_functions as mesh_functions
-#import bevy_pbr::mesh_vertex_output MeshVertexOutput
+#import bevy_pbr::{
+    mesh_view_bindings::globals,
+    mesh_bindings::mesh,
+    mesh_functions as mesh_functions,
+    view_transformations::position_world_to_clip,
+    forward_io::{Vertex,VertexOutput},
+}
+#import bevy_render::instance_index::get_instance_index
 
 struct CustomMaterial {
     offset: f32,
@@ -11,17 +15,20 @@ struct CustomMaterial {
 @group(1) @binding(0)
 var<uniform> material: CustomMaterial;
 
-struct Vertex {
-    @location(0) position: vec3<f32>,
-    @location(1) normal: vec3<f32>
-};
+// struct Vertex {
+//     @builtin(instance_index) instance_index: u32,
+//     @location(0) position: vec3<f32>,
+//     @location(1) normal: vec3<f32>
+// };
 
 @vertex
-fn vertex(vertex: Vertex) -> MeshVertexOutput {
+fn vertex(vertex: Vertex) -> VertexOutput {
 
-    var out: MeshVertexOutput;
+    var model = mesh_functions::get_model_matrix(vertex.instance_index);
 
-    out.world_normal = mesh_functions::mesh_normal_local_to_world(vertex.normal);
+    var out: VertexOutput;
+
+    out.world_normal = mesh_functions::mesh_normal_local_to_world(vertex.normal, get_instance_index(vertex.instance_index));
 
     let y = abs(sin(globals.time + material.offset / 3.0));
 
@@ -32,16 +39,16 @@ fn vertex(vertex: Vertex) -> MeshVertexOutput {
         position = vec3(vertex.position.x, vertex.position.y - y - 0.4, vertex.position.z);
     }
 
-    out.world_position = mesh_functions::mesh_position_local_to_world(mesh.model, vec4<f32>(position, 1.0));
+    out.world_position = mesh_functions::mesh_position_local_to_world(model, vec4<f32>(position, 1.0));
     // out.position is clip_position
-    out.position = mesh_functions::mesh_position_world_to_clip(out.world_position);
-        
+    out.position = position_world_to_clip(out.world_position.xyz);
+
     return out;
 }
 
 @fragment
 fn fragment(
-    mesh: MeshVertexOutput
+    mesh: VertexOutput
 ) -> @location(0) vec4<f32> {
     if mesh.world_normal.x == 1.0 {
         return vec4(0.57, 0.76, 0.74, 1.0);

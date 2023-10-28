@@ -18,7 +18,7 @@ use bevy::{
         },
     },
 };
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_shader_utils::ShaderUtilsPlugin;
 use itertools::Itertools;
 
@@ -34,7 +34,7 @@ fn main() {
             }),
             ShaderUtilsPlugin,
             MaterialPlugin::<CubeMaterial>::default(),
-            WorldInspectorPlugin::new(),
+            // WorldInspectorPlugin::new(),
         ))
         .add_systems(Startup, setup)
         .run();
@@ -115,7 +115,9 @@ fn setup(
     });
 }
 
-#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
+#[derive(
+    Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone,
+)]
 #[uuid = "f690fdae-d598-42ab-8225-97e2a3f056e0"]
 pub struct CubeMaterial {
     #[uniform(0)]
