@@ -1,14 +1,14 @@
-#import bevy_pbr::mesh_vertex_output MeshVertexOutput
-#import bevy_sprite::mesh2d_view_bindings globals
+#import bevy_pbr::forward_io::VertexOutput
+#import bevy_sprite::mesh2d_view_bindings::globals
 
-#import bevy_shader_utils::voronoise voronoise
+#import bevy_shader_utils::voronoise::voronoise
 
 @fragment
 fn fragment(
-    mesh: MeshVertexOutput
+    mesh: VertexOutput
 ) -> @location(0) vec4<f32> {
 
-    var p: vec2<f32> = 0.5 - 0.5*cos( globals.time + vec2(1.0,0.5) );
+    var p: vec2<f32> = 0.5 - 0.5 * cos(globals.time + vec2(1.0, 0.5));
     p.y = 0.0;
     // var p = vec2(0.0,0.0);
     // var p = vec2(1.0,0.0);

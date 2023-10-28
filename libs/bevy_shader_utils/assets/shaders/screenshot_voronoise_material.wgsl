@@ -1,6 +1,6 @@
-#import bevy_pbr::mesh_vertex_output MeshVertexOutput
+#import bevy_pbr::forward_io::VertexOutput
 
-#import bevy_shader_utils::voronoise voronoise
+#import bevy_shader_utils::voronoise::voronoise
 
 struct Material {
     x: f32,
@@ -13,7 +13,7 @@ var<uniform> material: Material;
 
 @fragment
 fn fragment(
-    mesh: MeshVertexOutput
+    mesh: VertexOutput
 ) -> @location(0) vec4<f32> {
     let f: f32 = voronoise(material.scale * mesh.uv, material.x, material.y);
 

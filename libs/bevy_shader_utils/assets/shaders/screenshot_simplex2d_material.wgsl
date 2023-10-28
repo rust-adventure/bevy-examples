@@ -1,6 +1,6 @@
-#import bevy_pbr::mesh_vertex_output MeshVertexOutput
+#import bevy_pbr::forward_io::VertexOutput
 
-#import bevy_shader_utils::simplex_noise_2d simplex_noise_2d
+#import bevy_shader_utils::simplex_noise_2d::simplex_noise_2d
 
 struct Material {
     scale: f32
@@ -12,7 +12,7 @@ var<uniform> material: Material;
 
 @fragment
 fn fragment(
-    mesh: MeshVertexOutput
+    mesh: VertexOutput
 ) -> @location(0) vec4<f32> {
     let f: f32 = simplex_noise_2d(material.scale * mesh.uv);
 

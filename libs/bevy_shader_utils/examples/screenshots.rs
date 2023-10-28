@@ -3,7 +3,7 @@
 
 use bevy::{
     prelude::*,
-    reflect::{TypePath, TypeUuid},
+    reflect::TypeUuid,
     render::{
         render_resource::{AsBindGroup, ShaderRef},
         view::screenshot::ScreenshotManager,
@@ -13,10 +13,10 @@ use bevy::{
     },
     window::PrimaryWindow,
 };
-use bevy_inspector_egui::quick::{
-    AssetInspectorPlugin, ResourceInspectorPlugin,
-    WorldInspectorPlugin,
-};
+// use bevy_inspector_egui::quick::{
+//     AssetInspectorPlugin, ResourceInspectorPlugin,
+//     WorldInspectorPlugin,
+// };
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 #[derive(Component)]
@@ -110,6 +110,9 @@ fn example_navigation(
     }
     if input.just_pressed(KeyCode::Right) {
         *example_index += 1;
+        if *example_index == examples.0.len() as u32 {
+            *example_index = 0;
+        }
     }
     for example in examples.0.iter() {
         commands
@@ -179,7 +182,6 @@ struct ActiveCamera;
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
     mut screenshot_perlin2d_materials: ResMut<
         Assets<ScreenshotPerlin2dMaterial>,
     >,
@@ -480,7 +482,7 @@ fn setup(
 }
 
 // Set up materials
-#[derive(AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
+#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
 #[uuid = "08063870-7da9-4b79-b9b7-6eeb904222ed"]
 pub struct ScreenshotPerlin2dMaterial {
     #[uniform(0)]
@@ -493,7 +495,7 @@ impl Material2d for ScreenshotPerlin2dMaterial {
     }
 }
 
-#[derive(AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
+#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
 #[uuid = "a4704519-fd4f-4cb0-a96a-be86901ab101"]
 pub struct ScreenshotPerlin3dMaterial {
     #[uniform(0)]
@@ -506,7 +508,7 @@ impl Material for ScreenshotPerlin3dMaterial {
     }
 }
 
-#[derive(AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
+#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
 #[uuid = "f2e98d09-230c-45a3-ba42-8b5da5642f36"]
 pub struct ScreenshotSimplex2dMaterial {
     #[uniform(0)]
@@ -519,7 +521,7 @@ impl Material2d for ScreenshotSimplex2dMaterial {
     }
 }
 
-#[derive(AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
+#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
 #[uuid = "848b7711-3819-4525-bbba-91b474303778"]
 pub struct ScreenshotSimplex3dMaterial {
     #[uniform(0)]
@@ -532,7 +534,7 @@ impl Material for ScreenshotSimplex3dMaterial {
     }
 }
 
-// #[derive(AsBindGroup, TypeUuid,  Debug, Clone,
+// #[derive(Asset, AsBindGroup, TypeUuid,  Debug, Clone,
 // Reflect)]
 // #[uuid = "0c0bf6dc-492b-43d4-89b0-70f2c5ae2166"
 // ] pub struct ScreenshotFresnelMaterial {}
@@ -543,7 +545,7 @@ impl Material for ScreenshotSimplex3dMaterial {
 // wgsl".into()     }
 // }
 
-#[derive(AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
+#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
 #[uuid = "3177e91c-c3db-4b62-bf9b-b2e50c81e3f4"]
 pub struct ScreenshotVoronoiseMaterial {
     #[uniform(0)]
