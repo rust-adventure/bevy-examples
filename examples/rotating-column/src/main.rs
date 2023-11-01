@@ -19,16 +19,15 @@ fn main() {
         .insert_resource(ClearColor(
             Color::hex("e3eefc").unwrap(),
         ))
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            watch_for_changes: true,
-            ..default()
-        }))
-        .add_plugin(TweeningPlugin)
-        .add_plugin(ShaderUtilsPlugin)
-        .add_plugin(CubeMaterialPlugin)
-        .add_startup_system(setup)
+        .add_plugins((
+            DefaultPlugins,
+            TweeningPlugin,
+            ShaderUtilsPlugin,
+            CubeMaterialPlugin,
+        ))
+        .add_systems(Startup, setup)
         .add_plugin(WorldInspectorPlugin::new())
-        .add_system(cube_completed)
+        .add_systems(Update, cube_completed)
         .run();
 }
 

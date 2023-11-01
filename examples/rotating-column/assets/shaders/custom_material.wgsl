@@ -1,6 +1,4 @@
-#import bevy_pbr::utils
-#import bevy_pbr::mesh_view_bindings
-#import bevy_pbr::lighting
+#import bevy_pbr::forward_io::VertexOutput
 
 struct CustomMaterial {
     color: vec4<f32>,
@@ -15,15 +13,7 @@ var base_color_sampler: sampler;
 
 @fragment
 fn fragment(
-    @builtin(front_facing) is_front: bool,
-    @builtin(position) frag_coord: vec4<f32>,
-    @location(0) world_position: vec4<f32>,
-    @location(1) world_normal: vec3<f32>,
-    @location(2) uv: vec2<f32>,
-    #ifdef VERTEX_COLORS
-    @location(4) color: vec4<f32>,
-    #endif
-
+    in: VertexOutput
 ) -> @location(0) vec4<f32> {
 
     if world_normal.y == 1.0 {

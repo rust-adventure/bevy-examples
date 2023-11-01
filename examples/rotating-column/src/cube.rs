@@ -36,7 +36,7 @@ impl TryFrom<u64> for TweenEvents {
 pub struct SpawnCube;
 
 impl Command for SpawnCube {
-    fn write(self, world: &mut World) {
+    fn apply(self, world: &mut World) {
         let cube_size = 0.2;
         let mut mesh =
             Mesh::from(shape::Cube { size: cube_size });

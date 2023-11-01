@@ -15,7 +15,7 @@ members = [
   # "examples/pressure-wave-sphere",
   # "examples/rotating-column",
   # "examples/shader-rgb-worldspace-cube",
-  # "examples/shader-test-001",
+  "examples/shader-test-001",
   # "examples/shield-spheres",
   "examples/shield-with-depth",
   # "examples/spacecraft-noiseland",
@@ -43,6 +43,7 @@ bevy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_ma
 bevy-inspector-egui = { git = "https://github.com/raffaeleragni/bevy-inspector-egui", branch = "bevy_0_12" }
 # bevy-inspector-egui = "0.20.0"
 bevy_asset_loader = { git = "https://github.com/NiklasEi/bevy_asset_loader", branch = "bevy_main" }
+bevy_tweening = { git = "https://github.com/djeedai/bevy_tweening" }
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }

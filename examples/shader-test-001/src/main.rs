@@ -7,16 +7,13 @@ use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            watch_for_changes: true,
-            ..default()
-        }))
-        .add_plugin(ShaderUtilsPlugin)
-        .add_plugin(
+        .add_plugins((
+            DefaultPlugins,
+            ShaderUtilsPlugin,
             MaterialPlugin::<CustomMaterial>::default(),
-        )
-        .add_startup_system(setup)
-        .add_system(change_color)
+        ))
+        .add_systems(Startup, setup)
+        .add_systems(Update, change_color)
         .run();
 }
 
@@ -81,8 +78,7 @@ impl Material for CustomMaterial {
 }
 
 // This is the struct that will be passed to your shader
-#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
-#[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
+#[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct CustomMaterial {
     #[uniform(0)]
     color: Color,

@@ -1,4 +1,5 @@
-#import bevy_shader_utils::perlin_noise_3d
+#import bevy_pbr::forward_io::VertexOutput
+#import bevy_shader_utils::perlin_noise_3d::perlin_noise_3d
 
 struct CustomMaterial {
     color: vec4<f32>,
@@ -13,13 +14,11 @@ var base_color_sampler: sampler;
 
 @fragment
 fn fragment(
-    @location(0) something: vec4<f32>,
-    @location(1) dunno: vec3<f32>,
-    @location(2) uv: vec2<f32>
+    in: VertexOutput
 ) -> @location(0) vec4<f32> {
     // return material.color * textureSample(base_color_texture, base_color_sampler, uv);
-    var input: vec3<f32> = vec3<f32>(uv.x * 40.0, uv.y * 40.0, 1.);
-    var noise = perlinNoise3(input);
+    var input: vec3<f32> = vec3<f32>(in.uv.x * 40.0, in.uv.y * 40.0, 1.);
+    var noise = perlin_noise_3d(input);
     var alpha = (noise + 1.0) / 2.0;
-    return material.color * textureSample(base_color_texture, base_color_sampler, uv) * vec4<f32>(1.0, 1.0, 1.0, alpha);
+    return material.color * textureSample(base_color_texture, base_color_sampler, in.uv) * vec4<f32>(1.0, 1.0, 1.0, alpha);
 }
