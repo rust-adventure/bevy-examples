@@ -19,6 +19,8 @@ pub const VORONOISE: Handle<Shader> =
 // other utility functions
 pub const MOCK_FRESNEL: Handle<Shader> =
     Handle::weak_from_u128(11918512842344596158);
+pub const PRISTINE_GRID: Handle<Shader> =
+    Handle::weak_from_u128(11918512942344596158);
 
 /// To use the shader utility functions, add the plugin to your
 /// app.
@@ -76,6 +78,12 @@ impl Plugin for ShaderUtilsPlugin {
             app,
             MOCK_FRESNEL,
             "../shaders/mock_fresnel.wgsl",
+            Shader::from_wgsl
+        );
+        load_internal_asset!(
+            app,
+            PRISTINE_GRID,
+            "../shaders/pristine_grid.wgsl",
             Shader::from_wgsl
         );
     }
