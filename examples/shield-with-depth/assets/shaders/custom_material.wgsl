@@ -1,48 +1,43 @@
-#import bevy_shader_utils::simplex_noise_3d simplex_noise_3d
-#import bevy_pbr::mesh_view_bindings globals
-#import bevy_pbr::mesh_view_bindings as view_bindings
-#import bevy_pbr::mesh_bindings mesh
-#import bevy_pbr::mesh_functions as mesh_functions
-#import bevy_pbr::mesh_vertex_output MeshVertexOutput
-#import bevy_shader_utils::fresnel fresnel
-#import bevy_pbr::prepass_utils prepass_depth
+#import bevy_shader_utils::simplex_noise_3d::simplex_noise_3d
+#import bevy_pbr::{
+    mesh_view_bindings::{
+        globals,
+        view
+    },
+    mesh_bindings::mesh,
+    mesh_functions as mesh_functions,
+    forward_io::Vertex,
+    view_transformations::position_world_to_clip,
+}
+#import bevy_shader_utils::fresnel::fresnel
+#import bevy_pbr::prepass_utils::prepass_depth
+#import bevy_render::{
+    instance_index::get_instance_index
+}
 
-struct Vertex {
-#ifdef VERTEX_POSITIONS
-    @location(0) position: vec3<f32>,
-#endif
-#ifdef VERTEX_NORMALS
-    @location(1) normal: vec3<f32>,
-#endif
+// @group(0) @binding(0) var<uniform> view: View;
+
+// mostly a clone of bevy_pbr::forward_io::VertexOutput
+// so that we can add the extra fields
+struct VertexOutput {
+    // This is `clip position` when the struct is used as a vertex stage output
+    // and `frag coord` when used as a fragment stage input
+    @builtin(position) position: vec4<f32>,
+    @location(0) world_position: vec4<f32>,
+    @location(1) world_normal: vec3<f32>,
 #ifdef VERTEX_UVS
     @location(2) uv: vec2<f32>,
 #endif
 #ifdef VERTEX_TANGENTS
-    @location(3) tangent: vec4<f32>,
+    @location(3) world_tangent: vec4<f32>,
 #endif
 #ifdef VERTEX_COLORS
     @location(4) color: vec4<f32>,
 #endif
-#ifdef SKINNED
-    @location(5) joint_indices: vec4<u32>,
-    @location(6) joint_weights: vec4<f32>,
+#ifdef VERTEX_OUTPUT_INSTANCE_INDEX
+    @location(5) @interpolate(flat) instance_index: u32,
 #endif
-};
-
-struct VertexOutput {
-    @builtin(position) position: vec4<f32>,
-    @location(0) world_position: vec4<f32>,
-    @location(1) world_normal: vec3<f32>,
-    #ifdef VERTEX_UVS
-    @location(2) uv: vec2<f32>,
-    #endif
-    #ifdef VERTEX_TANGENTS
-    @location(3) world_tangent: vec4<f32>,
-    #endif
-    #ifdef VERTEX_COLORS
-    @location(4) color: vec4<f32>,
-    #endif
-    @location(5) position_diff: f32,
+    @location(6) position_diff: f32,
 };
 
 @vertex
@@ -59,24 +54,16 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     var out: VertexOutput;
     out.position_diff = position_diff;
 
-#ifdef SKINNED
-    var model = skin_model(vertex.joint_indices, vertex.joint_weights);
-#else
-    var model = mesh.model;
-#endif
+    var model = mesh_functions::get_model_matrix(vertex.instance_index);
 
-#ifdef VERTEX_NORMALS
-#ifdef SKINNED
-    out.world_normal = bevy_pbr::skinning::skin_normals(model, vertex.normal);
-#else
-    out.world_normal = mesh_functions::mesh_normal_local_to_world(vertex.normal);
-#endif
-#endif
+
+    out.world_normal = mesh_functions::mesh_normal_local_to_world(vertex.normal, get_instance_index(vertex.instance_index));
+
 
 #ifdef VERTEX_POSITIONS
     // out.world_position = mesh_functions::mesh_position_local_to_world(model, vec4<f32>(vertex.position, 1.0));
     out.world_position = mesh_functions::mesh_position_local_to_world(model, vec4<f32>(position, 1.0));
-    out.position = mesh_functions::mesh_position_world_to_clip(out.world_position);
+    out.position = position_world_to_clip(out.world_position.xyz);
 #endif
 
 #ifdef VERTEX_UVS
@@ -105,16 +92,16 @@ var<uniform> material: CustomMaterial;
 @fragment
 fn fragment(
     @builtin(front_facing) is_front: bool,
-    mesh: MeshVertexOutput,
-    @location(5) position_diff: f32,
+    mesh: VertexOutput,
+    // @location(6) position_diff: f32,
 ) -> @location(0) vec4<f32> {
     // return color;
     var noise = simplex_noise_3d(vec3<f32>(mesh.world_normal.xy * 4.2, globals.time));
     var alpha = (noise + 1.0) / 2.0;
 
-    let highlight = smoothstep(0.0, 1.0, position_diff + 1.0);
+    let highlight = smoothstep(0.0, 1.0, mesh.position_diff + 1.0);
 
-    let fresnel = fresnel(view_bindings::view.world_position.xyz, mesh.world_position.xyz, mesh.world_normal, 2.0, 1.0);
+    let fresnel = fresnel(view.world_position.xyz, mesh.world_position.xyz, mesh.world_normal, 2.0, 1.0);
 
     let offset = 0.82;
     let intersection_intensity = 10.0;

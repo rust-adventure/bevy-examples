@@ -27,17 +27,18 @@ members = [
 ]
 
 resolver = "2"
-# Enable a small amount of optimization in debug mode
-[profile.dev]
-opt-level = 1
+# # Enable a small amount of optimization in debug mode
+# [profile.dev]
+# opt-level = 1
 
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
-[profile.dev.package."*"]
-opt-level = 3
+# # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+# [profile.dev.package."*"]
+# opt-level = 3
 
 
 [workspace.dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy", rev = "b208388af95ecd753e4710f40baf2e913bc85c17" }
+# bevy = { git = "https://github.com/bevyengine/bevy" }
+bevy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
 ## use random PR fork of egui for 0.12
 bevy-inspector-egui = { git = "https://github.com/raffaeleragni/bevy-inspector-egui", branch = "bevy_0_12" }
 # bevy-inspector-egui = "0.20.0"
@@ -45,3 +46,24 @@ bevy_asset_loader = { git = "https://github.com/NiklasEi/bevy_asset_loader", bra
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
+
+[patch."https://github.com/bevyengine/bevy"]
+bevy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+
+bevy_app = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_asset = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_core = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_ecs = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_hierarchy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_log = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_math = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_reflect = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_utils = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_window = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+
+bevy_core_pipeline = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_pbr = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_render = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+
+# [patch.crates-io]
+# bevy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }

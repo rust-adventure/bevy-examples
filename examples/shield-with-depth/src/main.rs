@@ -1,44 +1,47 @@
-//! A shader and a material that uses it.
-
-use std::f32::consts::FRAC_PI_2;
-use std::time::Duration;
-
-use bevy::asset::ChangeWatcher;
-use bevy::reflect::TypePath;
 use bevy::{
     core_pipeline::{
         bloom::BloomSettings,
-        prepass::{DepthPrepass, NormalPrepass},
+        prepass::{
+            DepthPrepass, MotionVectorPrepass,
+            NormalPrepass,
+        },
     },
-    pbr::{MaterialPipeline, MaterialPipelineKey, NotShadowCaster},
+    pbr::{
+        MaterialPipeline, MaterialPipelineKey,
+        NotShadowCaster,
+    },
     prelude::*,
-    reflect::TypeUuid,
+    reflect::TypePath,
     render::{
         mesh::MeshVertexBufferLayout,
         render_resource::{
-            AsBindGroup, RenderPipelineDescriptor, ShaderRef, ShaderType,
+            AsBindGroup, RenderPipelineDescriptor,
+            ShaderRef, ShaderType,
             SpecializedMeshPipelineError,
         },
     },
 };
 use bevy_asset_loader::prelude::*;
+use std::f32::consts::FRAC_PI_2;
 
-use bevy_basic_camera::{CameraController, CameraControllerPlugin};
+use bevy_basic_camera::{
+    CameraController, CameraControllerPlugin,
+};
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Color::hex("071f3c").unwrap()))
+        .insert_resource(Msaa::Off)
+        .insert_resource(ClearColor(
+            Color::hex("071f3c").unwrap(),
+        ))
         .insert_resource(AmbientLight {
             color: Color::ORANGE_RED,
             brightness: 0.02,
         })
         .add_state::<MyStates>()
         .add_plugins((
-            DefaultPlugins.set(AssetPlugin {
-                watch_for_changes: ChangeWatcher::with_delay(Duration::from_millis(200)),
-                ..default()
-            }),
+            DefaultPlugins,
             CameraControllerPlugin,
             ShaderUtilsPlugin,
             MaterialPlugin::<CustomMaterial> {
@@ -53,34 +56,55 @@ fn main() {
             },
         ))
         .add_loading_state(
-            LoadingState::new(MyStates::AssetLoading).continue_to_state(MyStates::Next),
+            LoadingState::new(MyStates::AssetLoading)
+                .continue_to_state(MyStates::Next),
         )
-        .add_collection_to_loading_state::<_, MyAssets>(MyStates::AssetLoading)
+        .add_collection_to_loading_state::<_, GlbAssets>(
+            MyStates::AssetLoading,
+        )
         .add_systems(OnEnter(MyStates::Next), setup)
-        .add_systems(Update, toggle_prepass_view.run_if(in_state(MyStates::Next)))
+        .add_systems(
+            Update,
+            toggle_prepass_view
+                .run_if(in_state(MyStates::Next)),
+        )
         .run();
 }
 
 /// set up a simple 3D scene
 fn setup(
-    assets: Res<MyAssets>,
+    // assets: Res<GlbAssets>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<CustomMaterial>>,
     mut std_materials: ResMut<Assets<StandardMaterial>>,
-    mut depth_materials: ResMut<Assets<PrepassOutputMaterial>>,
+    mut depth_materials: ResMut<
+        Assets<PrepassOutputMaterial>,
+    >,
+    asset_server: Res<AssetServer>,
 ) {
     // Debug
     // A quad that shows the outputs of the prepass
     // To make it easy, we just draw a big quad right in front of the camera. For a real application, this isn't ideal.
     commands.spawn((
         MaterialMeshBundle {
-            mesh: meshes.add(shape::Quad::new(Vec2::new(20.0, 20.0)).into()),
-            material: depth_materials.add(PrepassOutputMaterial {
-                settings: ShowPrepassSettings::default(),
-            }),
-            transform: Transform::from_xyz(-0.75, 1.25, 3.0)
-                .looking_at(Vec3::new(2.0, -2.5, -5.0), Vec3::Y),
+            mesh: meshes.add(
+                shape::Quad::new(Vec2::new(20.0, 20.0))
+                    .into(),
+            ),
+            material: depth_materials.add(
+                PrepassOutputMaterial {
+                    settings: ShowPrepassSettings::default(
+                    ),
+                },
+            ),
+            transform: Transform::from_xyz(
+                -0.75, 1.25, 3.0,
+            )
+            .looking_at(
+                Vec3::new(2.0, -2.5, -5.0),
+                Vec3::Y,
+            ),
             ..default()
         },
         NotShadowCaster,
@@ -92,7 +116,8 @@ fn setup(
                 hdr: true,
                 ..default()
             },
-            transform: Transform::from_xyz(-2.0, 3., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(-2.0, 3., 5.0)
+                .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
         // To enable the prepass you need to add the components associated with the ones you need
@@ -100,6 +125,7 @@ fn setup(
         DepthPrepass,
         // This will generate a texture containing world normals (with normal maps applied)
         NormalPrepass,
+        MotionVectorPrepass,
         CameraController {
             orbit_mode: true,
             orbit_focus: Vec3::new(0.0, 0.5, 0.0).into(),
@@ -119,16 +145,22 @@ fn setup(
     });
 
     commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(10.0).into()),
-        material: std_materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+        mesh: meshes
+            .add(shape::Plane::from_size(10.0).into()),
+        material: std_materials
+            .add(Color::rgb(1.0, 1.0, 1.0).into()),
         transform: Transform::from_xyz(0.0, 0.3, 0.0),
         ..default()
     });
     commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(5.0).into()),
-        material: std_materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+        mesh: meshes
+            .add(shape::Plane::from_size(5.0).into()),
+        material: std_materials
+            .add(Color::rgb(1.0, 1.0, 1.0).into()),
         transform: Transform::from_xyz(0.3, 0.0, 0.0)
-            .with_rotation(Quat::from_rotation_z(FRAC_PI_2)),
+            .with_rotation(Quat::from_rotation_z(
+                FRAC_PI_2,
+            )),
 
         ..default()
     });
@@ -137,7 +169,8 @@ fn setup(
     // cube
     commands.spawn((
         MaterialMeshBundle {
-            mesh: assets.hex_sphere.clone(),
+            // mesh: assets.hex_sphere.clone(),
+            mesh: asset_server.load("models/hex-sphere-5-subdivisions.glb#Mesh0/Primitive0"),
             transform,
             material: materials.add(CustomMaterial {
                 color: Color::BLUE,
@@ -149,16 +182,16 @@ fn setup(
     ));
 
     commands.spawn(SceneBundle {
-        scene: assets.ferris.clone(),
-        transform: transform
-            .clone()
-            .with_rotation(Quat::from_rotation_y(-FRAC_PI_2)),
+        // scene: assets.ferris.clone(),
+        scene: asset_server
+            .load("models/ferris3d_v1.0.glb#Scene0"),
+        transform: transform.clone().with_rotation(
+            Quat::from_rotation_y(-FRAC_PI_2),
+        ),
         ..default()
     });
 }
 
-/// The Material trait is very configurable, but comes with sensible defaults for all methods.
-/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
 impl Material for CustomMaterial {
     fn fragment_shader() -> ShaderRef {
         "shaders/custom_material.wgsl".into()
@@ -187,23 +220,26 @@ impl Material for CustomMaterial {
 }
 
 // This is the struct that will be passed to your shader
-#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
-#[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
+#[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct CustomMaterial {
     #[uniform(0)]
     color: Color,
     alpha_mode: AlphaMode,
 }
 
-#[derive(AssetCollection, Resource)]
-struct MyAssets {
-    #[asset(path = "models/hex-sphere-5-subdivisions.glb#Mesh0/Primitive0")]
-    hex_sphere: Handle<Mesh>,
-    #[asset(path = "models/ferris3d_v1.0.glb#Scene0")]
-    ferris: Handle<Scene>,
+#[derive(Resource, AssetCollection)]
+struct GlbAssets {
+    // #[asset(
+    //     path = "models/hex-sphere-5-subdivisions.glb#Mesh0/Primitive0"
+    // )]
+    // hex_sphere: Handle<Mesh>,
+    // #[asset(path = "models/ferris3d_v1.0.glb#Scene0")]
+    // ferris: Handle<Scene>,
 }
 
-#[derive(Default, Clone, Eq, PartialEq, Debug, Hash, States)]
+#[derive(
+    Default, Clone, Eq, PartialEq, Debug, Hash, States,
+)]
 enum MyStates {
     #[default]
     AssetLoading,
@@ -216,13 +252,13 @@ enum MyStates {
 struct ShowPrepassSettings {
     show_depth: u32,
     show_normals: u32,
+    show_motion_vectors: u32,
     padding_1: u32,
     padding_2: u32,
 }
 
 // This shader simply loads the prepass texture and outputs it directly
-#[derive(AsBindGroup, TypeUuid, TypePath, Debug, Clone)]
-#[uuid = "0af99895-b96e-4451-bc12-c6b1c1c52750"]
+#[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct PrepassOutputMaterial {
     #[uniform(0)]
     settings: ShowPrepassSettings,
