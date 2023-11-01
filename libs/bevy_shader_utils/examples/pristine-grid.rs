@@ -1,17 +1,11 @@
-use bevy::{
-    prelude::*,
-    reflect::TypePath,
-    render::render_resource::{AsBindGroup, ShaderRef},
+use bevy::prelude::*;
+use bevy_shader_utils::{
+    PristineGridMaterial, ShaderUtilsPlugin,
 };
-use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .add_plugins((
-            DefaultPlugins,
-            MaterialPlugin::<PristineMaterial>::default(),
-            ShaderUtilsPlugin,
-        ))
+        .add_plugins((DefaultPlugins, ShaderUtilsPlugin))
         .add_systems(Startup, setup)
         .add_systems(Update, rotate_camera)
         .run();
@@ -23,17 +17,19 @@ struct MainCamera;
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<PristineMaterial>>,
+    mut materials: ResMut<Assets<PristineGridMaterial>>,
 ) {
     // floor
     commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(Mesh::from(shape::Plane {
             size: 40.,
-            subdivisions: 100,
+            ..default()
         })),
         transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        material: materials.add(PristineMaterial {
+        material: materials.add(PristineGridMaterial {
             color: Color::DARK_GRAY,
+            cell_multiplier: Vec2::splat(80.),
+            ..default()
         }),
         ..default()
     });
@@ -45,8 +41,11 @@ fn setup(
             ..default()
         })),
         transform: Transform::from_xyz(0.0, 0.8, 0.0),
-        material: materials
-            .add(PristineMaterial { color: Color::CYAN }),
+        material: materials.add(PristineGridMaterial {
+            color: Color::CYAN,
+            cell_multiplier: Vec2::splat(20.),
+            ..default()
+        }),
         ..default()
     });
 
@@ -59,21 +58,6 @@ fn setup(
         },
         MainCamera,
     ));
-}
-
-/// The Material trait is very configurable, but comes with sensible defaults for all methods.
-/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
-impl Material for PristineMaterial {
-    fn fragment_shader() -> ShaderRef {
-        "shaders/pristine_material.wgsl".into()
-    }
-}
-
-// This is the struct that will be passed to your shader
-#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
-pub struct PristineMaterial {
-    #[uniform(0)]
-    color: Color,
 }
 
 fn rotate_camera(
