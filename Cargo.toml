@@ -8,7 +8,7 @@ members = [
   # "examples/compute-3d",
   # "examples/compute-with-time",
   "examples/cube-wave",
-  # "examples/dissolve-sphere-standard-material-extensions",
+  "examples/dissolve-sphere-standard-material-extensions",
   # "examples/fresnel-effect",
   # "examples/infinite-tunnel",
   # "examples/pointcloud",
@@ -37,8 +37,10 @@ resolver = "2"
 
 
 [workspace.dependencies]
-# bevy = { git = "https://github.com/bevyengine/bevy" }
-bevy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+# bevy = { git = "https://github.com/christopherbiscardi/bevy", branch ="vertex-colors-prepass" }
+bevy = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass", features = [
+  "jpeg",
+] }
 ## use random PR fork of egui for 0.12
 bevy-inspector-egui = { git = "https://github.com/raffaeleragni/bevy-inspector-egui", branch = "bevy_0_12" }
 # bevy-inspector-egui = "0.20.0"
@@ -48,23 +50,23 @@ bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
 
-[patch."https://github.com/bevyengine/bevy"]
-bevy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+# [patch."https://github.com/christopherbiscardi/bevy", branch ="vertex-colors-prepass"]
+# bevy = { git = "https://github.com/christopherbiscardi/bevy", branch ="vertex-colors-prepass", features = ["jpeg"] }
 
-bevy_app = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_asset = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_core = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_ecs = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_hierarchy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_log = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_math = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_reflect = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_utils = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_window = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_app = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_asset = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_core = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_ecs = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_hierarchy = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_log = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_math = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_reflect = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_utils = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_window = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
 
-bevy_core_pipeline = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_pbr = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
-bevy_render = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+bevy_core_pipeline = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_pbr = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+bevy_render = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
 
 # [patch.crates-io]
-# bevy = { git = "https://github.com/mockersf/bevy", branch = "fix-apply_normal_mapping-calls-double-sided-normals" }
+# bevy = { git = "https://github.com/christopherbiscardi/bevy", branch ="vertex-colors-prepass" }

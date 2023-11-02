@@ -402,9 +402,17 @@ dependencies = [
 [[package]]
 name = "bevy"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_internal 0.12.0-dev",
+ "bevy_internal 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+]
+
+[[package]]
+name = "bevy"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_internal 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
 ]
 
 [[package]]
@@ -441,20 +449,20 @@ version = "0.20.0"
 source = "git+https://github.com/raffaeleragni/bevy-inspector-egui?branch=bevy_0_12#c963dc27cdb00052df90f37deb5c92df3414599a"
 dependencies = [
  "bevy-inspector-egui-derive 0.20.0",
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_core_pipeline 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "bevy_egui 0.22.0",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_pbr 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
- "bevy_window 0.12.0-dev",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_log 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_pbr 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_render 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_window 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "egui 0.23.0",
  "image",
  "once_cell",
@@ -498,30 +506,41 @@ dependencies = [
 [[package]]
 name = "bevy_a11y"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "accesskit 0.12.0",
- "bevy_app 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+]
+
+[[package]]
+name = "bevy_a11y"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "accesskit 0.12.0",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
 ]
 
 [[package]]
 name = "bevy_animation"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_time 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_time 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
 ]
 
 [[package]]
@@ -543,13 +562,28 @@ dependencies = [
 [[package]]
 name = "bevy_app"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_tasks 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "downcast-rs",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "bevy_app"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "downcast-rs",
  "wasm-bindgen",
  "web-sys",
@@ -586,19 +620,50 @@ dependencies = [
 [[package]]
 name = "bevy_asset"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "async-broadcast",
  "async-fs",
  "async-lock",
- "bevy_app 0.12.0-dev",
- "bevy_asset_macros",
- "bevy_ecs 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_tasks 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
- "bevy_winit 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset_macros 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_winit 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "blake3",
+ "crossbeam-channel",
+ "downcast-rs",
+ "futures-io",
+ "futures-lite",
+ "js-sys",
+ "parking_lot",
+ "ron",
+ "serde",
+ "thiserror",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
+name = "bevy_asset"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "async-broadcast",
+ "async-fs",
+ "async-lock",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_asset_macros 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_log 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_winit 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "blake3",
  "crossbeam-channel",
  "downcast-rs",
@@ -617,10 +682,10 @@ dependencies = [
 [[package]]
 name = "bevy_asset_loader"
 version = "0.17.0"
-source = "git+https://github.com/NiklasEi/bevy_asset_loader?branch=bevy_main#a12fa088cad017df3ffdf0eb5b083bc7d1cdab3b"
+source = "git+https://github.com/NiklasEi/bevy_asset_loader?branch=bevy_main#a69394dbe802133a082e654b867e175b8ed8f248"
 dependencies = [
  "anyhow",
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "bevy_asset_loader_derive",
  "path-slash",
 ]
@@ -628,7 +693,7 @@ dependencies = [
 [[package]]
 name = "bevy_asset_loader_derive"
 version = "0.17.0"
-source = "git+https://github.com/NiklasEi/bevy_asset_loader?branch=bevy_main#a12fa088cad017df3ffdf0eb5b083bc7d1cdab3b"
+source = "git+https://github.com/NiklasEi/bevy_asset_loader?branch=bevy_main#a69394dbe802133a082e654b867e175b8ed8f248"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -638,9 +703,20 @@ dependencies = [
 [[package]]
 name = "bevy_asset_macros"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_macro_utils 0.12.0-dev",
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+]
+
+[[package]]
+name = "bevy_asset_macros"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "proc-macro2",
  "quote",
  "syn 2.0.38",
@@ -649,16 +725,16 @@ dependencies = [
 [[package]]
 name = "bevy_audio"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "oboe",
  "rodio",
 ]
@@ -667,7 +743,7 @@ dependencies = [
 name = "bevy_basic_camera"
 version = "0.1.0"
 dependencies = [
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
 ]
 
 [[package]]
@@ -688,14 +764,28 @@ dependencies = [
 [[package]]
 name = "bevy_core"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_tasks 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bytemuck",
+]
+
+[[package]]
+name = "bevy_core"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "bytemuck",
 ]
 
@@ -723,19 +813,40 @@ dependencies = [
 [[package]]
 name = "bevy_core_pipeline"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bitflags 2.4.1",
+ "radsort",
+ "serde",
+]
+
+[[package]]
+name = "bevy_core_pipeline"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_log 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_render 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "bitflags 2.4.1",
  "radsort",
  "serde",
@@ -755,9 +866,19 @@ dependencies = [
 [[package]]
 name = "bevy_derive"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_macro_utils 0.12.0-dev",
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "quote",
+ "syn 2.0.38",
+]
+
+[[package]]
+name = "bevy_derive"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "quote",
  "syn 2.0.38",
 ]
@@ -780,14 +901,28 @@ dependencies = [
 [[package]]
 name = "bevy_diagnostic"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_time 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_time 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "sysinfo",
+]
+
+[[package]]
+name = "bevy_diagnostic"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_log 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_time 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "sysinfo",
 ]
 
@@ -815,14 +950,34 @@ dependencies = [
 [[package]]
 name = "bevy_ecs"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "async-channel",
- "bevy_ecs_macros 0.12.0-dev",
- "bevy_ptr 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_tasks 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_ecs_macros 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ptr 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "downcast-rs",
+ "event-listener",
+ "fixedbitset",
+ "rustc-hash",
+ "serde",
+ "thiserror",
+ "thread_local",
+]
+
+[[package]]
+name = "bevy_ecs"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "async-channel",
+ "bevy_ecs_macros 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ptr 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "downcast-rs",
  "event-listener",
  "fixedbitset",
@@ -847,9 +1002,20 @@ dependencies = [
 [[package]]
 name = "bevy_ecs_macros"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_macro_utils 0.12.0-dev",
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+]
+
+[[package]]
+name = "bevy_ecs_macros"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "proc-macro2",
  "quote",
  "syn 2.0.38",
@@ -874,7 +1040,7 @@ version = "0.22.0"
 source = "git+https://github.com/raffaeleragni/bevy_egui?branch=bevy_0_12#4e8b678386f83aec83fd60a38d02082c8bfde5db"
 dependencies = [
  "arboard",
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "egui 0.23.0",
  "thread_local",
  "webbrowser",
@@ -893,23 +1059,32 @@ dependencies = [
 [[package]]
 name = "bevy_encase_derive"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_macro_utils 0.12.0-dev",
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "encase_derive_impl",
+]
+
+[[package]]
+name = "bevy_encase_derive"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "encase_derive_impl",
 ]
 
 [[package]]
 name = "bevy_gilrs"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_input 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_time 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_input 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_time 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "gilrs",
  "thiserror",
 ]
@@ -917,44 +1092,44 @@ dependencies = [
 [[package]]
 name = "bevy_gizmos"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_core_pipeline 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_pbr 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_pbr 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_sprite",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
 ]
 
 [[package]]
 name = "bevy_gltf"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "base64 0.13.1",
  "bevy_animation",
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_core_pipeline 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_pbr 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_scene 0.12.0-dev",
- "bevy_tasks 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_pbr 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_scene 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "gltf",
  "percent-encoding",
  "serde",
@@ -980,14 +1155,28 @@ dependencies = [
 [[package]]
 name = "bevy_hierarchy"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "smallvec",
+]
+
+[[package]]
+name = "bevy_hierarchy"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_log 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "smallvec",
 ]
 
@@ -1008,13 +1197,26 @@ dependencies = [
 [[package]]
 name = "bevy_input"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "thiserror",
+]
+
+[[package]]
+name = "bevy_input"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "thiserror",
 ]
 
@@ -1049,39 +1251,66 @@ dependencies = [
 [[package]]
 name = "bevy_internal"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_a11y 0.12.0-dev",
+ "bevy_a11y 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_animation",
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_audio",
- "bevy_core 0.12.0-dev",
- "bevy_core_pipeline 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_diagnostic 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_diagnostic 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_gilrs",
  "bevy_gizmos",
  "bevy_gltf",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_input 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_pbr 0.12.0-dev",
- "bevy_ptr 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_scene 0.12.0-dev",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_input 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_pbr 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ptr 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_scene 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_sprite",
- "bevy_tasks 0.12.0-dev",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_text",
- "bevy_time 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
+ "bevy_time 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_ui",
- "bevy_utils 0.12.0-dev",
- "bevy_window 0.12.0-dev",
- "bevy_winit 0.12.0-dev",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_window 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_winit 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+]
+
+[[package]]
+name = "bevy_internal"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_a11y 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_diagnostic 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_input 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_log 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ptr 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_render 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_scene 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_time 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_window 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
 ]
 
 [[package]]
@@ -1103,12 +1332,27 @@ dependencies = [
 [[package]]
 name = "bevy_log"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "android_log-sys",
- "bevy_app 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "console_error_panic_hook",
+ "tracing-log",
+ "tracing-subscriber",
+ "tracing-wasm",
+]
+
+[[package]]
+name = "bevy_log"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "android_log-sys",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "console_error_panic_hook",
  "tracing-log",
  "tracing-subscriber",
@@ -1130,7 +1374,19 @@ dependencies = [
 [[package]]
 name = "bevy_macro_utils"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "rustc-hash",
+ "syn 2.0.38",
+ "toml_edit 0.20.7",
+]
+
+[[package]]
+name = "bevy_macro_utils"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1152,7 +1408,16 @@ dependencies = [
 [[package]]
 name = "bevy_math"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
+dependencies = [
+ "glam",
+ "serde",
+]
+
+[[package]]
+name = "bevy_math"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
 dependencies = [
  "glam",
  "serde",
@@ -1170,7 +1435,15 @@ dependencies = [
 [[package]]
 name = "bevy_mikktspace"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
+dependencies = [
+ "glam",
+]
+
+[[package]]
+name = "bevy_mikktspace"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
 dependencies = [
  "glam",
 ]
@@ -1201,19 +1474,44 @@ dependencies = [
 [[package]]
 name = "bevy_pbr"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core_pipeline 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
- "bevy_window 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_window 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bitflags 2.4.1",
+ "bytemuck",
+ "fixedbitset",
+ "naga_oil 0.10.0",
+ "radsort",
+ "smallvec",
+ "thread_local",
+]
+
+[[package]]
+name = "bevy_pbr"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_render 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_window 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "bitflags 2.4.1",
  "bytemuck",
  "fixedbitset",
@@ -1227,7 +1525,7 @@ dependencies = [
 name = "bevy_prepass_debug"
 version = "0.1.0"
 dependencies = [
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy-inspector-egui 0.20.0",
 ]
 
@@ -1240,7 +1538,12 @@ checksum = "72c7586401a46f7d8e436028225c1df5288f2e0082d066b247a82466fea155c6"
 [[package]]
 name = "bevy_ptr"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
+
+[[package]]
+name = "bevy_ptr"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
 
 [[package]]
 name = "bevy_reflect"
@@ -1266,12 +1569,30 @@ dependencies = [
 [[package]]
 name = "bevy_reflect"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_math 0.12.0-dev",
- "bevy_ptr 0.12.0-dev",
- "bevy_reflect_derive 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ptr 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "downcast-rs",
+ "erased-serde",
+ "glam",
+ "serde",
+ "smallvec",
+ "smol_str",
+ "thiserror",
+]
+
+[[package]]
+name = "bevy_reflect"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ptr 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "downcast-rs",
  "erased-serde",
  "glam",
@@ -1298,9 +1619,21 @@ dependencies = [
 [[package]]
 name = "bevy_reflect_derive"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_macro_utils 0.12.0-dev",
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+ "uuid",
+]
+
+[[package]]
+name = "bevy_reflect_derive"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "proc-macro2",
  "quote",
  "syn 2.0.38",
@@ -1358,26 +1691,26 @@ dependencies = [
 [[package]]
 name = "bevy_render"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "async-channel",
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_encase_derive 0.12.0-dev",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_mikktspace 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render_macros 0.12.0-dev",
- "bevy_tasks 0.12.0-dev",
- "bevy_time 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
- "bevy_window 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_encase_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_mikktspace 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render_macros 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_time 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_window 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bitflags 2.4.1",
  "bytemuck",
  "codespan-reporting",
@@ -1391,6 +1724,49 @@ dependencies = [
  "naga 0.13.0",
  "naga_oil 0.10.0",
  "ruzstd",
+ "serde",
+ "smallvec",
+ "thiserror",
+ "thread_local",
+ "wasm-bindgen",
+ "web-sys",
+ "wgpu 0.17.1",
+]
+
+[[package]]
+name = "bevy_render"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "async-channel",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_core 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_encase_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_log 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_mikktspace 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_render_macros 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_time 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_window 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bitflags 2.4.1",
+ "bytemuck",
+ "codespan-reporting",
+ "downcast-rs",
+ "encase",
+ "futures-lite",
+ "hexasphere",
+ "image",
+ "js-sys",
+ "naga 0.13.0",
+ "naga_oil 0.10.0",
  "serde",
  "smallvec",
  "thiserror",
@@ -1415,9 +1791,20 @@ dependencies = [
 [[package]]
 name = "bevy_render_macros"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_macro_utils 0.12.0-dev",
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+]
+
+[[package]]
+name = "bevy_render_macros"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_macro_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "proc-macro2",
  "quote",
  "syn 2.0.38",
@@ -1448,17 +1835,37 @@ dependencies = [
 [[package]]
 name = "bevy_scene"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "ron",
+ "serde",
+ "thiserror",
+ "uuid",
+]
+
+[[package]]
+name = "bevy_scene"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_render 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "ron",
  "serde",
  "thiserror",
@@ -1469,26 +1876,26 @@ dependencies = [
 name = "bevy_shader_utils"
 version = "0.5.2"
 dependencies = [
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy-inspector-egui 0.20.0",
 ]
 
 [[package]]
 name = "bevy_sprite"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core_pipeline 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bitflags 2.4.1",
  "bytemuck",
  "fixedbitset",
@@ -1515,7 +1922,20 @@ dependencies = [
 [[package]]
 name = "bevy_tasks"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
+dependencies = [
+ "async-channel",
+ "async-executor",
+ "async-task",
+ "concurrent-queue",
+ "futures-lite",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
+name = "bevy_tasks"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
 dependencies = [
  "async-channel",
  "async-executor",
@@ -1528,19 +1948,19 @@ dependencies = [
 [[package]]
 name = "bevy_text"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "ab_glyph",
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_sprite",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
- "bevy_window 0.12.0-dev",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_window 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "glyph_brush_layout",
  "serde",
  "thiserror",
@@ -1563,12 +1983,25 @@ dependencies = [
 [[package]]
 name = "bevy_time"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "crossbeam-channel",
+ "thiserror",
+]
+
+[[package]]
+name = "bevy_time"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "crossbeam-channel",
  "thiserror",
 ]
@@ -1589,38 +2022,51 @@ dependencies = [
 [[package]]
 name = "bevy_transform"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_app 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "thiserror",
+]
+
+[[package]]
+name = "bevy_transform"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "thiserror",
 ]
 
 [[package]]
 name = "bevy_ui"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_a11y 0.12.0-dev",
- "bevy_app 0.12.0-dev",
- "bevy_asset 0.12.0-dev",
- "bevy_core_pipeline 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_input 0.12.0-dev",
- "bevy_log 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_render 0.12.0-dev",
+ "bevy_a11y 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_asset 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_core_pipeline 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_input 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_log 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_render 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_sprite",
  "bevy_text",
- "bevy_transform 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
- "bevy_window 0.12.0-dev",
+ "bevy_transform 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_window 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bytemuck",
  "serde",
  "smallvec",
@@ -1648,10 +2094,27 @@ dependencies = [
 [[package]]
 name = "bevy_utils"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "ahash",
- "bevy_utils_proc_macros 0.12.0-dev",
+ "bevy_utils_proc_macros 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "getrandom",
+ "hashbrown 0.14.2",
+ "instant",
+ "nonmax",
+ "petgraph",
+ "thiserror",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "bevy_utils"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "ahash",
+ "bevy_utils_proc_macros 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "getrandom",
  "hashbrown 0.14.2",
  "instant",
@@ -1676,7 +2139,17 @@ dependencies = [
 [[package]]
 name = "bevy_utils_proc_macros"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+]
+
+[[package]]
+name = "bevy_utils_proc_macros"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1701,15 +2174,30 @@ dependencies = [
 [[package]]
 name = "bevy_window"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
- "bevy_a11y 0.12.0-dev",
- "bevy_app 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_input 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_reflect 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
+ "bevy_a11y 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_input 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "raw-window-handle",
+]
+
+[[package]]
+name = "bevy_window"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "bevy_a11y 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_input 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_reflect 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "raw-window-handle",
 ]
 
@@ -1741,20 +2229,44 @@ dependencies = [
 [[package]]
 name = "bevy_winit"
 version = "0.12.0-dev"
-source = "git+https://github.com/mockersf/bevy?branch=fix-apply_normal_mapping-calls-double-sided-normals#bb194ca5da3af4ce68a8e4657404fbc9f99c521f"
+source = "git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass#3a0e4a4fc137febf9a3cd01ff4edb759f5a9c9cf"
 dependencies = [
  "accesskit_winit 0.15.0",
  "approx",
- "bevy_a11y 0.12.0-dev",
- "bevy_app 0.12.0-dev",
- "bevy_derive 0.12.0-dev",
- "bevy_ecs 0.12.0-dev",
- "bevy_hierarchy 0.12.0-dev",
- "bevy_input 0.12.0-dev",
- "bevy_math 0.12.0-dev",
- "bevy_tasks 0.12.0-dev",
- "bevy_utils 0.12.0-dev",
- "bevy_window 0.12.0-dev",
+ "bevy_a11y 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_app 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_input 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_math 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_window 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "crossbeam-channel",
+ "raw-window-handle",
+ "wasm-bindgen",
+ "web-sys",
+ "winit",
+]
+
+[[package]]
+name = "bevy_winit"
+version = "0.12.0-dev"
+source = "git+https://github.com/bevyengine/bevy#6f8848a6c222f3c2f12f0b0ea5daed5c1e1ce819"
+dependencies = [
+ "accesskit_winit 0.15.0",
+ "approx",
+ "bevy_a11y 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_app 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_derive 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_ecs 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_hierarchy 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_input 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_math 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_tasks 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_utils 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
+ "bevy_window 0.12.0-dev (git+https://github.com/bevyengine/bevy)",
  "crossbeam-channel",
  "raw-window-handle",
  "wasm-bindgen",
@@ -2158,7 +2670,7 @@ dependencies = [
 name = "cube-wave"
 version = "0.1.0"
 dependencies = [
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy-inspector-egui 0.19.0",
  "bevy_shader_utils",
  "itertools",
@@ -2203,6 +2715,16 @@ name = "dispatch"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bd0c93bb4b0c6d9b77f4435b0ae98c24d17f1c45b2ff844c6151a07256ca923b"
+
+[[package]]
+name = "dissolve-sphere-standard-material-extension"
+version = "0.1.0"
+dependencies = [
+ "bevy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
+ "bevy_prepass_debug",
+ "bevy_shader_utils",
+ "bitflags 1.3.2",
+]
 
 [[package]]
 name = "downcast-rs"
@@ -2800,6 +3322,7 @@ dependencies = [
  "bytemuck",
  "byteorder",
  "color_quant",
+ "jpeg-decoder",
  "num-rational",
  "num-traits",
  "png",
@@ -2936,9 +3459,9 @@ checksum = "bc0000e42512c92e31c2252315bda326620a4e034105e900c98ec492fa077b3e"
 
 [[package]]
 name = "js-sys"
-version = "0.3.64"
+version = "0.3.65"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5f195fe497f702db0f318b07fdd68edb16955aed830df8363d837542f8f935a"
+checksum = "54c0c35952f67de54bb584e9fd912b3023117cbafc0a77d8f3dee1fb5f572fe8"
 dependencies = [
  "wasm-bindgen",
 ]
@@ -3878,7 +4401,7 @@ dependencies = [
 name = "shader-test-001"
 version = "0.1.0"
 dependencies = [
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_shader_utils",
 ]
 
@@ -3895,7 +4418,7 @@ dependencies = [
 name = "shield-with-depth"
 version = "0.1.0"
 dependencies = [
- "bevy 0.12.0-dev",
+ "bevy 0.12.0-dev (git+https://github.com/christopherbiscardi/bevy?branch=vertex-colors-prepass)",
  "bevy_asset_loader",
  "bevy_basic_camera",
  "bevy_shader_utils",
@@ -4322,9 +4845,9 @@ checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 
 [[package]]
 name = "wasm-bindgen"
-version = "0.2.87"
+version = "0.2.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7706a72ab36d8cb1f80ffbf0e071533974a60d0a308d01a5d0375bf60499a342"
+checksum = "7daec296f25a1bae309c0cd5c29c4b260e510e6d813c286b19eaadf409d40fce"
 dependencies = [
  "cfg-if",
  "wasm-bindgen-macro",
@@ -4332,9 +4855,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-backend"
-version = "0.2.87"
+version = "0.2.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ef2b6d3c510e9625e5fe6f509ab07d66a760f0885d858736483c32ed7809abd"
+checksum = "e397f4664c0e4e428e8313a469aaa58310d302159845980fd23b0f22a847f217"
 dependencies = [
  "bumpalo",
  "log",
@@ -4347,9 +4870,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-futures"
-version = "0.4.37"
+version = "0.4.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c02dbc21516f9f1f04f187958890d7e6026df8d16540b7ad9492bc34a67cea03"
+checksum = "9afec9963e3d0994cac82455b2b3502b81a7f40f9a0d32181f7528d9f4b43e02"
 dependencies = [
  "cfg-if",
  "js-sys",
@@ -4359,9 +4882,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro"
-version = "0.2.87"
+version = "0.2.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dee495e55982a3bd48105a7b947fd2a9b4a8ae3010041b9e0faab3f9cd028f1d"
+checksum = "5961017b3b08ad5f3fe39f1e79877f8ee7c23c5e5fd5eb80de95abc41f1f16b2"
 dependencies = [
  "quote",
  "wasm-bindgen-macro-support",
@@ -4369,9 +4892,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro-support"
-version = "0.2.87"
+version = "0.2.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54681b18a46765f095758388f2d0cf16eb8d4169b639ab575a8f5693af210c7b"
+checksum = "c5353b8dab669f5e10f5bd76df26a9360c748f054f862ff5f3f8aae0c7fb3907"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4382,9 +4905,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-shared"
-version = "0.2.87"
+version = "0.2.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca6ad05a4870b2bf5fe995117d3728437bd27d7cd5f06f13c17443ef369775a1"
+checksum = "0d046c5d029ba91a1ed14da14dca44b68bf2f124cfbaf741c54151fdb3e0750b"
 
 [[package]]
 name = "wayland-scanner"
@@ -4399,9 +4922,9 @@ dependencies = [
 
 [[package]]
 name = "web-sys"
-version = "0.3.64"
+version = "0.3.65"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b85cbef8c220a6abc02aefd892dfc0fc23afb1c6a426316ec33253a3877249b"
+checksum = "5db499c5f66323272151db0e666cd34f78617522fb0c1604d31a27c50c206a85"
 dependencies = [
  "js-sys",
  "wasm-bindgen",

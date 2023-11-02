@@ -1,25 +1,53 @@
 use bevy::{
-    prelude::*, render::mesh::VertexAttributeValues,
+    core_pipeline::{
+        fxaa::Fxaa,
+        prepass::{
+            DeferredPrepass, DepthPrepass,
+            MotionVectorPrepass, NormalPrepass,
+        },
+    },
+    pbr::{
+        DefaultOpaqueRendererMethod, ExtendedMaterial,
+        OpaqueRendererMethod,
+    },
+    prelude::*,
+    render::mesh::VertexAttributeValues,
 };
+
+use bevy_prepass_debug::PrepassDebugPlugin;
 use bevy_shader_utils::ShaderUtilsPlugin;
+use dissolve_sphere_standard_material_extension::DissolveExtension;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(
-            Color::hex("071f3c").unwrap(),
-        ))
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            watch_for_changes: true,
-            ..default()
-        }))
-        .add_plugin(ShaderUtilsPlugin)
-        .add_plugin(
-            MaterialPlugin::<dissolve_sphere_standard_material_extension::StandardMaterial>::default(),
+        .insert_resource(AmbientLight {
+            color: Color::WHITE,
+            brightness: 0.02,
+        })
+        .insert_resource(
+            DefaultOpaqueRendererMethod::deferred(),
         )
-        .add_startup_system(setup)
+        .insert_resource(Msaa::Off)
+        .insert_resource(ClearColor(
+            Color::hex("1fa9f4").unwrap(),
+        ))
+        .add_plugins((
+            DefaultPlugins,
+            ShaderUtilsPlugin,
+            PrepassDebugPlugin,
+            MaterialPlugin::<
+                ExtendedMaterial<
+                    StandardMaterial,
+                    DissolveExtension,
+                >,
+            >::default(),
+        ))
+        .add_systems(Startup, setup)
         // .add_system(change_color)
-        .add_system(animate_light_direction)
-        .add_system(movement)
+        .add_systems(
+            Update,
+            (animate_light_direction, movement),
+        )
         .run();
 }
 
@@ -30,7 +58,14 @@ struct Cube;
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut custom_materials: ResMut<Assets<dissolve_sphere_standard_material_extension::StandardMaterial>>,
+    mut dissolve_materials: ResMut<
+        Assets<
+            ExtendedMaterial<
+                StandardMaterial,
+                DissolveExtension,
+            >,
+        >,
+    >,
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
@@ -63,36 +98,55 @@ fn setup(
     commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(mesh),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        material: custom_materials.add(dissolve_sphere_standard_material_extension::StandardMaterial {
-            base_color: Color::rgb(0.533, 0.533, 0.80,),
-            // base_color: Color::YELLOW,
-            base_color_texture: Some(asset_server.load("concrete/sekjcawb_2K_Albedo.jpg")),
-            normal_map_texture: Some(
-                asset_server.load("concrete/sekjcawb_2K_Normal.jpg"),
-            ),
-            double_sided: true,
-            cull_mode: None,
-            // alpha_mode: AlphaMode::Blend,
-            // perceptual_roughness: 10.0,
-            // time: 0.,
-            ..default()
+        material: dissolve_materials
+            .add(ExtendedMaterial {
+            base: StandardMaterial {
+                // base_color: Color::rgb(0.533, 0.533, 0.80),
+                base_color: Color::WHITE,
+                // base_color: Color::YELLOW,
+                base_color_texture: Some(
+                    asset_server.load(
+                        "concrete/sekjcawb_2K_Albedo.jpg",
+                    ),
+                ),
+                normal_map_texture: Some(
+                    asset_server.load(
+                        "concrete/sekjcawb_2K_Normal.jpg",
+                    ),
+                ),
+                double_sided: true,
+                cull_mode: None,
+                // can be used in forward or deferred mode.
+                opaque_render_method:
+                    OpaqueRendererMethod::Deferred,
+                // in deferred mode, only the PbrInput can be modified (uvs, color and other material properties),
+                // in forward mode, the output can also be modified after lighting is applied.
+                // see the fragment shader `extended_material.wgsl` for more info.
+                // Note: to run in deferred mode, you must also add a `DeferredPrepass` component to the camera and either
+                // change the above to `OpaqueRendererMethod::Deferred` or add the `DefaultOpaqueRendererMethod` resource.
+                ..default()
+            },
+            extension: DissolveExtension {
+                // quantize_steps: 3,
+            },
         }),
-        // material: materials.add(StandardMaterial {
-        //     base_color: Color::BLUE,
-        //     alpha_mode: AlphaMode::Blend,
-        //     ..default()
-        // }),
         ..default()
     });
 
     // camera
-    commands
-        .spawn(Camera3dBundle {
+    commands.spawn((
+        Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0)
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
-        })
-        .insert(Movable);
+        },
+        Movable,
+        DepthPrepass,
+        NormalPrepass,
+        MotionVectorPrepass,
+        DeferredPrepass,
+        Fxaa::default(),
+    ));
     // ground plane
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane {
@@ -135,12 +189,6 @@ fn setup(
             ..default()
         }),
         ..default()
-    });
-
-    // ambient light
-    commands.insert_resource(AmbientLight {
-        color: Color::ORANGE_RED,
-        brightness: 0.02,
     });
 
     // red point light
