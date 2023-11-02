@@ -26,7 +26,10 @@ fn main() {
             Color::hex("1fa9f4").unwrap(),
         ))
         .add_plugins((
-            DefaultPlugins,
+            DefaultPlugins.set(AssetPlugin {
+                watch_for_changes_override: Some(true),
+                ..default()
+            }),
             ShaderUtilsPlugin,
             PrepassDebugPlugin,
             MaterialPlugin::<
@@ -153,36 +156,36 @@ fn setup(
         }),
         ..default()
     });
-    // left wall
-    let mut transform = Transform::from_xyz(2.5, 2.5, 0.0);
-    transform.rotate_z(std::f32::consts::FRAC_PI_2);
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Box::new(
-            5.0, 0.15, 5.0,
-        ))),
-        transform,
-        material: materials.add(StandardMaterial {
-            base_color: Color::INDIGO,
-            perceptual_roughness: 1.0,
-            ..default()
-        }),
-        ..default()
-    });
-    // // back (right) wall
-    let mut transform = Transform::from_xyz(0.0, 2.5, -2.5);
-    transform.rotate_x(std::f32::consts::FRAC_PI_2);
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Box::new(
-            5.0, 0.15, 5.0,
-        ))),
-        transform,
-        material: materials.add(StandardMaterial {
-            base_color: Color::INDIGO,
-            perceptual_roughness: 1.0,
-            ..default()
-        }),
-        ..default()
-    });
+    // // left wall
+    // let mut transform = Transform::from_xyz(2.5, 2.5, 0.0);
+    // transform.rotate_z(std::f32::consts::FRAC_PI_2);
+    // commands.spawn(PbrBundle {
+    //     mesh: meshes.add(Mesh::from(shape::Box::new(
+    //         5.0, 0.15, 5.0,
+    //     ))),
+    //     transform,
+    //     material: materials.add(StandardMaterial {
+    //         base_color: Color::INDIGO,
+    //         perceptual_roughness: 1.0,
+    //         ..default()
+    //     }),
+    //     ..default()
+    // });
+    // // // back (right) wall
+    // let mut transform = Transform::from_xyz(0.0, 2.5, -2.5);
+    // transform.rotate_x(std::f32::consts::FRAC_PI_2);
+    // commands.spawn(PbrBundle {
+    //     mesh: meshes.add(Mesh::from(shape::Box::new(
+    //         5.0, 0.15, 5.0,
+    //     ))),
+    //     transform,
+    //     material: materials.add(StandardMaterial {
+    //         base_color: Color::INDIGO,
+    //         perceptual_roughness: 1.0,
+    //         ..default()
+    //     }),
+    //     ..default()
+    // });
 
     // red point light
     commands

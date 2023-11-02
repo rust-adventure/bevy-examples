@@ -38,7 +38,10 @@ resolver = "2"
 
 [workspace.dependencies]
 # bevy = { git = "https://github.com/christopherbiscardi/bevy", branch ="vertex-colors-prepass" }
-bevy = { git = "https://github.com/bevyengine/bevy", features = ["jpeg"] }
+bevy = { git = "https://github.com/bevyengine/bevy", features = [
+  "jpeg",
+  "file_watcher",
+] }
 ## use random PR fork of egui for 0.12
 bevy-inspector-egui = { git = "https://github.com/raffaeleragni/bevy-inspector-egui", branch = "bevy_0_12" }
 # bevy-inspector-egui = "0.20.0"
