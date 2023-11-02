@@ -2,14 +2,11 @@ use bevy::{
     core_pipeline::{
         fxaa::Fxaa,
         prepass::{
-            DeferredPrepass, DepthPrepass,
-            MotionVectorPrepass, NormalPrepass,
+            DepthPrepass, MotionVectorPrepass,
+            NormalPrepass,
         },
     },
-    pbr::{
-        DefaultOpaqueRendererMethod, ExtendedMaterial,
-        OpaqueRendererMethod,
-    },
+    pbr::{ExtendedMaterial, OpaqueRendererMethod},
     prelude::*,
     render::mesh::VertexAttributeValues,
 };
@@ -24,9 +21,6 @@ fn main() {
             color: Color::WHITE,
             brightness: 0.02,
         })
-        .insert_resource(
-            DefaultOpaqueRendererMethod::deferred(),
-        )
         .insert_resource(Msaa::Off)
         .insert_resource(ClearColor(
             Color::hex("1fa9f4").unwrap(),
@@ -118,7 +112,7 @@ fn setup(
                 cull_mode: None,
                 // can be used in forward or deferred mode.
                 opaque_render_method:
-                    OpaqueRendererMethod::Deferred,
+                    OpaqueRendererMethod::Auto,
                 // in deferred mode, only the PbrInput can be modified (uvs, color and other material properties),
                 // in forward mode, the output can also be modified after lighting is applied.
                 // see the fragment shader `extended_material.wgsl` for more info.
@@ -144,7 +138,6 @@ fn setup(
         DepthPrepass,
         NormalPrepass,
         MotionVectorPrepass,
-        DeferredPrepass,
         Fxaa::default(),
     ));
     // ground plane

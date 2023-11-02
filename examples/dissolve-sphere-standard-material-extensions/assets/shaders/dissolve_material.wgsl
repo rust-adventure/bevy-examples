@@ -50,7 +50,21 @@ fn fragment(
 #ifdef PREPASS_PIPELINE
     // in deferred mode we can't modify anything after that, as lighting is run in a separate fullscreen shader.
     let out = deferred_output(in, pbr_input);
-      // we can optionally modify the final result here
+   
+#else
+    var out: FragmentOutput;
+    // apply lighting
+    out.color = apply_pbr_lighting(pbr_input);
+
+    // we can optionally modify the lit color before post-processing is applied
+    out.color = out.color;
+
+    // apply in-shader post processing (fog, alpha-premultiply, and also tonemapping, debanding if the camera is non-hdr)
+    // note this does not include fullscreen postprocessing effects like bloom.
+    out.color = main_pass_post_lighting_processing(pbr_input, out.color);
+
+
+   // we can optionally modify the final result here
       // custom code
     var base_color = out.color;
     var output_color: vec4f;
@@ -81,26 +95,13 @@ fn fragment(
     );
 // var test = (simplexNoise3(vec3<f32>(material.time, material.time, material.time)) + 1.0) / 2.0;
 // return vec4<f32>(test, test,test,test);
-    // if output_color.a == 0.0 { discard; } else {
-    //     return vec4(1.0, 1.0, 0., 1.);
-    //     // return output_color;
-    // }
+    if output_color.a == 0.0 { discard; } else {
+        // return vec4(1.0, 1.0, 0., 1.);
+        return output_color;
+    }
     return output_color;
-#else
-    var out: FragmentOutput;
-    // apply lighting
-    out.color = apply_pbr_lighting(pbr_input);
-
-    // we can optionally modify the lit color before post-processing is applied
-    out.color = out.color;
-
-    // apply in-shader post processing (fog, alpha-premultiply, and also tonemapping, debanding if the camera is non-hdr)
-    // note this does not include fullscreen postprocessing effects like bloom.
-    out.color = main_pass_post_lighting_processing(pbr_input, out.color);
-
-
-
     // return out.color;
 #endif
-    return vec4(1.0, 0.0, 0.0, 1.0);
+
+    // return vec4(1.0, 0.0, 0.0, 1.0);
 }

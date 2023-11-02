@@ -17,14 +17,14 @@ pub struct DissolveExtension {
 }
 
 impl MaterialExtension for DissolveExtension {
-    // fn prepass_fragment_shader() -> ShaderRef {
-    //     "shaders/dissolve_material_prepass.wgsl".into()
-    // }
-    // fn fragment_shader() -> ShaderRef {
-    //     "shaders/dissolve_material.wgsl".into()
-    // }
-
-    fn deferred_fragment_shader() -> ShaderRef {
+    fn prepass_fragment_shader() -> ShaderRef {
         "shaders/dissolve_material_prepass.wgsl".into()
     }
+    fn fragment_shader() -> ShaderRef {
+        "shaders/dissolve_material.wgsl".into()
+    }
+
+    // fn deferred_fragment_shader() -> ShaderRef {
+    //     "shaders/dissolve_material_prepass.wgsl".into()
+    // }
 }

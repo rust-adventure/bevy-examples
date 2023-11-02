@@ -26,7 +26,7 @@ STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT
 
 
  
-#ifdef PREPASS_FRAGMENT
+
 @fragment
 fn fragment(
     in: VertexOutput,
@@ -113,56 +113,8 @@ fn fragment(
         // return out;
     }
 
-    var pbr_input = pbr_types::pbr_input_new();
-    pbr_input.frag_coord = in.position;
-    pbr_input.material = material;
-    // pbr_input.material.base_color = output_color;
-    pbr_input.material.base_color = vec4(1.0, 0.0, 0.0, 1.0);
-    pbr_input.material.flags |= STANDARD_MATERIAL_FLAGS_UNLIT_BIT;
-    pbr_input.material.flags = material.flags;
-    out.deferred = pbr_deferred_functions::deferred_gbuffer_from_pbr_input(pbr_input);
-    out.deferred_lighting_pass_id = 1u;
-
-
     return out;
 }
-#else
-@fragment
-fn fragment(in: VertexOutput) {
-    pbr_prepass_functions::prepass_alpha_discard(in);
-    var output_color: vec4f;
-
-    // var base_color = vec4<f32>(1.0, 1.0, 1.0, 1.0);
-    var noise_step = 2.0;
-    // var base_color = vec3<f32>(0.533, 0.533, 0.80);
-
-    // var noise = simplexNoise3(vec3<f32>(in.frag_coord.x * noise_step, in.frag_coord.y * noise_step, in.frag_coord.z * noise_step));
-    // var noise = simplex_noise_3d(in.color.xyz * noise_step);
-    // var noise = simplex_noise_3d(vec3(in.world_position.xyz / 1000. * noise_step));
-    let c = in.x.xyz;
-    var noise = simplex_noise_3d(c * noise_step);
-
-    var threshold = sin(globals.time);
-    // var threshold = sin(2023);
-    var alpha = step(noise, threshold);
-
-    // var edge_color = vec3<f32>(0.0, 1.0, 0.8);
-    var edge_color = output_color * 3.0;
-    var border_step = smoothstep(threshold - 0.2, threshold + 0.2, noise);
-    var dissolve_border = edge_color.xyz * border_step;
-
-    output_color = vec4<f32>(
-        dissolve_border,
-        alpha
-    );
-// var test = (simplexNoise3(vec3<f32>(material.time, material.time, material.time)) + 1.0) / 2.0;
-// return vec4<f32>(test, test,test,test);
-
-    if output_color.a == 0.00 { discard; } else {
-        // return out;
-    }
-}
-#endif // PREPASS_FRAGMENT
 
 
 
