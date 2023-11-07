@@ -20,6 +20,7 @@ members = [
   "examples/shield-with-depth",
   # "examples/spacecraft-noiseland",
   # "examples/standard-material-quixel-megascan",
+  "examples/ui-button-shader",
   "libs/*",
   # "vendor/bevy_asset_loader/bevy_asset_loader_derive",
   # "vendor/bevy_asset_loader/bevy_asset_loader",
@@ -37,14 +38,10 @@ resolver = "2"
 
 
 [workspace.dependencies]
-# bevy = { git = "https://github.com/christopherbiscardi/bevy", branch ="vertex-colors-prepass" }
-bevy = { git = "https://github.com/bevyengine/bevy", features = [
-  "jpeg",
-  "file_watcher",
-] }
+# bevy = { git = "https://github.com/bevyengine/bevy", branch ="vertex-colors-prepass" }
+bevy = { version = "0.12", features = ["jpeg", "file_watcher"] }
 ## use random PR fork of egui for 0.12
-bevy-inspector-egui = { git = "https://github.com/raffaeleragni/bevy-inspector-egui", branch = "bevy_0_12" }
-# bevy-inspector-egui = "0.20.0"
+bevy-inspector-egui = "0.21"
 bevy_asset_loader = { git = "https://github.com/NiklasEi/bevy_asset_loader", branch = "bevy_main" }
 bevy_tweening = { git = "https://github.com/djeedai/bevy_tweening" }
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
@@ -52,24 +49,22 @@ bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
 
 [patch."https://github.com/bevyengine/bevy"]
-bevy = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass", features = [
-  "jpeg",
-] }
+bevy = "0.12"
 
-bevy_app = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_asset = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_core = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_ecs = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_hierarchy = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_log = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_math = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_reflect = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_utils = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_window = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+# bevy_app = { git = "https://github.com/bevyengine/bevy" }
+# bevy_asset = { git = "https://github.com/bevyengine/bevy" }
+# bevy_core = { git = "https://github.com/bevyengine/bevy" }
+# bevy_ecs = { git = "https://github.com/bevyengine/bevy" }
+# bevy_hierarchy = { git = "https://github.com/bevyengine/bevy" }
+# bevy_log = { git = "https://github.com/bevyengine/bevy" }
+# bevy_math = { git = "https://github.com/bevyengine/bevy" }
+# bevy_reflect = { git = "https://github.com/bevyengine/bevy" }
+# bevy_utils = { git = "https://github.com/bevyengine/bevy" }
+# bevy_window = { git = "https://github.com/bevyengine/bevy" }
 
-bevy_core_pipeline = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_pbr = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
-bevy_render = { git = "https://github.com/christopherbiscardi/bevy", branch = "vertex-colors-prepass" }
+# bevy_core_pipeline = { git = "https://github.com/bevyengine/bevy" }
+# bevy_pbr = { git = "https://github.com/bevyengine/bevy" }
+# bevy_render = { git = "https://github.com/bevyengine/bevy" }
 
 # [patch.crates-io]
-# bevy = { git = "https://github.com/christopherbiscardi/bevy", branch ="vertex-colors-prepass" }
+# bevy = { git = "https://github.com/bevyengine/bevy", branch ="vertex-colors-prepass" }

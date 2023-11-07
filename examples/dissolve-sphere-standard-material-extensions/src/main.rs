@@ -222,7 +222,6 @@ fn setup(
     // blue point light
     commands
         .spawn(PointLightBundle {
-            // transform: Transform::from_xyz(5.0, 8.0, 2.0),
             transform: Transform::from_xyz(0.0, 4.0, 0.0),
             point_light: PointLight {
                 intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
@@ -252,15 +251,13 @@ fn setup(
         });
 
     // directional 'sun' light
-    const HALF_SIZE: f32 = 10.0;
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
-            // Configure the projection to better fit the scene
             shadows_enabled: true,
             ..default()
         },
         transform: Transform {
-            translation: Vec3::new(0.0, 2.0, 0.0),
+            translation: Vec3::new(10.0, 20.0, 10.0),
             rotation: Quat::from_rotation_x(
                 -std::f32::consts::FRAC_PI_4,
             ),

@@ -7,10 +7,10 @@ homepage = "https://github.com/rust-adventure/bevy-examples/libs/bevy_shader_uti
 keywords = ["bevy", "wgpu"]
 license = "MIT"
 name = "bevy_shader_utils"
-version = "0.5.2"
+version = "0.6.0"
 
 [dependencies]
-bevy = { workspace = true }
+bevy = "0.12"
 
 [dev-dependencies]
 bevy-inspector-egui = { workspace = true }
