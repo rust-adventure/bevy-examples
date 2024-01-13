@@ -13,9 +13,14 @@ use bevy::{
         render_asset::RenderAssets,
         render_graph::{self, RenderGraph},
         render_resource::{
-            binding_types::texture_storage_2d, *,
+            binding_types::{
+                texture_storage_2d, uniform_buffer,
+            },
+            *,
         },
-        renderer::{RenderContext, RenderDevice},
+        renderer::{
+            RenderContext, RenderDevice, RenderQueue,
+        },
         Render, RenderApp, RenderSet,
     },
     window::WindowPlugin,
@@ -85,14 +90,22 @@ impl Plugin for GameOfLifeComputePlugin {
     fn build(&self, app: &mut App) {
         // Extract the game of life image resource from the main world into the render world
         // for operation on by the compute shader and display on the sprite.
-        app.add_plugins(ExtractResourcePlugin::<
-            GameOfLifeImage,
-        >::default());
+        app.add_plugins((
+            ExtractResourcePlugin::<
+                GameOfLifeImage,
+            >::default(),
+            ExtractResourcePlugin::<
+                ExtractedTime,
+            >::default()
+        ));
         let render_app = app.sub_app_mut(RenderApp);
         render_app.add_systems(
             Render,
-            prepare_bind_group
-                .in_set(RenderSet::PrepareBindGroups),
+            (
+                prepare_bind_group
+                    .in_set(RenderSet::PrepareBindGroups),
+                prepare_time.in_set(RenderSet::Prepare),
+            ),
         );
 
         let mut render_graph =
@@ -125,13 +138,17 @@ fn prepare_bind_group(
     gpu_images: Res<RenderAssets<Image>>,
     game_of_life_image: Res<GameOfLifeImage>,
     render_device: Res<RenderDevice>,
+    time_meta: ResMut<TimeMeta>,
 ) {
     let view =
         gpu_images.get(&game_of_life_image.0).unwrap();
     let bind_group = render_device.create_bind_group(
         None,
         &pipeline.texture_bind_group_layout,
-        &BindGroupEntries::single(&view.texture_view),
+        &BindGroupEntries::sequential((
+            &view.texture_view,
+            time_meta.buffer.as_entire_binding(),
+        )),
     );
     commands.insert_resource(GameOfLifeImageBindGroup(
         bind_group,
@@ -151,17 +168,32 @@ impl FromWorld for GameOfLifePipeline {
             .resource::<RenderDevice>()
             .create_bind_group_layout(
                 None,
-                &BindGroupLayoutEntries::single(
+                &BindGroupLayoutEntries::sequential(
                     ShaderStages::COMPUTE,
-                    texture_storage_2d(
-                        TextureFormat::Rgba8Unorm,
-                        StorageTextureAccess::ReadWrite,
+                    (
+                        texture_storage_2d(
+                            TextureFormat::Rgba8Unorm,
+                            StorageTextureAccess::ReadWrite,
+                        ),
+                        uniform_buffer::<f32>(false),
                     ),
                 ),
             );
+        let render_device =
+            world.resource::<RenderDevice>();
+        let buffer = render_device.create_buffer(
+            &BufferDescriptor {
+                label: Some("time uniform buffer"),
+                size: std::mem::size_of::<f32>() as u64,
+                usage: BufferUsages::UNIFORM
+                    | BufferUsages::COPY_DST,
+                mapped_at_creation: false,
+            },
+        );
+        world.insert_resource(TimeMeta { buffer });
         let shader = world
             .resource::<AssetServer>()
-            .load("shaders/game_of_life.wgsl");
+            .load("shaders/flow.wgsl");
         let pipeline_cache =
             world.resource::<PipelineCache>();
         let init_pipeline = pipeline_cache
@@ -304,4 +336,39 @@ impl render_graph::Node for GameOfLifeNode {
 
         Ok(())
     }
+}
+
+#[derive(Resource, Default)]
+struct ExtractedTime {
+    seconds_since_startup: f32,
+}
+
+impl ExtractResource for ExtractedTime {
+    type Source = Time;
+
+    fn extract_resource(time: &Self::Source) -> Self {
+        ExtractedTime {
+            seconds_since_startup: time.elapsed_seconds(),
+        }
+    }
+}
+
+#[derive(Resource)]
+struct TimeMeta {
+    buffer: Buffer,
+}
+
+// write the extracted time into the corresponding uniform buffer
+fn prepare_time(
+    time: Res<ExtractedTime>,
+    time_meta: ResMut<TimeMeta>,
+    render_queue: Res<RenderQueue>,
+) {
+    render_queue.write_buffer(
+        &time_meta.buffer,
+        0,
+        bevy::core::cast_slice(&[
+            time.seconds_since_startup
+        ]),
+    );
 }
