@@ -6,7 +6,7 @@ members = [
   # "examples/candy-cane",
   # "examples/cartoon-water",
   # "examples/compute-3d",
-  # "examples/compute-with-time",
+  "examples/compute-with-time",
   "examples/cube-wave",
   "examples/dissolve-sphere-standard-material-extensions",
   # "examples/fresnel-effect",
@@ -28,28 +28,25 @@ members = [
 ]
 
 resolver = "2"
-# # Enable a small amount of optimization in debug mode
-# [profile.dev]
-# opt-level = 1
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
 
-# # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
-# [profile.dev.package."*"]
-# opt-level = 3
-
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
 
 [workspace.dependencies]
-# bevy = { git = "https://github.com/bevyengine/bevy", branch ="vertex-colors-prepass" }
 bevy = { version = "0.12", features = ["jpeg", "file_watcher"] }
-## use random PR fork of egui for 0.12
 bevy-inspector-egui = "0.21"
-bevy_asset_loader = { git = "https://github.com/NiklasEi/bevy_asset_loader", branch = "bevy_main" }
-bevy_tweening = { git = "https://github.com/djeedai/bevy_tweening" }
+bevy_asset_loader = "0.19.1"
+bevy_tweening = "0.9.0"
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
 
-[patch."https://github.com/bevyengine/bevy"]
-bevy = "0.12"
+# [patch."https://github.com/bevyengine/bevy"]
+# bevy = "0.12"
 
 # bevy_app = { git = "https://github.com/bevyengine/bevy" }
 # bevy_asset = { git = "https://github.com/bevyengine/bevy" }

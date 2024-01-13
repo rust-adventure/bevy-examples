@@ -9,33 +9,37 @@ use bevy::{
         extract_resource::{
             ExtractResource, ExtractResourcePlugin,
         },
+        render_asset::RenderAssetPersistencePolicy,
         render_asset::RenderAssets,
         render_graph::{self, RenderGraph},
-        render_resource::*,
-        renderer::{
-            RenderContext, RenderDevice, RenderQueue,
+        render_resource::{
+            binding_types::texture_storage_2d, *,
         },
-        RenderApp, RenderStage,
+        renderer::{RenderContext, RenderDevice},
+        Render, RenderApp, RenderSet,
     },
-    window::WindowDescriptor,
+    window::WindowPlugin,
 };
-use bevy_shader_utils::ShaderUtilsPlugin;
 use std::borrow::Cow;
 
 const SIZE: (u32, u32) = (1280, 720);
-// const SIZE: (u32, u32) = (3840, 2160);
 const WORKGROUP_SIZE: u32 = 8;
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            watch_for_changes: true,
-            ..default()
-        }))
-        .add_plugin(ShaderUtilsPlugin)
-        .add_plugin(GameOfLifeComputePlugin)
-        .add_startup_system(setup)
+        .add_plugins((
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    // uncomment for unthrottled FPS
+                    // present_mode: bevy::window::PresentMode::AutoNoVsync,
+                    ..default()
+                }),
+                ..default()
+            }),
+            GameOfLifeComputePlugin,
+        ))
+        .add_systems(Startup, setup)
         .run();
 }
 
@@ -52,6 +56,7 @@ fn setup(
         TextureDimension::D2,
         &[0, 0, 0, 255],
         TextureFormat::Rgba8Unorm,
+        RenderAssetPersistencePolicy::Unload,
     );
     image.texture_descriptor.usage = TextureUsages::COPY_DST
         | TextureUsages::STORAGE_BINDING
@@ -78,39 +83,17 @@ pub struct GameOfLifeComputePlugin;
 
 impl Plugin for GameOfLifeComputePlugin {
     fn build(&self, app: &mut App) {
-        let render_device =
-            app.world.resource::<RenderDevice>();
-
-        let buffer = render_device.create_buffer(
-            &BufferDescriptor {
-                label: Some("time uniform buffer"),
-                size: std::mem::size_of::<f32>() as u64,
-                usage: BufferUsages::UNIFORM
-                    | BufferUsages::COPY_DST,
-                mapped_at_creation: false,
-            },
-        );
-        app.add_plugin(ExtractResourcePlugin::<
+        // Extract the game of life image resource from the main world into the render world
+        // for operation on by the compute shader and display on the sprite.
+        app.add_plugins(ExtractResourcePlugin::<
             GameOfLifeImage,
-        >::default())
-            .add_plugin(ExtractResourcePlugin::<
-                ExtractedTime,
-            >::default());
+        >::default());
         let render_app = app.sub_app_mut(RenderApp);
-        render_app
-            .init_resource::<GameOfLifePipeline>()
-            .insert_resource(TimeMeta {
-                buffer,
-                bind_group: None,
-            })
-            .add_system_to_stage(
-                RenderStage::Queue,
-                queue_bind_group,
-            )
-            .add_system_to_stage(
-                RenderStage::Prepare,
-                prepare_time,
-            );
+        render_app.add_systems(
+            Render,
+            prepare_bind_group
+                .in_set(RenderSet::PrepareBindGroups),
+        );
 
         let mut render_graph =
             render_app.world.resource_mut::<RenderGraph>();
@@ -118,50 +101,37 @@ impl Plugin for GameOfLifeComputePlugin {
             "game_of_life",
             GameOfLifeNode::default(),
         );
-        render_graph
-            .add_node_edge(
-                "game_of_life",
-                bevy::render::main_graph::node::CAMERA_DRIVER,
-            )
-            .unwrap();
+        render_graph.add_node_edge(
+            "game_of_life",
+            bevy::render::main_graph::node::CAMERA_DRIVER,
+        );
+    }
+
+    fn finish(&self, app: &mut App) {
+        let render_app = app.sub_app_mut(RenderApp);
+        render_app.init_resource::<GameOfLifePipeline>();
     }
 }
 
-// Resource is opt-in in main branch
 #[derive(Resource, Clone, Deref, ExtractResource)]
 struct GameOfLifeImage(Handle<Image>);
 
 #[derive(Resource)]
 struct GameOfLifeImageBindGroup(BindGroup);
 
-fn queue_bind_group(
+fn prepare_bind_group(
     mut commands: Commands,
     pipeline: Res<GameOfLifePipeline>,
     gpu_images: Res<RenderAssets<Image>>,
     game_of_life_image: Res<GameOfLifeImage>,
     render_device: Res<RenderDevice>,
-    time_meta: ResMut<TimeMeta>,
 ) {
-    let view = &gpu_images[&game_of_life_image.0];
+    let view =
+        gpu_images.get(&game_of_life_image.0).unwrap();
     let bind_group = render_device.create_bind_group(
-        &BindGroupDescriptor {
-            label: None,
-            layout: &pipeline.texture_bind_group_layout,
-            entries: &[
-                BindGroupEntry {
-                    binding: 0,
-                    resource: BindingResource::TextureView(
-                        &view.texture_view,
-                    ),
-                },
-                BindGroupEntry {
-                    binding: 1,
-                    resource: time_meta
-                        .buffer
-                        .as_entire_binding(),
-                },
-            ],
-        },
+        None,
+        &pipeline.texture_bind_group_layout,
+        &BindGroupEntries::single(&view.texture_view),
     );
     commands.insert_resource(GameOfLifeImageBindGroup(
         bind_group,
@@ -177,43 +147,31 @@ pub struct GameOfLifePipeline {
 
 impl FromWorld for GameOfLifePipeline {
     fn from_world(world: &mut World) -> Self {
-        let texture_bind_group_layout =
-            world
-                .resource::<RenderDevice>()
-                .create_bind_group_layout(&BindGroupLayoutDescriptor {
-                    label: None,
-                    entries: &[BindGroupLayoutEntry {
-                        binding: 0,
-                        visibility: ShaderStages::COMPUTE,
-                        ty: BindingType::StorageTexture {
-                            access: StorageTextureAccess::ReadWrite,
-                            format: TextureFormat::Rgba8Unorm,
-                            view_dimension: TextureViewDimension::D2,
-                        },
-                        count: None,
-                    },BindGroupLayoutEntry {
-                        binding: 1,
-                        visibility: ShaderStages::COMPUTE,
-                        ty: BindingType::Buffer {
-                            ty: BufferBindingType::Uniform,
-                            has_dynamic_offset: false,
-                            min_binding_size: BufferSize::new(std::mem::size_of::<f32>() as u64),
-                        },
-                        count: None,
-                    }],
-                });
+        let texture_bind_group_layout = world
+            .resource::<RenderDevice>()
+            .create_bind_group_layout(
+                None,
+                &BindGroupLayoutEntries::single(
+                    ShaderStages::COMPUTE,
+                    texture_storage_2d(
+                        TextureFormat::Rgba8Unorm,
+                        StorageTextureAccess::ReadWrite,
+                    ),
+                ),
+            );
         let shader = world
             .resource::<AssetServer>()
-            .load("shaders/flow.wgsl");
-        let mut pipeline_cache =
-            world.resource_mut::<PipelineCache>();
+            .load("shaders/game_of_life.wgsl");
+        let pipeline_cache =
+            world.resource::<PipelineCache>();
         let init_pipeline = pipeline_cache
             .queue_compute_pipeline(
                 ComputePipelineDescriptor {
                     label: None,
-                    layout: Some(vec![
-                        texture_bind_group_layout.clone(),
-                    ]),
+                    layout: vec![
+                        texture_bind_group_layout.clone()
+                    ],
+                    push_constant_ranges: Vec::new(),
                     shader: shader.clone(),
                     shader_defs: vec![],
                     entry_point: Cow::from("init"),
@@ -223,9 +181,10 @@ impl FromWorld for GameOfLifePipeline {
             .queue_compute_pipeline(
                 ComputePipelineDescriptor {
                     label: None,
-                    layout: Some(vec![
-                        texture_bind_group_layout.clone(),
-                    ]),
+                    layout: vec![
+                        texture_bind_group_layout.clone()
+                    ],
+                    push_constant_ranges: Vec::new(),
                     shader,
                     shader_defs: vec![],
                     entry_point: Cow::from("update"),
@@ -305,7 +264,7 @@ impl render_graph::Node for GameOfLifeNode {
             world.resource::<GameOfLifePipeline>();
 
         let mut pass = render_context
-            .command_encoder
+            .command_encoder()
             .begin_compute_pass(
                 &ComputePassDescriptor::default(),
             );
@@ -345,40 +304,4 @@ impl render_graph::Node for GameOfLifeNode {
 
         Ok(())
     }
-}
-
-#[derive(Resource, Default)]
-struct ExtractedTime {
-    seconds_since_startup: f32,
-}
-
-impl ExtractResource for ExtractedTime {
-    type Source = Time;
-
-    fn extract_resource(time: &Self::Source) -> Self {
-        ExtractedTime {
-            seconds_since_startup: time.elapsed_seconds(),
-        }
-    }
-}
-
-#[derive(Resource)]
-struct TimeMeta {
-    buffer: Buffer,
-    bind_group: Option<BindGroup>,
-}
-
-// write the extracted time into the corresponding uniform buffer
-fn prepare_time(
-    time: Res<ExtractedTime>,
-    time_meta: ResMut<TimeMeta>,
-    render_queue: Res<RenderQueue>,
-) {
-    render_queue.write_buffer(
-        &time_meta.buffer,
-        0,
-        bevy::core::cast_slice(&[
-            time.seconds_since_startup
-        ]),
-    );
 }

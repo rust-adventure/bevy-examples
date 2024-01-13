@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies.bevy]
-workspace = true
+bevy = { git = "https://github.com/bevyengine/bevy", rev = "e6a324a11a419b5bcd4922ed7039a0f9e7c1abc8", features = [
+    "file_watcher",
+] }
 
-[dependencies.bevy_shader_utils]
-path = "../../libs/bevy_shader_utils"
+# [dependencies.bevy_shader_utils]
+# path = "../../libs/bevy_shader_utils"
