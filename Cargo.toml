@@ -6,7 +6,6 @@ members = [
   # "examples/candy-cane",
   # "examples/cartoon-water",
   # "examples/compute-3d",
-  "examples/compute-with-time",
   "examples/cube-wave",
   "examples/dissolve-sphere-standard-material-extensions",
   # "examples/fresnel-effect",
@@ -26,6 +25,7 @@ members = [
   # "vendor/bevy_asset_loader/bevy_asset_loader",
   # , "vendor/bevy/crates/*"
 ]
+exclude = ["examples/compute-with-time"]
 
 resolver = "2"
 # Enable a small amount of optimization in debug mode
