@@ -28,6 +28,11 @@ members = [
 exclude = ["examples/compute-with-time"]
 
 resolver = "2"
+
+[workspace.lints.clippy]
+type_complexity = "allow"
+too_many_arguments = "allow"
+
 # Enable a small amount of optimization in debug mode
 [profile.dev]
 opt-level = 1

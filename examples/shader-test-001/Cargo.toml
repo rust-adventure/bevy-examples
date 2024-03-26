@@ -4,6 +4,9 @@ workspace = true
 [dependencies.bevy_shader_utils]
 path = "../../libs/bevy_shader_utils"
 
+[lints]
+workspace = true
+
 [package]
 edition = "2021"
 name = "shader-test-001"

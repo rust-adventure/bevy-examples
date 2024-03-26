@@ -2,6 +2,9 @@
 workspace = true
 features = ["jpeg"]
 
+[lints]
+workspace = true
+
 [dependencies.bevy_shader_utils]
 path = "../../libs/bevy_shader_utils"
 

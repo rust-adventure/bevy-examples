@@ -6,5 +6,8 @@ edition = "2021"
 name = "pressure-wave-sphere"
 version = "0.1.0"
 
+[lints]
+workspace = true
+
 [dependencies.bevy]
 workspace = true

@@ -2,6 +2,9 @@
 itertools = "0.10.3"
 noise = "0.7.0"
 
+[lints]
+workspace = true
+
 [dependencies.bevy]
 workspace = true
 
