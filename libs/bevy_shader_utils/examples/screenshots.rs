@@ -3,7 +3,6 @@
 
 use bevy::{
     prelude::*,
-    reflect::TypeUuid,
     render::{
         render_resource::{AsBindGroup, ShaderRef},
         view::screenshot::ScreenshotManager,
@@ -89,7 +88,7 @@ enum CameraType {
 
 fn example_navigation(
     mut commands: Commands,
-    input: Res<Input<KeyCode>>,
+    input: Res<ButtonInput<KeyCode>>,
     examples: Option<Res<Examples>>,
     mut example_index: Local<u32>,
     names: Query<&Name>,
@@ -97,7 +96,7 @@ fn example_navigation(
     active_cameras: Query<Entity, With<ActiveCamera>>,
 ) {
     let Some(examples) = examples else { return };
-    if input.just_pressed(KeyCode::Left) {
+    if input.just_pressed(KeyCode::ArrowLeft) {
         match example_index.checked_sub(1) {
             Some(_) => {
                 *example_index -= 1;
@@ -108,7 +107,7 @@ fn example_navigation(
             }
         }
     }
-    if input.just_pressed(KeyCode::Right) {
+    if input.just_pressed(KeyCode::ArrowRight) {
         *example_index += 1;
         if *example_index == examples.0.len() as u32 {
             *example_index = 0;
@@ -156,7 +155,7 @@ fn example_navigation(
 }
 
 fn screenshot_on_spacebar(
-    input: Res<Input<KeyCode>>,
+    input: Res<ButtonInput<KeyCode>>,
     main_window: Query<Entity, With<PrimaryWindow>>,
     mut screenshot_manager: ResMut<ScreenshotManager>,
     name_text: Query<&Text, With<ExampleName>>,
@@ -209,9 +208,7 @@ fn setup(
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
-                        .add(Mesh::from(
-                            shape::Quad::default(),
-                        ))
+                        .add(Rectangle::default())
                         .into(),
                     transform: Transform::default()
                         .with_scale(Vec3::splat(4000.)),
@@ -236,9 +233,7 @@ fn setup(
         commands
             .spawn((
                 MaterialMeshBundle {
-                    mesh: meshes.add(Mesh::from(
-                        shape::Cube { size: 2.0 },
-                    )),
+                    mesh: meshes.add(Cuboid{ half_size: Vec3::splat(1.) }),
                     material: screenshot_perlin3d_materials
                         .add(ScreenshotPerlin3dMaterial {
                             scale: 5.0,
@@ -258,9 +253,7 @@ fn setup(
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
-                        .add(Mesh::from(
-                            shape::Quad::default(),
-                        ))
+                        .add(Rectangle::default())
                         .into(),
                     transform: Transform::default()
                         .with_scale(Vec3::splat(4000.)),
@@ -284,9 +277,7 @@ fn setup(
         commands
             .spawn((
                 MaterialMeshBundle {
-                    mesh: meshes.add(Mesh::from(
-                        shape::Cube { size: 2.0 },
-                    )),
+                    mesh: meshes.add(Cuboid{ half_size: Vec3::splat(1.) }),
                     material:
                         screenshot_simplex3d_materials.add(
                             ScreenshotSimplex3dMaterial {
@@ -329,9 +320,7 @@ fn setup(
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
-                        .add(Mesh::from(
-                            shape::Quad::default(),
-                        ))
+                        .add(Rectangle::default())
                         .into(),
                     transform: Transform::default()
                         .with_scale(Vec3::splat(4000.)),
@@ -356,9 +345,7 @@ fn setup(
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
-                        .add(Mesh::from(
-                            shape::Quad::default(),
-                        ))
+                        .add(Rectangle::default())
                         .into(),
                     transform: Transform::default()
                         .with_scale(Vec3::splat(4000.)),
@@ -383,9 +370,7 @@ fn setup(
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
-                        .add(Mesh::from(
-                            shape::Quad::default(),
-                        ))
+                        .add(Rectangle::default())
                         .into(),
                     transform: Transform::default()
                         .with_scale(Vec3::splat(4000.)),
@@ -410,9 +395,7 @@ fn setup(
             .spawn((
                 MaterialMesh2dBundle {
                     mesh: meshes
-                        .add(Mesh::from(
-                            shape::Quad::default(),
-                        ))
+                        .add(Rectangle::default())
                         .into(),
                     transform: Transform::default()
                         .with_scale(Vec3::splat(4000.)),
@@ -482,8 +465,7 @@ fn setup(
 }
 
 // Set up materials
-#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
-#[uuid = "08063870-7da9-4b79-b9b7-6eeb904222ed"]
+#[derive(Asset, AsBindGroup, Debug, Clone, Reflect)]
 pub struct ScreenshotPerlin2dMaterial {
     #[uniform(0)]
     scale: f32,
@@ -495,8 +477,7 @@ impl Material2d for ScreenshotPerlin2dMaterial {
     }
 }
 
-#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
-#[uuid = "a4704519-fd4f-4cb0-a96a-be86901ab101"]
+#[derive(Asset, AsBindGroup, Debug, Clone, Reflect)]
 pub struct ScreenshotPerlin3dMaterial {
     #[uniform(0)]
     scale: f32,
@@ -508,8 +489,7 @@ impl Material for ScreenshotPerlin3dMaterial {
     }
 }
 
-#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
-#[uuid = "f2e98d09-230c-45a3-ba42-8b5da5642f36"]
+#[derive(Asset, AsBindGroup, Debug, Clone, Reflect)]
 pub struct ScreenshotSimplex2dMaterial {
     #[uniform(0)]
     scale: f32,
@@ -521,8 +501,7 @@ impl Material2d for ScreenshotSimplex2dMaterial {
     }
 }
 
-#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
-#[uuid = "848b7711-3819-4525-bbba-91b474303778"]
+#[derive(Asset, AsBindGroup, Debug, Clone, Reflect)]
 pub struct ScreenshotSimplex3dMaterial {
     #[uniform(0)]
     scale: f32,
@@ -534,9 +513,8 @@ impl Material for ScreenshotSimplex3dMaterial {
     }
 }
 
-// #[derive(Asset, AsBindGroup, TypeUuid,  Debug, Clone,
+// #[derive(Asset, AsBindGroup,  Debug, Clone,
 // Reflect)]
-// #[uuid = "0c0bf6dc-492b-43d4-89b0-70f2c5ae2166"
 // ] pub struct ScreenshotFresnelMaterial {}
 
 // impl Material2d for ScreenshotFresnelMaterial {
@@ -545,8 +523,7 @@ impl Material for ScreenshotSimplex3dMaterial {
 // wgsl".into()     }
 // }
 
-#[derive(Asset, AsBindGroup, TypeUuid, Debug, Clone, Reflect)]
-#[uuid = "3177e91c-c3db-4b62-bf9b-b2e50c81e3f4"]
+#[derive(Asset, AsBindGroup, Debug, Clone, Reflect)]
 pub struct ScreenshotVoronoiseMaterial {
     #[uniform(0)]
     x: f32,

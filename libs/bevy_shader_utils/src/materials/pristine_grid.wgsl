@@ -9,7 +9,7 @@ struct PristineMaterial {
     line_size: vec2f
 }
 
-@group(1) @binding(0)
+@group(2) @binding(0)
 var<uniform> material: PristineMaterial;
 
 @fragment

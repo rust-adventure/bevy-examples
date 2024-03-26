@@ -5,7 +5,7 @@
 
 use bevy::{
     prelude::*,
-    reflect::{TypePath, TypeUuid},
+    reflect::TypePath,
     render::render_resource::{AsBindGroup, ShaderRef},
     sprite::{
         Material2d, Material2dPlugin, MaterialMesh2dBundle,
@@ -29,7 +29,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<CustomMaterial>>,
 ) {
-    let mesh = Mesh::from(shape::Quad::default());
+    let mesh = Rectangle::default();
 
     // Spawn camera
     commands.spawn(Camera2dBundle::default());
@@ -60,10 +60,7 @@ impl Material2d for CustomMaterial {
 
 // This is the struct that will be passed to your
 // shader
-#[derive(
-    Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone,
-)]
-#[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
+#[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct CustomMaterial {
     #[uniform(0)]
     color: Color,

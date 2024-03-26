@@ -1,5 +1,5 @@
 use bevy::{
-    asset::load_internal_asset,
+    asset::{embedded_asset, load_internal_asset},
     prelude::*,
     render::render_resource::{AsBindGroup, ShaderRef},
 };
@@ -25,8 +25,6 @@ pub const MOCK_FRESNEL: Handle<Shader> =
     Handle::weak_from_u128(11918512842344596158);
 pub const PRISTINE_GRID: Handle<Shader> =
     Handle::weak_from_u128(11918512942344596158);
-pub const PRISTINE_GRID_MATERIAL: Handle<Shader> =
-    Handle::weak_from_u128(11918512952344596158);
 
 /// To use the shader utility functions, add the plugin to your
 /// app.
@@ -50,54 +48,74 @@ pub struct ShaderUtilsPlugin;
 
 impl Plugin for ShaderUtilsPlugin {
     fn build(&self, app: &mut App) {
+        // embedded_asset!(
+        //     app,
+        //     "shaders/perlin_noise_2d.wgsl"
+        // );
+        // embedded_asset!(
+        //     app,
+        //     "shaders/perlin_noise_3d.wgsl"
+        // );
+        // embedded_asset!(
+        //     app,
+        //     "shaders/simplex_noise_2d.wgsl"
+        // );
+        // embedded_asset!(
+        //     app,
+        //     "shaders/simplex_noise_3d.wgsl"
+        // );
+        // embedded_asset!(app, "shaders/voronoise.wgsl");
+        // embedded_asset!(app, "shaders/mock_fresnel.wgsl");
+        // embedded_asset!(app, "shaders/pristine_grid.wgsl");
+
+        embedded_asset!(
+            app,
+            "materials/pristine_grid.wgsl"
+        );
+
         load_internal_asset!(
             app,
             PERLIN_NOISE_2D,
-            "../shaders/perlin_noise_2d.wgsl",
+            "shaders/perlin_noise_2d.wgsl",
             Shader::from_wgsl
         );
         load_internal_asset!(
             app,
             PERLIN_NOISE_3D,
-            "../shaders/perlin_noise_3d.wgsl",
+            "shaders/perlin_noise_3d.wgsl",
             Shader::from_wgsl
         );
         load_internal_asset!(
             app,
             SIMPLEX_NOISE_2D,
-            "../shaders/simplex_noise_2d.wgsl",
+            "shaders/simplex_noise_2d.wgsl",
             Shader::from_wgsl
         );
         load_internal_asset!(
             app,
             SIMPLEX_NOISE_3D,
-            "../shaders/simplex_noise_3d.wgsl",
+            "shaders/simplex_noise_3d.wgsl",
             Shader::from_wgsl
         );
         load_internal_asset!(
             app,
             VORONOISE,
-            "../shaders/voronoise.wgsl",
+            "shaders/voronoise.wgsl",
             Shader::from_wgsl
         );
         load_internal_asset!(
             app,
             MOCK_FRESNEL,
-            "../shaders/mock_fresnel.wgsl",
+            "shaders/mock_fresnel.wgsl",
             Shader::from_wgsl
         );
         load_internal_asset!(
             app,
             PRISTINE_GRID,
-            "../shaders/pristine_grid.wgsl",
+            "shaders/pristine_grid.wgsl",
             Shader::from_wgsl
         );
-        load_internal_asset!(
-            app,
-            PRISTINE_GRID_MATERIAL,
-            "../materials/pristine_grid.wgsl",
-            Shader::from_wgsl
-        );
+
         app.add_plugins(MaterialPlugin::<
             PristineGridMaterial,
         >::default());
@@ -106,7 +124,7 @@ impl Plugin for ShaderUtilsPlugin {
 
 impl Material for PristineGridMaterial {
     fn fragment_shader() -> ShaderRef {
-        PRISTINE_GRID_MATERIAL.into()
+        "embedded://bevy_shader_utils/materials/pristine_grid.wgsl".into()
     }
 }
 

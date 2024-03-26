@@ -37,10 +37,10 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.12", features = ["jpeg", "file_watcher"] }
-bevy-inspector-egui = "0.21"
-bevy_asset_loader = "0.19.1"
-bevy_tweening = "0.9.0"
+bevy = { version = "0.13", features = ["jpeg", "file_watcher"] }
+bevy-inspector-egui = "0.23.4"
+bevy_asset_loader = "0.20"
+bevy_tweening = "0.10.0"
 bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
