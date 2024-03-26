@@ -8,6 +8,8 @@ keywords = ["bevy", "wgpu"]
 license = "MIT"
 name = "bevy_shader_utils"
 version = "0.7.0"
+exclude = ["/screenshots", "/assets", "/examples"]
+
 
 [dependencies]
 bevy = "0.13"
