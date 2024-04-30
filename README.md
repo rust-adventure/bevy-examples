@@ -1,8 +1,6 @@
 # Bevy Examples
 
-This repo is a selection of contained examples using the Bevy game engine, often using the Material shader APIs in Bevy 0.8.
-
-There is a branch tracking Bevy 0.9 for some examples.
+This repo is a selection of contained examples using the Bevy game engine. It is mostly focused on examples that interact with shaders.
 
 ![](examples/shader-test-001/readme/demo.png)
 
