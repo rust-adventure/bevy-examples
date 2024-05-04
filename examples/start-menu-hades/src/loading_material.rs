@@ -22,3 +22,19 @@ impl UiMaterial for LoadingUiMaterial {
         "shaders/loading.wgsl".into()
     }
 }
+
+#[derive(AsBindGroup, Asset, TypePath, Debug, Clone)]
+pub struct SmokeUiMaterial {
+    #[texture(2)]
+    #[sampler(3)]
+    pub backdrop: Handle<Image>,
+    #[texture(4)]
+    #[sampler(5)]
+    pub texture: Handle<Image>,
+}
+
+impl UiMaterial for SmokeUiMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "shaders/smoke.wgsl".into()
+    }
+}

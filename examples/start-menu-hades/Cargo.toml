@@ -9,6 +9,7 @@ edition = "2021"
 bevy = { workspace = true, features = ["wav"] }
 bevy_asset_loader = { workspace = true, features = ["2d", "progress_tracking"] }
 bevy_tweening.workspace = true
+itertools = "0.12.1"
 iyes_progress = "0.11.0"
 strum = { version = "0.26.2", features = ["derive"] }
 

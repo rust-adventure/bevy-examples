@@ -4676,6 +4676,7 @@ dependencies = [
  "bevy 0.13.2",
  "bevy_asset_loader",
  "bevy_tweening",
+ "itertools 0.12.1",
  "iyes_progress",
  "strum",
 ]

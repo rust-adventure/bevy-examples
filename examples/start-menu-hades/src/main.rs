@@ -1,23 +1,33 @@
-use bevy::diagnostic::{
-    DiagnosticsStore, FrameTimeDiagnosticsPlugin,
-};
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy::{app::AppExit, window::WindowMode};
 use bevy::{
     asset::RecursiveDependencyLoadState,
     ui::widget::UiImageSize,
 };
+use bevy::{
+    diagnostic::{
+        DiagnosticsStore, FrameTimeDiagnosticsPlugin,
+    },
+    utils::HashMap,
+};
 use bevy_asset_loader::prelude::*;
 use bevy_tweening::{
-    lens::{UiBackgroundColorLens, UiPositionLens},
+    lens::{
+        TransformScaleLens, UiBackgroundColorLens,
+        UiPositionLens,
+    },
     *,
 };
+use itertools::Itertools;
 use iyes_progress::{
     Progress, ProgressCounter, ProgressPlugin,
     ProgressSystem,
 };
 use start_menu_hades::loading_material::{
     AppStartLoadingIndicator, LoadingUiMaterial,
+    SmokeUiMaterial,
 };
 use strum::FromRepr;
 
@@ -44,6 +54,7 @@ fn main() {
             TweeningPlugin,
             UiMaterialPlugin::<LoadingUiMaterial>::default(
             ),
+            UiMaterialPlugin::<SmokeUiMaterial>::default(),
         ))
         .init_state::<MyStates>()
         .add_loading_state(
@@ -80,10 +91,20 @@ fn main() {
         .add_systems(
             Update,
             (
+                looping_animation,
+                play_once_animation,
                 remove_intro_tweens, // .run_if(on_event::<TweenCompleted>()),
                 asset_animator_system::<LoadingUiMaterial>,
             ),
         )
+        .add_systems(
+            FixedUpdate,
+            smoke.run_if(in_state(MyStates::Next)),
+        )
+        // 12 frames every 60 seconds
+        .insert_resource(Time::<Fixed>::from_duration(
+            Duration::from_millis(1000 / 12),
+        ))
         .run();
 }
 
@@ -128,6 +149,26 @@ struct TextureAssets {
     logo_youtube_faded: Handle<Image>,
     #[asset(path = "logo-rust-adventure.png")]
     logo_rust_adventure: Handle<Image>,
+    #[asset(path = "druid/sheet-0.png")]
+    druid_idle: Handle<Image>,
+    #[asset(texture_atlas_layout(
+        tile_size_x = 1080.,
+        tile_size_y = 1080.,
+        columns = 6,
+        rows = 10
+    ))]
+    druid_idle_layout: Handle<TextureAtlasLayout>,
+    #[asset(path = "title-sheet.png")]
+    title: Handle<Image>,
+    #[asset(texture_atlas_layout(
+        tile_size_x = 960.,
+        tile_size_y = 720.,
+        columns = 4,
+        rows = 5
+    ))]
+    title_layout: Handle<TextureAtlasLayout>,
+    #[asset(path = "frames/", collection(mapped, typed))]
+    frames: HashMap<AssetFileStem, Handle<Image>>,
 }
 
 fn track_fake_long_task(time: Res<Time>) -> Progress {
@@ -165,6 +206,28 @@ fn fourth_fake(time: Res<Time>) -> Progress {
     }
 }
 
+#[derive(Component)]
+struct Smoke;
+
+fn smoke(
+    images: Res<TextureAssets>,
+    mut frame: Local<usize>,
+    mut smoke_ui_materials: ResMut<Assets<SmokeUiMaterial>>,
+) {
+    for mat in smoke_ui_materials.iter_mut() {
+        *frame = (*frame + 1) % 121;
+        mat.1.texture = images
+            .frames
+            .iter()
+            .sorted()
+            .skip(*frame)
+            .next()
+            .unwrap()
+            .1
+            .clone()
+            .into();
+    }
+}
 fn spawn_camera(
     mut commands: Commands,
     asset_server: ResMut<AssetServer>,
@@ -373,6 +436,64 @@ fn icon_button_system(
     }
 }
 
+#[derive(Component)]
+struct AnimateLoop {
+    max_index: usize,
+    fps: Timer,
+}
+
+fn looping_animation(
+    time: Res<Time>,
+    mut query: Query<(&mut TextureAtlas, &mut AnimateLoop)>,
+) {
+    for (mut atlas, mut animate_loop) in &mut query {
+        if animate_loop
+            .fps
+            .tick(time.delta())
+            .just_finished()
+        {
+            atlas.index =
+                (atlas.index + 1) % animate_loop.max_index;
+        }
+    }
+}
+
+#[derive(Component)]
+struct AnimateOnce {
+    max_index: usize,
+    fps: Timer,
+}
+
+fn play_once_animation(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(
+        Entity,
+        &mut TextureAtlas,
+        &mut AnimateOnce,
+    )>,
+) {
+    for (entity, mut atlas, mut animate_once) in &mut query
+    {
+        if animate_once
+            .fps
+            .tick(time.delta())
+            .just_finished()
+        {
+            if atlas.index + 1 == animate_once.max_index {
+                // stop animating
+                commands
+                    .entity(entity)
+                    .remove::<AnimateOnce>();
+            } else {
+                //animate until end
+                atlas.index = (atlas.index + 1)
+                    % animate_once.max_index;
+            }
+        }
+    }
+}
+
 #[derive(FromRepr)]
 enum TweenCompletedAction {
     Remove = 42,
@@ -381,9 +502,7 @@ fn remove_intro_tweens(
     mut commands: Commands,
     mut reader: EventReader<TweenCompleted>,
 ) {
-    debug_once!("remove_intro_tweens");
     for ev in reader.read() {
-        dbg!("TweenEvent");
         match TweenCompletedAction::from_repr(
             ev.user_data as usize,
         ) {
@@ -452,6 +571,7 @@ fn expect(
     asset_server: Res<AssetServer>,
     texture_atlas_layouts: Res<Assets<TextureAtlasLayout>>,
     mut quit: EventWriter<AppExit>,
+    mut smoke_ui_materials: ResMut<Assets<SmokeUiMaterial>>,
 ) {
     commands.spawn(AudioBundle {
         source: audio_assets.plop.clone(),
@@ -469,19 +589,47 @@ fn expect(
     .with_repeat_count(RepeatCount::Finite(1));
 
     commands.spawn((
-        ImageBundle {
+        MaterialNodeBundle {
             style: Style {
-                height: Val::Vh(100.),
-                width: Val::Vw(100.),
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.),
+                height: Val::Percent(100.),
                 ..default()
             },
-            image: texture_assets.backdrop.clone().into(),
-            background_color: Color::hsla(1., 1., 1., 0.)
-                .into(),
+            material: smoke_ui_materials.add(
+                SmokeUiMaterial {
+                    backdrop: texture_assets
+                        .backdrop
+                        .clone(),
+                    texture: texture_assets
+                        .frames
+                        .iter()
+                        .next()
+                        .unwrap()
+                        .1
+                        .clone()
+                        .into(),
+                },
+            ),
             ..default()
         },
-        Animator::new(tween),
+        Smoke,
     ));
+
+    // commands.spawn((
+    //     ImageBundle {
+    //         style: Style {
+    //             height: Val::Vh(100.),
+    //             width: Val::Vw(100.),
+    //             ..default()
+    //         },
+    //         image: texture_assets.backdrop.clone().into(),
+    //         background_color: Color::hsla(1., 1., 1., 0.)
+    //             .into(),
+    //         ..default()
+    //     },
+    //     Animator::new(tween),
+    // ));
 
     let tween = Tween::new(
         EaseFunction::QuadraticIn,
@@ -510,10 +658,12 @@ fn expect(
                 height: Val::Percent(100.0),
                 padding: UiRect {
                     left: Val::Percent(10.),
-                    right: Val::Percent(10.),
+                    right: Val::Percent(0.),
                     top: Val::Percent(0.),
                     bottom: Val::Percent(0.),
                 },
+                right: Val::Px(-100.),
+                bottom: Val::Px(-200.),
                 align_items: AlignItems::FlexEnd,
                 justify_content: JustifyContent::Center,
                 flex_direction: FlexDirection::Column,
@@ -524,20 +674,115 @@ fn expect(
         },))
         .with_children(|parent| {
             parent.spawn((
+                AnimateLoop {
+                    max_index: 60,
+                    fps: Timer::from_seconds(
+                        1. / 20.,
+                        TimerMode::Repeating,
+                    ),
+                },
                 ImageBundle {
                     style: Style {
-                        height: Val::Percent(80.),
+                        height: Val::Percent(100.),
                         width: Val::Auto,
                         ..default()
                     },
                     image: texture_assets
-                        .player
+                        .druid_idle
+                        .clone()
+                        .into(),
+                    // image: texture_assets
+                    //     .player
+                    //     .clone()
+                    //     .into(),
+                    ..default()
+                },
+                TextureAtlas {
+                    layout: texture_assets
+                        .druid_idle_layout
+                        .clone(),
+                    index: 0,
+                },
+                Animator::new(tween),
+                Animator::new(tween_pos),
+            ));
+        });
+
+    let tween = Tween::new(
+        EaseFunction::QuadraticIn,
+        std::time::Duration::from_millis(100),
+        TransformScaleLens {
+            start: Vec3::splat(1.),
+            end: Vec3::splat(0.5),
+        },
+    )
+    .with_repeat_count(RepeatCount::Finite(1));
+
+    let tween_pos = Tween::new(
+        EaseFunction::QuadraticIn,
+        std::time::Duration::from_millis(100),
+        UiPositionLens {
+            start: UiRect {
+                left: Val::Px(0.),
+                right: Val::Px(0.),
+                top: Val::Px(0.),
+                bottom: Val::Px(0.),
+            },
+            end: UiRect {
+                left: Val::Px(-1000.),
+                right: Val::Px(0.),
+                top: Val::Px(-300.),
+                bottom: Val::Px(0.),
+            },
+        },
+    )
+    .with_repeat_count(RepeatCount::Finite(1));
+
+    commands
+        .spawn((NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..default()
+            },
+            background_color: Color::NONE.into(),
+            ..default()
+        },))
+        .with_children(|parent| {
+            parent.spawn((
+                AnimateOnce {
+                    max_index: 17,
+                    fps: Timer::from_seconds(
+                        1. / 16.,
+                        TimerMode::Repeating,
+                    ),
+                },
+                ImageBundle {
+                    style: Style {
+                        height: Val::Percent(100.),
+                        width: Val::Percent(100.),
+                        ..default()
+                    },
+                    image: texture_assets
+                        .title
                         .clone()
                         .into(),
                     ..default()
                 },
-                Animator::new(tween),
-                Animator::new(tween_pos),
+                TextureAtlas {
+                    layout: texture_assets
+                        .title_layout
+                        .clone(),
+                    index: 0,
+                },
+                Animator::new(
+                    Delay::new(Duration::from_millis(950))
+                        .then(tween),
+                ),
+                Animator::new(
+                    Delay::new(Duration::from_millis(950))
+                        .then(tween_pos),
+                ),
             ));
         });
 
