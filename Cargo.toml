@@ -7,7 +7,7 @@ members = [
   # "examples/cartoon-water",
   # "examples/compute-3d",
   "examples/cube-wave",
-  "examples/dissolve-sphere-standard-material-extensions",
+  "examples/dissolve-sphere-standard-material-extensions", "examples/eight-way-sprites",
   # "examples/fresnel-effect",
   # "examples/infinite-tunnel",
   # "examples/pointcloud",

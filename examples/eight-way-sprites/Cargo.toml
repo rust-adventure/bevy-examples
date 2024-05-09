@@ -1,0 +1,16 @@
+[package]
+name = "eight-way-sprites"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy.workspace = true
+bevy_asset_loader = { workspace = true, features = ["2d"] }
+# leafwing-input-manager = "0.13.3"
+leafwing-input-manager = { git = "https://github.com/Leafwing-Studios/leafwing-input-manager", rev = "83b5948fbf22769b55a4b5689b351a0d6b2d6a43" }
+seldom_state = { version = "0.10.0", features = ["leafwing_input"] }
+
+[lints]
+workspace = true
