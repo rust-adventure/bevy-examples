@@ -57,7 +57,10 @@ pub fn player_state_machine() -> StateMachine {
 pub fn controller(
     mut query: Query<
         (&ActionState<Action>, &mut Facing),
-        With<Player>,
+        (
+            With<Player>,
+            Or<(With<Running>, With<Idling>)>,
+        ),
     >,
 ) {
     for (action_state, mut facing) in &mut query {
