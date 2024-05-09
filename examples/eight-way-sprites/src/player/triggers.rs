@@ -27,7 +27,7 @@ pub fn dash_timer_complete(
         .then_some(())
 }
 
-pub fn no_movement(
+pub fn has_directional_input(
     In(entity): In<Entity>,
     query_player: Query<&ActionState<Action>>,
 ) -> Option<()> {
@@ -41,5 +41,5 @@ pub fn no_movement(
     else {
         return Some(());
     };
-    (axis_pair.xy().length() <= 0.1).then_some(())
+    (axis_pair.xy().length() > 0.1).then_some(())
 }

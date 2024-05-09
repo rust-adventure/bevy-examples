@@ -32,19 +32,23 @@ pub fn player_state_machine() -> StateMachine {
         // Whenever the player presses dash, dash
         .trans::<Idling, _>(dash, Dashing::default())
         .trans::<Idling, _>(
-            no_movement.not(),
+            has_directional_input,
             Running::default(),
         )
         .trans::<Running, _>(dash, Dashing::default())
-        .trans::<Running, _>(no_movement, Idling::default())
+        .trans::<Running, _>(
+            has_directional_input.not(),
+            Idling::default(),
+        )
         // when the timer runs out and the user isn't pressing a direction, idle
         .trans::<Dashing, _>(
-            dash_timer_complete.and(no_movement),
+            dash_timer_complete
+                .and(has_directional_input.not()),
             Idling::default(),
         )
         // when the timer runs out and the user is pressing a direction, Run
         .trans::<Dashing, _>(
-            dash_timer_complete.and(no_movement.not()),
+            dash_timer_complete.and(has_directional_input),
             Running::default(),
         )
         .set_trans_logging(true)
