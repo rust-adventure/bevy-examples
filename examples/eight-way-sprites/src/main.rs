@@ -61,7 +61,7 @@ struct MyAssets {
     druid_layout: Handle<TextureAtlasLayout>,
     // you can configure the sampler for the sprite sheet image
     #[asset(image(sampler = nearest))]
-    #[asset(path = "druid-three-sheet.png")]
+    #[asset(path = "druid-three-sheet-optimized.png")]
     druid: Handle<Image>,
 }
 
