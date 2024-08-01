@@ -12,7 +12,7 @@ exclude = ["/screenshots", "/assets", "/examples"]
 
 
 [dependencies]
-bevy = "0.13"
+bevy = "0.14"
 
 [dev-dependencies]
 bevy-inspector-egui = { workspace = true }

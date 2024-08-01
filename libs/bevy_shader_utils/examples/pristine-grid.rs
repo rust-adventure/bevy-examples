@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::tailwind::*, prelude::*};
 use bevy_shader_utils::{
     PristineGridMaterial, ShaderUtilsPlugin,
 };
@@ -21,13 +21,15 @@ fn setup(
 ) {
     // floor
     commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 40.,
-            ..default()
-        })),
+        mesh: meshes.add(Mesh::from(
+            Plane3d::default()
+                .mesh()
+                .size(40., 40.)
+                .subdivisions(10),
+        )),
         transform: Transform::from_xyz(0.0, 0.0, 0.0),
         material: materials.add(PristineGridMaterial {
-            color: Color::DARK_GRAY,
+            color: SLATE_950.into(),
             cell_multiplier: Vec2::splat(80.),
             ..default()
         }),
@@ -36,13 +38,10 @@ fn setup(
 
     // sphere
     commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Mesh::from(shape::UVSphere {
-            radius: 1.0,
-            ..default()
-        })),
+        mesh: meshes.add(Sphere::default().mesh().uv(1, 1)),
         transform: Transform::from_xyz(0.0, 0.8, 0.0),
         material: materials.add(PristineGridMaterial {
-            color: Color::CYAN,
+            color: SKY_400.into(),
             cell_multiplier: Vec2::splat(20.),
             ..default()
         }),

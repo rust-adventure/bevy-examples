@@ -4,6 +4,7 @@
 //! giving per-vertex tinting.
 
 use bevy::{
+    color::palettes::tailwind::*,
     prelude::*,
     reflect::TypePath,
     render::render_resource::{AsBindGroup, ShaderRef},
@@ -41,8 +42,9 @@ fn setup(
             0., 0., 0.,
         ))
         .with_scale(Vec3::splat(4024.)),
-        material: materials
-            .add(CustomMaterial { color: Color::RED }),
+        material: materials.add(CustomMaterial {
+            color: RED_400.into(),
+        }),
         ..default()
     });
 }
@@ -63,5 +65,5 @@ impl Material2d for CustomMaterial {
 #[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct CustomMaterial {
     #[uniform(0)]
-    color: Color,
+    color: LinearRgba,
 }

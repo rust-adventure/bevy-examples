@@ -6,9 +6,8 @@ use bevy::{
     core_pipeline::prepass::{
         DepthPrepass, MotionVectorPrepass, NormalPrepass,
     },
-    pbr::PbrPlugin,
     prelude::*,
-    reflect::{TypePath, TypeUuid},
+    reflect::TypePath,
     render::render_resource::{AsBindGroup, ShaderRef},
 };
 use bevy_prepass_debug::PrepassDebugPlugin;
@@ -51,19 +50,23 @@ fn setup(
 
     // plane
     commands.spawn(PbrBundle {
-        mesh: meshes
-            .add(shape::Plane::from_size(5.0).into()),
+        mesh: meshes.add(
+            Plane3d::default()
+                .mesh()
+                .size(5., 5.)
+                .subdivisions(10),
+        ),
         material: std_materials
-            .add(Color::rgb(0.3, 0.5, 0.3).into()),
+            .add(Color::srgb(0.3, 0.5, 0.3)),
         ..default()
     });
 
     // Opaque cube using the StandardMaterial
     commands.spawn(PbrBundle {
         mesh: meshes
-            .add(Mesh::from(shape::Cube { size: 1.0 })),
+            .add(Mesh::from(Cuboid::from_size(Vec3::ONE))),
         material: std_materials
-            .add(Color::rgb(0.8, 0.7, 0.6).into()),
+            .add(Color::srgb(0.8, 0.7, 0.6)),
         transform: Transform::from_xyz(-1.0, 0.5, 0.0),
         ..default()
     });
@@ -71,7 +74,7 @@ fn setup(
     // Cube with alpha mask
     commands.spawn(PbrBundle {
         mesh: meshes
-            .add(Mesh::from(shape::Cube { size: 1.0 })),
+            .add(Mesh::from(Cuboid::from_size(Vec3::ONE))),
         material: std_materials.add(StandardMaterial {
             alpha_mode: AlphaMode::Mask(1.0),
             base_color_texture: Some(
@@ -88,9 +91,9 @@ fn setup(
     // Transparent materials are ignored by the prepass
     commands.spawn(MaterialMeshBundle {
         mesh: meshes
-            .add(Mesh::from(shape::Cube { size: 1.0 })),
+            .add(Mesh::from(Cuboid::from_size(Vec3::ONE))),
         material: materials.add(CustomMaterial {
-            color: Color::WHITE,
+            color: LinearRgba::WHITE,
             color_texture: Some(
                 asset_server.load("branding/icon.png"),
             ),
@@ -113,13 +116,10 @@ fn setup(
 }
 
 // This is the struct that will be passed to your shader
-#[derive(
-    Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone,
-)]
-#[uuid = "f690fdae-d598-45ab-8425-97e2a3f056e0"]
+#[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct CustomMaterial {
     #[uniform(0)]
-    color: Color,
+    color: LinearRgba,
     #[texture(1)]
     #[sampler(2)]
     color_texture: Option<Handle<Image>>,

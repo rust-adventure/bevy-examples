@@ -1,11 +1,11 @@
 // The code in this file is literally the Bevy prepass example copy/pasted and slightly modified
 // to exist as a plugin.
 // https://github.com/bevyengine/bevy/blob/b208388af95ecd753e4710f40baf2e913bc85c17/examples/shader/shader_prepass.rs
-use bevy::reflect::TypePath;
 use bevy::{
     asset::load_internal_asset, pbr::NotShadowCaster,
     prelude::*, render::render_resource::*,
 };
+use bevy::{math::vec2, reflect::TypePath};
 use bevy_inspector_egui::prelude::*;
 use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 
@@ -54,10 +54,8 @@ fn setup_prepass_debug(
     // To make it easy, we just draw a big quad right in front of the camera. For a real application, this isn't ideal.
     commands.spawn((
         MaterialMeshBundle {
-            mesh: meshes.add(
-                shape::Quad::new(Vec2::new(20.0, 20.0))
-                    .into(),
-            ),
+            mesh: meshes
+                .add(Rectangle::from_size(vec2(20., 20.))),
             material: depth_materials.add(
                 PrepassOutputMaterial {
                     settings: ShowPrepassSettings::default(

@@ -30,17 +30,18 @@ pub const PRISTINE_GRID: Handle<Shader> =
 /// app.
 ///
 /// ```rust
+/// use bevy::prelude::*;
+/// use bevy_shader_utils::ShaderUtilsPlugin;
 /// App::new()
 ///     .add_plugins((
 ///         DefaultPlugins,
 ///         ShaderUtilsPlugin,
-///     )
-/// );
+///     ));
 /// ```
 ///
 /// then import the relevant function in your shader.
 ///
-/// ```
+/// ```ignore
 /// #import bevy_shader_utils::perlin_noise_2d::perlin_noise_2d
 /// ```
 ///
@@ -132,7 +133,7 @@ impl Material for PristineGridMaterial {
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct PristineGridMaterial {
     #[uniform(0)]
-    pub color: Color,
+    pub color: LinearRgba,
     #[uniform(0)]
     pub cell_multiplier: Vec2,
     #[uniform(0)]
@@ -142,7 +143,7 @@ pub struct PristineGridMaterial {
 impl Default for PristineGridMaterial {
     fn default() -> Self {
         Self {
-            color: Color::WHITE,
+            color: LinearRgba::WHITE,
             cell_multiplier: Vec2::splat(10.),
             line_size: Vec2::splat(0.1),
         }
