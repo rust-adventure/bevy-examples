@@ -3447,6 +3447,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "sdf-2d-sphere"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "send_wrapper"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

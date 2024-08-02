@@ -1,5 +1,5 @@
 [package]
-name = "sdf-2d-sphere"
+name = "raymarch-sphere"
 version = "0.1.0"
 edition = "2021"
 
