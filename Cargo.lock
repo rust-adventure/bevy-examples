@@ -3281,6 +3281,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8cc3bcbdb1ddfc11e700e62968e6b4cc9c75bb466464ad28fb61c5b2c964418b"
 
 [[package]]
+name = "raymarch-sphere"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_shader_utils",
+]
+
+[[package]]
 name = "rectangle-pack"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3444,14 +3452,6 @@ dependencies = [
  "memmap2",
  "smithay-client-toolkit",
  "tiny-skia",
-]
-
-[[package]]
-name = "sdf-2d-sphere"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy_shader_utils",
 ]
 
 [[package]]

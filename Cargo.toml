@@ -20,7 +20,7 @@ members = [
   # "examples/spacecraft-noiseland",
   # "examples/standard-material-quixel-megascan",
   # "examples/ui-button-shader",
-  "examples/sdf-2d-sphere",
+  "examples/raymarch-sphere",
   "libs/*",
   # "vendor/bevy_asset_loader/bevy_asset_loader_derive",
   # "vendor/bevy_asset_loader/bevy_asset_loader",
