@@ -18,7 +18,7 @@ members = [
   # "examples/shield-spheres",
   # "examples/shield-with-depth", "examples/start-menu-hades",
   # "examples/spacecraft-noiseland",
-  # "examples/standard-material-quixel-megascan",
+  "examples/standard-material-quixel-megascan",
   # "examples/ui-button-shader",
   "examples/raymarch-sphere",
   "libs/*",
