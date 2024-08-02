@@ -8,5 +8,6 @@ edition = "2021"
 [lints]
 workspace = true
 
-[dependencies.bevy]
-workspace = true
+[dependencies]
+bevy.workspace = true
+bevy_panorbit_camera.workspace = true

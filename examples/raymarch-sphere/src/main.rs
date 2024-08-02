@@ -41,7 +41,8 @@ impl Material2d for SdfMaterial {
     }
 }
 
-// This is the struct that will be passed to your shader
+// This is the struct that will be passed to your
+// shader
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct SdfMaterial {
     #[uniform(0)]

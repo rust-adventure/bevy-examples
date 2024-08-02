@@ -1,18 +1,22 @@
-// The code in this file is literally the Bevy prepass example copy/pasted and slightly modified
-// to exist as a plugin.
+// The code in this file is literally the Bevy
+// prepass example copy/pasted and slightly
+// modified to exist as a plugin.
 // https://github.com/bevyengine/bevy/blob/b208388af95ecd753e4710f40baf2e913bc85c17/examples/shader/shader_prepass.rs
 use bevy::{
-    asset::load_internal_asset, pbr::NotShadowCaster,
-    prelude::*, render::render_resource::*,
+    asset::load_internal_asset, math::vec2,
+    pbr::NotShadowCaster, prelude::*, reflect::TypePath,
+    render::render_resource::*,
 };
-use bevy::{math::vec2, reflect::TypePath};
-use bevy_inspector_egui::prelude::*;
-use bevy_inspector_egui::quick::ResourceInspectorPlugin;
+use bevy_inspector_egui::{
+    prelude::*, quick::ResourceInspectorPlugin,
+};
 
 const SHOW_PREPASS_SHADER_HANDLE: Handle<Shader> =
     Handle::weak_from_u128(3223086272834592509);
 /// Debug depth/normal/
-/// In order to function, the [`PrepassDebug`] component should be attached to the camera entity.
+/// In order to function, the [`PrepassDebug`]
+/// component should be attached to the camera
+/// entity.
 #[derive(Default)]
 pub struct PrepassDebugPlugin;
 
@@ -33,8 +37,10 @@ impl Plugin for PrepassDebugPlugin {
             .add_plugins(MaterialPlugin::<
                 PrepassOutputMaterial,
             > {
-                // This material only needs to read the prepass textures,
-                // but the meshes using it should not contribute to the prepass render, so we can disable it.
+                // This material only needs to read the
+                // prepass textures, but the
+                // meshes using it should not contribute to
+                // the prepass render, so we can disable it.
                 prepass_enabled: false,
                 ..default()
             })
@@ -51,7 +57,9 @@ fn setup_prepass_debug(
     >,
 ) {
     // A quad that shows the outputs of the prepass
-    // To make it easy, we just draw a big quad right in front of the camera. For a real application, this isn't ideal.
+    // To make it easy, we just draw a big quad right
+    // in front of the camera. For a real application,
+    // this isn't ideal.
     commands.spawn((
         MaterialMeshBundle {
             mesh: meshes
@@ -100,7 +108,8 @@ struct ShowPrepassSettings {
     padding_2: u32,
 }
 
-// This shader simply loads the prepass texture and outputs it directly
+// This shader simply loads the prepass texture
+// and outputs it directly
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct PrepassOutputMaterial {
     #[uniform(0)]
@@ -112,13 +121,15 @@ impl Material for PrepassOutputMaterial {
         SHOW_PREPASS_SHADER_HANDLE.into()
     }
 
-    // This needs to be transparent in order to show the scene behind the mesh
+    // This needs to be transparent in order to show
+    // the scene behind the mesh
     fn alpha_mode(&self) -> AlphaMode {
         AlphaMode::Blend
     }
 }
 
-/// Every time you press space, it will cycle between transparent, depth and normals view
+/// Every time you press space, it will cycle
+/// between transparent, depth and normals view
 fn toggle_prepass_view(
     settings: Res<PrepassSettings>,
     material_handle: Query<&Handle<PrepassOutputMaterial>>,

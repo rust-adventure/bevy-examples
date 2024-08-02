@@ -13,7 +13,8 @@ use bevy::{
     window::PrimaryWindow,
 };
 // use bevy_inspector_egui::quick::{
-//     AssetInspectorPlugin, ResourceInspectorPlugin,
+//     AssetInspectorPlugin,
+// ResourceInspectorPlugin,
 //     WorldInspectorPlugin,
 // };
 use bevy_shader_utils::ShaderUtilsPlugin;
@@ -303,7 +304,7 @@ fn setup(
     //                 size: 1.0,
     //             })),
     //             material:
-    // screenshot_fresnel_materials               
+    // screenshot_fresnel_materials
     // .add(ScreenshotFresnelMaterial {}),
     //             transform: Transform::from_xyz(
     //                 0.0, 0.5, 0.0,

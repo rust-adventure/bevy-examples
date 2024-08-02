@@ -26,8 +26,8 @@ pub const MOCK_FRESNEL: Handle<Shader> =
 pub const PRISTINE_GRID: Handle<Shader> =
     Handle::weak_from_u128(11918512942344596158);
 
-/// To use the shader utility functions, add the plugin to your
-/// app.
+/// To use the shader utility functions, add the
+/// plugin to your app.
 ///
 /// ```rust
 /// use bevy::prelude::*;
@@ -39,12 +39,12 @@ pub const PRISTINE_GRID: Handle<Shader> =
 ///     ));
 /// ```
 ///
-/// then import the relevant function in your shader.
+/// then import the relevant function in your
+/// shader.
 ///
 /// ```ignore
 /// #import bevy_shader_utils::perlin_noise_2d::perlin_noise_2d
 /// ```
-///
 pub struct ShaderUtilsPlugin;
 
 impl Plugin for ShaderUtilsPlugin {
@@ -66,8 +66,10 @@ impl Plugin for ShaderUtilsPlugin {
         //     "shaders/simplex_noise_3d.wgsl"
         // );
         // embedded_asset!(app, "shaders/voronoise.wgsl");
-        // embedded_asset!(app, "shaders/mock_fresnel.wgsl");
-        // embedded_asset!(app, "shaders/pristine_grid.wgsl");
+        // embedded_asset!(app,
+        // "shaders/mock_fresnel.wgsl");
+        // embedded_asset!(app,
+        // "shaders/pristine_grid.wgsl");
 
         embedded_asset!(
             app,
@@ -129,7 +131,8 @@ impl Material for PristineGridMaterial {
     }
 }
 
-// This is the struct that will be passed to your shader
+// This is the struct that will be passed to your
+// shader
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct PristineGridMaterial {
     #[uniform(0)]

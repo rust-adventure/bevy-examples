@@ -1,6 +1,11 @@
-//! Bevy has an optional prepass that is controlled per-material. A prepass is a rendering pass that runs before the main pass.
-//! It will optionally generate various view textures. Currently it supports depth, normal, and motion vector textures.
-//! The textures are not generated for any material using alpha blending.
+//! Bevy has an optional prepass that is
+//! controlled per-material. A prepass is a
+//! rendering pass that runs before the main pass.
+//! It will optionally generate various view
+//! textures. Currently it supports depth, normal,
+//! and motion vector textures. The textures are
+//! not generated for any material using alpha
+//! blending.
 
 use bevy::{
     core_pipeline::prepass::{
@@ -39,12 +44,16 @@ fn setup(
                 .looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
-        // To enable the prepass you need to add the components associated with the ones you need
-        // This will write the depth buffer to a texture that you can use in the main pass
+        // To enable the prepass you need to add the
+        // components associated with the ones you need
+        // This will write the depth buffer to a texture
+        // that you can use in the main pass
         DepthPrepass,
-        // This will generate a texture containing world normals (with normal maps applied)
+        // This will generate a texture containing world
+        // normals (with normal maps applied)
         NormalPrepass,
-        // This will generate a texture containing screen space pixel motion vectors
+        // This will generate a texture containing screen
+        // space pixel motion vectors
         MotionVectorPrepass,
     ));
 
@@ -88,7 +97,8 @@ fn setup(
     });
 
     // Cube with alpha blending.
-    // Transparent materials are ignored by the prepass
+    // Transparent materials are ignored by the
+    // prepass
     commands.spawn(MaterialMeshBundle {
         mesh: meshes
             .add(Mesh::from(Cuboid::from_size(Vec3::ONE))),
@@ -115,7 +125,8 @@ fn setup(
     });
 }
 
-// This is the struct that will be passed to your shader
+// This is the struct that will be passed to your
+// shader
 #[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct CustomMaterial {
     #[uniform(0)]
@@ -126,7 +137,8 @@ pub struct CustomMaterial {
     alpha_mode: AlphaMode,
 }
 
-/// Not shown in this example, but if you need to specialize your material, the specialize
+/// Not shown in this example, but if you need to
+/// specialize your material, the specialize
 /// function will also be used by the prepass
 impl Material for CustomMaterial {
     fn fragment_shader() -> ShaderRef {
@@ -137,7 +149,8 @@ impl Material for CustomMaterial {
         self.alpha_mode
     }
 
-    // You can override the default shaders used in the prepass if your material does
+    // You can override the default shaders used in
+    // the prepass if your material does
     // anything not supported by the default prepass
     // fn prepass_fragment_shader() -> ShaderRef {
     //     "shaders/custom_material.wgsl".into()
