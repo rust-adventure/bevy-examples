@@ -7,12 +7,15 @@ use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Color::RgbaLinear {
-            red: 0.25,
-            green: 0.24,
-            blue: 0.28,
-            alpha: 1.,
-        }))
+        .insert_resource(ClearColor(
+            LinearRgba {
+                red: 0.25,
+                green: 0.24,
+                blue: 0.28,
+                alpha: 1.,
+            }
+            .into(),
+        ))
         .add_plugins((DefaultPlugins, ShaderUtilsPlugin))
         .add_plugins(
             UiMaterialPlugin::<CustomUiMaterial>::default(),
@@ -36,7 +39,7 @@ fn update(
             1.,
             0.5,
         );
-        material.color = new_color.into();
+        material.color = new_color.to_linear();
     }
 }
 
@@ -55,7 +58,7 @@ fn setup(
     mut heart_ui_materials: ResMut<Assets<HeartUiMaterial>>,
 ) {
     // Camera so we can see UI
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 
     commands
         .spawn(NodeBundle {
@@ -102,10 +105,11 @@ fn setup(
                                 height: Val::Percent(100.),
                                 ..default()
                             },
-                            material: heart_ui_materials
-                                .add(HeartUiMaterial {
-                                    color: Color::WHITE
-                                        .into(),
+                            material: UiMaterialHandle(
+                                heart_ui_materials
+                                    .add(HeartUiMaterial {
+                                    color:
+                                        LinearRgba::WHITE,
                                     time: 0.,
                                     fill_level: -(((i
                                         as f32
@@ -115,6 +119,7 @@ fn setup(
                                         - 1.0),
                                     offset: i as f32 * 10.,
                                 }),
+                            ),
                             ..default()
                         });
                     });
@@ -145,13 +150,15 @@ fn setup(
                     height: Val::Percent(100.),
                     ..default()
                 },
-                material: heart_ui_materials.add(
-                    HeartUiMaterial {
-                        color: Color::WHITE.into(),
-                        time: 0.,
-                        fill_level: 0.,
-                        offset: 0.,
-                    },
+                material: UiMaterialHandle(
+                    heart_ui_materials.add(
+                        HeartUiMaterial {
+                            color: LinearRgba::WHITE,
+                            time: 0.,
+                            fill_level: 0.,
+                            offset: 0.,
+                        },
+                    ),
                 ),
                 ..default()
             });
@@ -161,7 +168,7 @@ fn setup(
 #[derive(AsBindGroup, Asset, TypePath, Debug, Clone)]
 struct CustomUiMaterial {
     #[uniform(0)]
-    color: Vec4,
+    color: LinearRgba,
 }
 
 impl UiMaterial for CustomUiMaterial {
@@ -173,7 +180,7 @@ impl UiMaterial for CustomUiMaterial {
 #[derive(AsBindGroup, Asset, TypePath, Debug, Clone)]
 struct HeartUiMaterial {
     #[uniform(0)]
-    color: Vec4,
+    color: LinearRgba,
     #[uniform(0)]
     time: f32,
     #[uniform(0)]

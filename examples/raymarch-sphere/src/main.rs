@@ -2,9 +2,7 @@ use bevy::{
     color::palettes::tailwind::BLUE_400,
     prelude::*,
     render::render_resource::{AsBindGroup, ShaderRef},
-    sprite::{
-        Material2d, Material2dPlugin, MaterialMesh2dBundle,
-    },
+    sprite::{Material2d, Material2dPlugin},
 };
 
 fn main() {
@@ -22,17 +20,20 @@ fn startup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<SdfMaterial>>,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 
-    commands.spawn(MaterialMesh2dBundle {
-        mesh: meshes
-            .add(Rectangle::from_size(Vec2::splat(512.)))
-            .into(),
-        material: materials.add(SdfMaterial {
+    commands.spawn((
+        Mesh2d(
+            meshes
+                .add(Rectangle::from_size(Vec2::splat(
+                    512.,
+                )))
+                .into(),
+        ),
+        MeshMaterial2d(materials.add(SdfMaterial {
             color: BLUE_400.into(),
-        }),
-        ..default()
-    });
+        })),
+    ));
 }
 
 impl Material2d for SdfMaterial {
