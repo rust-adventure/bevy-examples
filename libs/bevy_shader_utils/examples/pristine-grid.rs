@@ -20,41 +20,45 @@ fn setup(
     mut materials: ResMut<Assets<PristineGridMaterial>>,
 ) {
     // floor
-    commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Mesh::from(
-            Plane3d::default()
-                .mesh()
-                .size(40., 40.)
-                .subdivisions(10),
+    commands.spawn((
+        Mesh3d(
+            meshes.add(Mesh::from(
+                Plane3d::default()
+                    .mesh()
+                    .size(40., 40.)
+                    .subdivisions(10),
+            )),
+        ),
+        Transform::from_xyz(0.0, 0.0, 0.0),
+        MeshMaterial3d(materials.add(
+            PristineGridMaterial {
+                color: GREEN_400.into(),
+                cell_multiplier: Vec2::splat(80.),
+                ..default()
+            },
         )),
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        material: materials.add(PristineGridMaterial {
-            color: SLATE_950.into(),
-            cell_multiplier: Vec2::splat(80.),
-            ..default()
-        }),
-        ..default()
-    });
+    ));
 
     // sphere
-    commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Sphere::default().mesh().uv(1, 1)),
-        transform: Transform::from_xyz(0.0, 0.8, 0.0),
-        material: materials.add(PristineGridMaterial {
-            color: SKY_400.into(),
-            cell_multiplier: Vec2::splat(20.),
-            ..default()
-        }),
-        ..default()
-    });
+    commands.spawn((
+        Mesh3d(
+            meshes.add(Sphere::default().mesh().uv(32, 18)),
+        ),
+        Transform::from_xyz(0.0, 0.8, 0.0),
+        MeshMaterial3d(materials.add(
+            PristineGridMaterial {
+                color: SKY_400.into(),
+                cell_multiplier: Vec2::splat(20.),
+                ..default()
+            },
+        )),
+    ));
 
     // camera
     commands.spawn((
-        Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 3.0, 5.0)
-                .looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(-2.0, 3.0, 5.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
         MainCamera,
     ));
 }
