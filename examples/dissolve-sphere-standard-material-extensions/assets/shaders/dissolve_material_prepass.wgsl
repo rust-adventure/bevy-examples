@@ -23,8 +23,6 @@ STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT
 #import bevy_render::globals::Globals
 
 @group(0) @binding(1) var<uniform> globals: Globals;
-
-
  
 // basically all of this prepass shader is just copy/pasted from
 // the bevy pbr prepass shader.
@@ -33,54 +31,40 @@ fn fragment(
     in: VertexOutput,
     @builtin(front_facing) is_front: bool,
 ) -> FragmentOutput {
-    pbr_prepass_functions::prepass_alpha_discard(in);
-
     var out: FragmentOutput;
+
+#ifdef NORMAL_PREPASS
+    out.normal = vec4(in.world_normal * 0.5 + vec3(0.5), 1.0);
+#endif
 
 #ifdef DEPTH_CLAMP_ORTHO
     out.frag_depth = in.clip_position_unclamped.z;
 #endif // DEPTH_CLAMP_ORTHO
 
-#ifdef NORMAL_PREPASS
-    // NOTE: Unlit bit not set means == 0 is true, so the true case is if lit
+#ifdef MOTION_VECTOR_PREPASS
+    let clip_position_t = view.unjittered_clip_from_world * in.world_position;
+    let clip_position = clip_position_t.xy / clip_position_t.w;
+    let previous_clip_position_t = prepass_bindings::previous_view_uniforms.clip_from_world * in.previous_world_position;
+    let previous_clip_position = previous_clip_position_t.xy / previous_clip_position_t.w;
+    // These motion vectors are used as offsets to UV positions and are stored
+    // in the range -1,1 to allow offsetting from the one corner to the
+    // diagonally-opposite corner in UV coordinates, in either direction.
+    // A difference between diagonally-opposite corners of clip space is in the
+    // range -2,2, so this needs to be scaled by 0.5. And the V direction goes
+    // down where clip space y goes up, so y needs to be flipped.
+    out.motion_vector = (clip_position - previous_clip_position) * vec2(0.5, -0.5);
+#endif // MOTION_VECTOR_PREPASS
 
-    if (material.flags & STANDARD_MATERIAL_FLAGS_UNLIT_BIT) == 0u {
-        let double_sided = (material.flags & STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT) != 0u;
-
-        let world_normal = pbr_functions::prepare_world_normal(
-            in.world_normal,
-            double_sided,
-            is_front,
-        );
-
-        let normal = pbr_functions::apply_normal_mapping(
-            material.flags,
-            world_normal,
-            double_sided,
-            is_front,
-#ifdef VERTEX_TANGENTS
-#ifdef STANDARDMATERIAL_NORMAL_MAP
-            in.world_tangent,
-#endif // STANDARDMATERIAL_NORMAL_MAP
-#endif // VERTEX_TANGENTS
-#ifdef VERTEX_UVS
-            in.uv,
-#endif // VERTEX_UVS
-            view.mip_bias,
-        );
-
-        out.normal = vec4(normal * 0.5 + vec3(0.5), 1.0);
-    } else {
-        out.normal = vec4(in.world_normal * 0.5 + vec3(0.5), 1.0);
-    }
-
+#ifdef DEFERRED_PREPASS
+    // There isn't any material info available for this default prepass shader so we are just writing 
+    // emissive magenta out to the deferred gbuffer to be rendered by the first deferred lighting pass layer.
+    // This is here so if the default prepass fragment is used for deferred magenta will be rendered, and also
+    // as an example to show that a user could write to the deferred gbuffer if they were to start from this shader.
+    out.deferred = vec4(0u, bevy_pbr::rgb9e5::vec3_to_rgb9e5_(vec3(1.0, 0.0, 1.0)), 0u, 0u);
+    out.deferred_lighting_pass_id = 1u;
+#endif
 
     
-#endif // NORMAL_PREPASS
-
-#ifdef MOTION_VECTOR_PREPASS
-    out.motion_vector = pbr_prepass_functions::calculate_motion_vector(in.world_position, in.previous_world_position);
-#endif
 
     // same calcuation for gaps as the material, but without color
     // output. 

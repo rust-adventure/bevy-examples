@@ -7,9 +7,9 @@ use bevy::{
     pbr::NotShadowCaster, prelude::*, reflect::TypePath,
     render::render_resource::*,
 };
-use bevy_inspector_egui::{
-    prelude::*, quick::ResourceInspectorPlugin,
-};
+// use bevy_inspector_egui::{
+//     prelude::*, quick::ResourceInspectorPlugin,
+// };
 
 const SHOW_PREPASS_SHADER_HANDLE: Handle<Shader> =
     Handle::weak_from_u128(3223086272834592509);
@@ -31,9 +31,9 @@ impl Plugin for PrepassDebugPlugin {
 
         app.init_resource::<PrepassSettings>()
             .register_type::<PrepassSettings>()
-            .add_plugins((ResourceInspectorPlugin::<
-                PrepassSettings,
-            >::default(),))
+            // .add_plugins((ResourceInspectorPlugin::<
+            //     PrepassSettings,
+            // >::default(),))
             .add_plugins(MaterialPlugin::<
                 PrepassOutputMaterial,
             > {
@@ -61,29 +61,27 @@ fn setup_prepass_debug(
     // in front of the camera. For a real application,
     // this isn't ideal.
     commands.spawn((
-        MaterialMeshBundle {
-            mesh: meshes
+        Mesh3d(
+            meshes
                 .add(Rectangle::from_size(vec2(20., 20.))),
-            material: depth_materials.add(
-                PrepassOutputMaterial {
-                    settings: ShowPrepassSettings::default(
-                    ),
+        ),
+        MeshMaterial3d(depth_materials.add(
+            PrepassOutputMaterial {
+                settings: ShowPrepassSettings {
+                    show_depth: 1,
+                    ..default()
                 },
-            ),
-            transform: Transform::from_xyz(
-                -0.75, 1.25, 3.0,
-            )
-            .looking_at(
-                Vec3::new(2.0, -2.5, -5.0),
-                Vec3::Y,
-            ),
-            ..default()
-        },
+            },
+        )),
+        Transform::from_xyz(-0.75, 1.25, 3.0).looking_at(
+            Vec3::new(2.0, -2.5, -5.0),
+            Vec3::Y,
+        ),
         NotShadowCaster,
     ));
 }
 
-#[derive(Reflect, Default)]
+#[derive(Reflect, Default, Debug)]
 enum Show {
     #[default]
     None,
@@ -91,8 +89,10 @@ enum Show {
     Normals,
     MotionVectors,
 }
-#[derive(Reflect, Resource, Default, InspectorOptions)]
-#[reflect(Resource, InspectorOptions)]
+// #[derive(Reflect, Resource, Default, InspectorOptions)]
+// #[reflect(Resource, InspectorOptions)]
+#[derive(Reflect, Resource, Default)]
+#[reflect(Resource)]
 struct PrepassSettings {
     show: Show,
     padding_1: u32,
@@ -128,13 +128,23 @@ impl Material for PrepassOutputMaterial {
     }
 }
 
-/// Every time you press space, it will cycle
-/// between transparent, depth and normals view
 fn toggle_prepass_view(
-    settings: Res<PrepassSettings>,
-    material_handle: Query<&Handle<PrepassOutputMaterial>>,
+    keycode: Res<ButtonInput<KeyCode>>,
+    mut settings: ResMut<PrepassSettings>,
+    material_handle: Query<
+        &MeshMaterial3d<PrepassOutputMaterial>,
+    >,
     mut materials: ResMut<Assets<PrepassOutputMaterial>>,
 ) {
+    if keycode.just_pressed(KeyCode::Space) {
+        let next_view = match settings.show {
+            Show::None => Show::Depth,
+            Show::Depth => Show::Normals,
+            Show::Normals => Show::MotionVectors,
+            Show::MotionVectors => Show::None,
+        };
+        settings.show = next_view;
+    }
     if settings.is_changed() {
         let prepass_view = match settings.show {
             Show::None => 0,
@@ -143,8 +153,9 @@ fn toggle_prepass_view(
             Show::MotionVectors => 3,
         };
 
-        let handle = material_handle.single();
-        let mat = materials.get_mut(handle).unwrap();
+        let mat = materials
+            .get_mut(&material_handle.single().0)
+            .unwrap();
         mat.settings.show_depth =
             (prepass_view == 1) as u32;
         mat.settings.show_normals =

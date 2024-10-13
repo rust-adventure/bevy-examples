@@ -1,4 +1,5 @@
 use bevy::{
+    color::palettes::tailwind::{BLUE_400, RED_400},
     core_pipeline::{
         fxaa::Fxaa,
         prepass::{
@@ -21,9 +22,8 @@ fn main() {
             color: Color::WHITE,
             brightness: 0.02,
         })
-        .insert_resource(Msaa::Off)
         .insert_resource(ClearColor(
-            Color::hex("1fa9f4").unwrap(),
+            Srgba::hex("1fa9f4").unwrap().into(),
         ))
         .add_plugins((
             DefaultPlugins.set(AssetPlugin {
@@ -66,10 +66,7 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
-    let mut mesh = Mesh::from(shape::UVSphere {
-        radius: 1.0,
-        ..default()
-    });
+    let mut mesh = Sphere::default().mesh().uv(32, 18);
     // let mut mesh = Mesh::from(shape::Cube { size: 1.0 });
     if let Some(VertexAttributeValues::Float32x3(
         positions,
@@ -92,10 +89,10 @@ fn setup(
         );
     }
 
-    commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(mesh),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        material: dissolve_materials
+    commands.spawn((
+        Mesh3d(meshes.add(mesh)),
+        Transform::from_xyz(0.0, 0.5, 0.0),
+        MeshMaterial3d(dissolve_materials
             .add(ExtendedMaterial {
             base: StandardMaterial {
                 // base_color: Color::rgb(0.533, 0.533, 0.80),
@@ -126,17 +123,14 @@ fn setup(
             extension: DissolveExtension {
                 // quantize_steps: 3,
             },
-        }),
-        ..default()
-    });
+        })),
+    ));
 
     // camera
     commands.spawn((
-        Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 2.5, 5.0)
-                .looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(-2.0, 2.5, 5.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
         Movable,
         DepthPrepass,
         NormalPrepass,
@@ -144,127 +138,89 @@ fn setup(
         Fxaa::default(),
     ));
     // ground plane
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane {
-            size: 10.0,
-            ..default()
-        })),
-        material: materials.add(StandardMaterial {
+    commands.spawn((
+        Mesh3d(meshes.add(Mesh::from(
+            Plane3d::default().mesh().size(10., 10.),
+        ))),
+        MeshMaterial3d(materials.add(StandardMaterial {
             base_color: Color::WHITE,
             perceptual_roughness: 1.0,
             ..default()
-        }),
-        ..default()
-    });
-    // // left wall
-    // let mut transform = Transform::from_xyz(2.5, 2.5, 0.0);
-    // transform.rotate_z(std::f32::consts::FRAC_PI_2);
-    // commands.spawn(PbrBundle {
-    //     mesh: meshes.add(Mesh::from(shape::Box::new(
-    //         5.0, 0.15, 5.0,
-    //     ))),
-    //     transform,
-    //     material: materials.add(StandardMaterial {
-    //         base_color: Color::INDIGO,
-    //         perceptual_roughness: 1.0,
-    //         ..default()
-    //     }),
-    //     ..default()
-    // });
-    // // // back (right) wall
-    // let mut transform = Transform::from_xyz(0.0, 2.5, -2.5);
-    // transform.rotate_x(std::f32::consts::FRAC_PI_2);
-    // commands.spawn(PbrBundle {
-    //     mesh: meshes.add(Mesh::from(shape::Box::new(
-    //         5.0, 0.15, 5.0,
-    //     ))),
-    //     transform,
-    //     material: materials.add(StandardMaterial {
-    //         base_color: Color::INDIGO,
-    //         perceptual_roughness: 1.0,
-    //         ..default()
-    //     }),
-    //     ..default()
-    // });
+        })),
+    ));
 
     // red point light
     commands
-        .spawn(PointLightBundle {
-            // transform: Transform::from_xyz(5.0, 8.0, 2.0),
-            transform: Transform::from_xyz(1.0, 2.0, 0.0),
-            point_light: PointLight {
+        .spawn((
+            Transform::from_xyz(1.0, 2.0, 0.0),
+            PointLight {
                 intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
-                color: Color::RED,
+                color: RED_400.into(),
                 shadows_enabled: true,
                 ..default()
             },
-            ..default()
-        })
+        ))
         .with_children(|builder| {
-            builder.spawn(PbrBundle {
-                mesh: meshes.add(Mesh::from(
-                    shape::UVSphere {
-                        radius: 0.1,
+            builder.spawn((
+                Mesh3d(
+                    meshes
+                        .add(Sphere { radius: 0.1 }.mesh()),
+                ),
+                MeshMaterial3d(materials.add(
+                    StandardMaterial {
+                        base_color: RED_400.into(),
+                        emissive: LinearRgba::new(
+                            100., 0., 0., 0.,
+                        ),
                         ..default()
                     },
                 )),
-                material: materials.add(StandardMaterial {
-                    base_color: Color::RED,
-                    emissive: Color::rgba_linear(
-                        100.0, 0.0, 0.0, 0.0,
-                    ),
-                    ..default()
-                }),
-                ..default()
-            });
+            ));
         });
 
     // blue point light
     commands
-        .spawn(PointLightBundle {
-            transform: Transform::from_xyz(0.0, 4.0, 0.0),
-            point_light: PointLight {
+        .spawn((
+            Transform::from_xyz(0.0, 4.0, 0.0),
+            PointLight {
                 intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
-                color: Color::BLUE,
+                color: BLUE_400.into(),
                 shadows_enabled: true,
                 ..default()
             },
-            ..default()
-        })
+        ))
         .with_children(|builder| {
-            builder.spawn(PbrBundle {
-                mesh: meshes.add(Mesh::from(
-                    shape::UVSphere {
-                        radius: 0.1,
+            builder.spawn((
+                Mesh3d(
+                    meshes
+                        .add(Sphere { radius: 0.1 }.mesh()),
+                ),
+                MeshMaterial3d(materials.add(
+                    StandardMaterial {
+                        base_color: BLUE_400.into(),
+                        emissive: LinearRgba::new(
+                            0.0, 0.0, 100.0, 0.0,
+                        ),
                         ..default()
                     },
                 )),
-                material: materials.add(StandardMaterial {
-                    base_color: Color::BLUE,
-                    emissive: Color::rgba_linear(
-                        0.0, 0.0, 100.0, 0.0,
-                    ),
-                    ..default()
-                }),
-                ..default()
-            });
+            ));
         });
 
     // directional 'sun' light
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
+    commands.spawn((
+        DirectionalLight {
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform {
+        Transform {
             translation: Vec3::new(10.0, 20.0, 10.0),
             rotation: Quat::from_rotation_x(
                 -std::f32::consts::FRAC_PI_4,
             ),
             ..default()
         },
-        ..default()
-    });
+    ));
 }
 
 fn animate_light_direction(
@@ -292,22 +248,22 @@ fn animate_light_direction(
 #[derive(Component)]
 struct Movable;
 fn movement(
-    input: Res<Input<KeyCode>>,
+    input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     mut query: Query<&mut Transform, With<Movable>>,
 ) {
     for mut transform in query.iter_mut() {
         let mut direction = Vec3::ZERO;
-        if input.pressed(KeyCode::Up) {
+        if input.pressed(KeyCode::ArrowUp) {
             direction.y += 1.0;
         }
-        if input.pressed(KeyCode::Down) {
+        if input.pressed(KeyCode::ArrowDown) {
             direction.y -= 1.0;
         }
-        if input.pressed(KeyCode::Left) {
+        if input.pressed(KeyCode::ArrowLeft) {
             direction.x -= 1.0;
         }
-        if input.pressed(KeyCode::Right) {
+        if input.pressed(KeyCode::ArrowRight) {
             direction.x += 1.0;
         }
 
