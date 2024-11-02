@@ -116,7 +116,7 @@ fn animate_light_direction(
     >,
 ) {
     for mut transform in query.iter_mut() {
-        transform.rotate_y(time.delta_seconds() * 0.5);
+        transform.rotate_y(time.delta_secs() * 0.5);
     }
 }
 
@@ -124,7 +124,7 @@ fn swap_components(
     mut materials: ResMut<Assets<NormalVisualizerMaterial>>,
     time: Res<Time>,
 ) {
-    if time.elapsed_seconds().sin() > 0. {
+    if time.elapsed_secs().sin() > 0. {
         for (_, mat) in materials.iter_mut() {
             mat.show_components = 0.;
         }

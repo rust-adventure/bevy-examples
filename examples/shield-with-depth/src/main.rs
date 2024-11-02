@@ -1,6 +1,7 @@
 use bevy::{
+    color::palettes::css::*,
     core_pipeline::{
-        bloom::BloomSettings,
+        bloom::Bloom,
         prepass::{
             DepthPrepass, MotionVectorPrepass,
             NormalPrepass,
@@ -13,7 +14,7 @@ use bevy::{
     prelude::*,
     reflect::TypePath,
     render::{
-        mesh::MeshVertexBufferLayout,
+        mesh::MeshVertexBufferLayoutRef,
         render_resource::{
             AsBindGroup, RenderPipelineDescriptor,
             ShaderRef, ShaderType,
@@ -24,26 +25,25 @@ use bevy::{
 use bevy_asset_loader::prelude::*;
 use std::f32::consts::FRAC_PI_2;
 
-use bevy_basic_camera::{
-    CameraController, CameraControllerPlugin,
-};
+// use bevy_basic_camera::{
+//     CameraController, CameraControllerPlugin,
+// };
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa::Off)
         .insert_resource(ClearColor(
-            Color::hex("071f3c").unwrap(),
+            Srgba::hex("071f3c").unwrap().into(),
         ))
         .insert_resource(AmbientLight {
-            color: Color::ORANGE_RED,
+            color: ORANGE_RED.into(),
             brightness: 0.02,
         })
-        .add_state::<MyStates>()
         .add_plugins((
             DefaultPlugins,
-            CameraControllerPlugin,
+            // CameraControllerPlugin,
             ShaderUtilsPlugin,
+            // PrepassDebugPlugin,
             MaterialPlugin::<CustomMaterial> {
                 prepass_enabled: false,
                 ..default()
@@ -55,6 +55,7 @@ fn main() {
                 ..default()
             },
         ))
+        .init_state::<MyStates>()
         .add_loading_state(
             LoadingState::new(MyStates::AssetLoading)
                 .continue_to_state(MyStates::Next),
@@ -63,11 +64,11 @@ fn main() {
             MyStates::AssetLoading,
         )
         .add_systems(OnEnter(MyStates::Next), setup)
-        .add_systems(
-            Update,
-            toggle_prepass_view
-                .run_if(in_state(MyStates::Next)),
-        )
+        // .add_systems(
+        //     Update,
+        //     toggle_prepass_view
+        //         .run_if(in_state(MyStates::Next)),
+        // )
         .run();
 }
 
@@ -86,110 +87,108 @@ fn setup(
     // Debug
     // A quad that shows the outputs of the prepass
     // To make it easy, we just draw a big quad right in front of the camera. For a real application, this isn't ideal.
+    // commands.spawn((
+    //     MaterialMeshBundle {
+    //         mesh: meshes.add(
+    //             shape::Quad::new(Vec2::new(20.0, 20.0))
+    //                 .into(),
+    //         ),
+    //         material: depth_materials.add(
+    //             PrepassOutputMaterial {
+    //                 settings: ShowPrepassSettings::default(
+    //                 ),
+    //             },
+    //         ),
+    //         transform: Transform::from_xyz(
+    //             -0.75, 1.25, 3.0,
+    //         )
+    //         .looking_at(
+    //             Vec3::new(2.0, -2.5, -5.0),
+    //             Vec3::Y,
+    //         ),
+    //         ..default()
+    //     },
+    //     NotShadowCaster,
+    // ));
+    // // end Debug
     commands.spawn((
-        MaterialMeshBundle {
-            mesh: meshes.add(
-                shape::Quad::new(Vec2::new(20.0, 20.0))
-                    .into(),
-            ),
-            material: depth_materials.add(
-                PrepassOutputMaterial {
-                    settings: ShowPrepassSettings::default(
-                    ),
-                },
-            ),
-            transform: Transform::from_xyz(
-                -0.75, 1.25, 3.0,
-            )
-            .looking_at(
-                Vec3::new(2.0, -2.5, -5.0),
-                Vec3::Y,
-            ),
+        Camera3d::default(),
+        Camera {
+            hdr: true,
             ..default()
         },
-        NotShadowCaster,
-    ));
-    // end Debug
-    commands.spawn((
-        Camera3dBundle {
-            camera: Camera {
-                hdr: true,
-                ..default()
-            },
-            transform: Transform::from_xyz(-2.0, 3., 5.0)
-                .looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Transform::from_xyz(-2.0, 3., 5.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
         // To enable the prepass you need to add the components associated with the ones you need
         // This will write the depth buffer to a texture that you can use in the main pass
         DepthPrepass,
         // This will generate a texture containing world normals (with normal maps applied)
         NormalPrepass,
         MotionVectorPrepass,
-        CameraController {
-            orbit_mode: true,
-            orbit_focus: Vec3::new(0.0, 0.5, 0.0).into(),
-            ..default()
-        },
-        BloomSettings::default(),
+        // CameraController {
+        //     orbit_mode: true,
+        //     orbit_focus: Vec3::new(0.0, 0.5, 0.0).into(),
+        //     ..default()
+        // },
+        Bloom::default(),
     ));
 
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            intensity: 1500.0,
+    commands.spawn((
+        PointLight {
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_xyz(-4.0, 8.0, 4.0),
-        ..default()
-    });
+        Transform::from_xyz(-4.0, 8.0, 4.0),
+    ));
 
-    commands.spawn(PbrBundle {
-        mesh: meshes
-            .add(shape::Plane::from_size(10.0).into()),
-        material: std_materials
-            .add(Color::rgb(1.0, 1.0, 1.0).into()),
-        transform: Transform::from_xyz(0.0, 0.3, 0.0),
-        ..default()
-    });
-    commands.spawn(PbrBundle {
-        mesh: meshes
-            .add(shape::Plane::from_size(5.0).into()),
-        material: std_materials
-            .add(Color::rgb(1.0, 1.0, 1.0).into()),
-        transform: Transform::from_xyz(0.3, 0.0, 0.0)
-            .with_rotation(Quat::from_rotation_z(
-                FRAC_PI_2,
-            )),
-
-        ..default()
-    });
+    commands.spawn((
+        Mesh3d(
+            meshes.add(
+                Plane3d::default().mesh().size(10., 10.),
+            ),
+        ),
+        MeshMaterial3d(
+            std_materials.add(Color::rgb(1.0, 1.0, 1.0)),
+        ),
+        Transform::from_xyz(0.0, 0.3, 0.0),
+    ));
+    commands.spawn((
+        Mesh3d(
+            meshes.add(
+                Plane3d::default().mesh().size(5., 5.),
+            ),
+        ),
+        MeshMaterial3d(
+            std_materials.add(Color::rgb(1.0, 1.0, 1.0)),
+        ),
+        Transform::from_xyz(0.3, 0.0, 0.0).with_rotation(
+            Quat::from_rotation_z(FRAC_PI_2),
+        ),
+    ));
 
     let transform = Transform::from_xyz(0.0, 0.5, 0.0);
     // cube
     commands.spawn((
-        MaterialMeshBundle {
             // mesh: assets.hex_sphere.clone(),
-            mesh: asset_server.load("models/hex-sphere-5-subdivisions.glb#Mesh0/Primitive0"),
+           Mesh3d( asset_server.load("models/hex-sphere-5-subdivisions.glb#Mesh0/Primitive0")),
             transform,
-            material: materials.add(CustomMaterial {
-                color: Color::BLUE,
+             MeshMaterial3d( materials.add(CustomMaterial {
+                color: BLUE.into(),
                 alpha_mode: AlphaMode::Blend,
-            }),
-            ..default()
-        },
+            })),
         NotShadowCaster,
     ));
 
-    commands.spawn(SceneBundle {
+    commands.spawn((
         // scene: assets.ferris.clone(),
-        scene: asset_server
-            .load("models/ferris3d_v1.0.glb#Scene0"),
-        transform: transform.clone().with_rotation(
+        SceneRoot(
+            asset_server
+                .load("models/ferris3d_v1.0.glb#Scene0"),
+        ),
+        transform.clone().with_rotation(
             Quat::from_rotation_y(-FRAC_PI_2),
         ),
-        ..default()
-    });
+    ));
 }
 
 impl Material for CustomMaterial {
@@ -206,7 +205,7 @@ impl Material for CustomMaterial {
     fn specialize(
         _pipeline: &MaterialPipeline<Self>,
         descriptor: &mut RenderPipelineDescriptor,
-        _layout: &MeshVertexBufferLayout,
+        _layout: &MeshVertexBufferLayoutRef,
         _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         // descriptor.primitive.cull_mode = None;
@@ -223,7 +222,7 @@ impl Material for CustomMaterial {
 #[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub struct CustomMaterial {
     #[uniform(0)]
-    color: Color,
+    color: LinearRgba,
     alpha_mode: AlphaMode,
 }
 
@@ -275,31 +274,31 @@ impl Material for PrepassOutputMaterial {
     }
 }
 
-/// Every time you press space, it will cycle between transparent, depth and normals view
-fn toggle_prepass_view(
-    keycode: Res<Input<KeyCode>>,
-    material_handle: Query<&Handle<PrepassOutputMaterial>>,
-    mut materials: ResMut<Assets<PrepassOutputMaterial>>,
-) {
-    if keycode.just_pressed(KeyCode::Space) {
-        let handle = material_handle.single();
-        let mat = materials.get_mut(handle).unwrap();
-        if mat.settings.show_depth == 1 {
-            dbg!("normal");
-            mat.settings.show_depth = 0;
-            mat.settings.show_normals = 1;
-        } else if mat.settings.show_normals == 1 {
-            dbg!("transparent");
-            mat.settings.show_depth = 0;
-            mat.settings.show_normals = 0;
-        } else {
-            dbg!("depth");
-            mat.settings.show_depth = 1;
-            mat.settings.show_normals = 0;
-        }
+// Every time you press space, it will cycle between transparent, depth and normals view
+// fn toggle_prepass_view(
+//     keycode: Res<ButtonInput<KeyCode>>,
+//     material_handle: Query<&Handle<PrepassOutputMaterial>>,
+//     mut materials: ResMut<Assets<PrepassOutputMaterial>>,
+// ) {
+//     if keycode.just_pressed(KeyCode::Space) {
+//         let handle = material_handle.single();
+//         let mat = materials.get_mut(handle).unwrap();
+//         if mat.settings.show_depth == 1 {
+//             dbg!("normal");
+//             mat.settings.show_depth = 0;
+//             mat.settings.show_normals = 1;
+//         } else if mat.settings.show_normals == 1 {
+//             dbg!("transparent");
+//             mat.settings.show_depth = 0;
+//             mat.settings.show_normals = 0;
+//         } else {
+//             dbg!("depth");
+//             mat.settings.show_depth = 1;
+//             mat.settings.show_normals = 0;
+//         }
 
-        // let mut text = text.single_mut();
-        // text.sections[0].value =
-        //     format!("Prepass Output: {out_text}\n");
-    }
-}
+//         // let mut text = text.single_mut();
+//         // text.sections[0].value =
+//         //     format!("Prepass Output: {out_text}\n");
+//     }
+// }

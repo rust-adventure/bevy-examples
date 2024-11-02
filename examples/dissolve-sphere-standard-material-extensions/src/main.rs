@@ -231,7 +231,7 @@ fn animate_light_direction(
     >,
 ) {
     for mut transform in query.iter_mut() {
-        transform.rotate_y(time.delta_seconds() * 0.5);
+        transform.rotate_y(time.delta_secs() * 0.5);
     }
 }
 
@@ -268,6 +268,6 @@ fn movement(
         }
 
         transform.translation +=
-            time.delta_seconds() * 2.0 * direction;
+            time.delta_secs() * 2.0 * direction;
     }
 }

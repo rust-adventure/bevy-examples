@@ -6,7 +6,7 @@ use bevy::{
     prelude::*,
     reflect::TypePath,
     render::{
-        camera::Projection,
+        camera::{Projection, ScalingMode},
         mesh::VertexAttributeValues,
         render_resource::{
             AsBindGroup, RenderPipelineDescriptor,
@@ -102,7 +102,9 @@ fn setup(
             .looking_at(Vec3::ZERO, Vec3::Y),
         Projection::Orthographic(OrthographicProjection {
             // scale: 0.008,
-            scaling_mode: bevy::render::camera::ScalingMode::FixedHorizontal(10.),
+            scaling_mode: ScalingMode::FixedHorizontal {
+                viewport_width: 10.,
+            },
             ..OrthographicProjection::default_3d()
         }),
     ));

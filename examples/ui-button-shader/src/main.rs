@@ -35,7 +35,7 @@ fn update(
     for (_, material) in ui_materials.iter_mut() {
         // rainbow color effect
         let new_color = Color::hsl(
-            (time.elapsed_seconds() * 60.0) % 360.0,
+            (time.elapsed_secs() * 60.0) % 360.0,
             1.,
             0.5,
         );
@@ -48,7 +48,7 @@ fn update_time(
     mut ui_materials: ResMut<Assets<HeartUiMaterial>>,
 ) {
     for (_, material) in ui_materials.iter_mut() {
-        material.time = time.elapsed_seconds();
+        material.time = time.elapsed_secs();
     }
 }
 
@@ -61,51 +61,38 @@ fn setup(
     commands.spawn(Camera2d::default());
 
     commands
-        .spawn(NodeBundle {
+        .spawn(Node {
             // background_color: Color::RED.into(),
-            style: Style {
-                display: Display::Grid,
-                grid_template_columns: vec![
-                    RepeatedGridTrack::flex(10, 1.),
-                ],
-                grid_template_rows: vec![
-                    RepeatedGridTrack::px(50, 25.),
-                ],
-                column_gap: Val::Px(2.),
-                width: Val::Px(300.),
-                height: Val::Px(10.0),
-                padding: UiRect::all(Val::Px(20.)),
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                ..default()
-            },
+            display: Display::Grid,
+            grid_template_columns: vec![
+                RepeatedGridTrack::flex(10, 1.),
+            ],
+            grid_template_rows: vec![
+                RepeatedGridTrack::px(50, 25.),
+            ],
+            column_gap: Val::Px(2.),
+            width: Val::Px(300.),
+            height: Val::Px(10.0),
+            padding: UiRect::all(Val::Px(20.)),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
             ..default()
         })
         .with_children(|parent| {
             for i in 0..18 {
                 parent
-                    .spawn(NodeBundle {
-                        // background_color: Color::RED.into(),
-                        style: Style {
-                            aspect_ratio: Some(1.),
-                            width: Val::Percent(100.),
-                            height: Val::Auto,
-                            align_items: AlignItems::Center,
-                            justify_content:
-                                JustifyContent::Center,
-                            ..default()
-                        },
+                    .spawn(Node {
+                        aspect_ratio: Some(1.),
+                        width: Val::Percent(100.),
+                        height: Val::Auto,
+                        align_items: AlignItems::Center,
+                        justify_content:
+                            JustifyContent::Center,
                         ..default()
                     })
                     .with_children(|parent| {
-                        parent.spawn(MaterialNodeBundle {
-                            style: Style {
-                                aspect_ratio: Some(1.),
-                                width: Val::Percent(100.),
-                                height: Val::Percent(100.),
-                                ..default()
-                            },
-                            material: UiMaterialHandle(
+                        parent.spawn((
+                            MaterialNode(
                                 heart_ui_materials
                                     .add(HeartUiMaterial {
                                     color:
@@ -120,48 +107,46 @@ fn setup(
                                     offset: i as f32 * 10.,
                                 }),
                             ),
-                            ..default()
-                        });
+                            Node {
+                                aspect_ratio: Some(1.),
+                                width: Val::Percent(100.),
+                                height: Val::Percent(100.),
+                                ..default()
+                            },
+                        ));
                     });
             }
         });
     commands
-        .spawn(NodeBundle {
-            // background_color: Color::RED.into(),
-            style: Style {
-                position_type: PositionType::Absolute,
-                right: Val::Px(0.),
-                bottom: Val::Px(0.),
-                aspect_ratio: Some(1.),
-                margin: UiRect::all(Val::Px(50.)),
-                width: Val::Percent(50.),
-                height: Val::Auto,
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                ..default()
-            },
+        .spawn(Node {
+            position_type: PositionType::Absolute,
+            right: Val::Px(0.),
+            bottom: Val::Px(0.),
+            aspect_ratio: Some(1.),
+            margin: UiRect::all(Val::Px(50.)),
+            width: Val::Percent(50.),
+            height: Val::Auto,
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
             ..default()
         })
         .with_children(|parent| {
-            parent.spawn(MaterialNodeBundle {
-                style: Style {
+            parent.spawn((
+                MaterialNode(heart_ui_materials.add(
+                    HeartUiMaterial {
+                        color: LinearRgba::WHITE,
+                        time: 0.,
+                        fill_level: 0.,
+                        offset: 0.,
+                    },
+                )),
+                Node {
                     aspect_ratio: Some(1.),
                     width: Val::Percent(100.),
                     height: Val::Percent(100.),
                     ..default()
                 },
-                material: UiMaterialHandle(
-                    heart_ui_materials.add(
-                        HeartUiMaterial {
-                            color: LinearRgba::WHITE,
-                            time: 0.,
-                            fill_level: 0.,
-                            offset: 0.,
-                        },
-                    ),
-                ),
-                ..default()
-            });
+            ));
         });
 }
 
