@@ -16,7 +16,7 @@ members = [
   # "examples/rotating-column",
   # "examples/shader-rgb-worldspace-cube",
   # "examples/shader-test-001",
-  # "examples/shield-spheres",
+  "examples/shield-spheres",
   "examples/shield-with-depth",
   # "examples/start-menu-hades",
   # "examples/spacecraft-noiseland",

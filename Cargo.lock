@@ -3904,6 +3904,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "shield-spheres"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_asset_loader",
+ "bevy_shader_utils",
+ "itertools 0.13.0",
+]
+
+[[package]]
 name = "shield-with-depth"
 version = "0.1.0"
 dependencies = [
