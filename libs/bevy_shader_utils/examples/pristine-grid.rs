@@ -73,7 +73,7 @@ fn rotate_camera(
         Vec3::ZERO,
         Quat::from_axis_angle(
             Vec3::Y,
-            45f32.to_radians() * time.delta_seconds(),
+            45f32.to_radians() * time.delta_secs(),
         ),
     );
     cam_transform.look_at(Vec3::ZERO, Vec3::Y);

@@ -44,10 +44,9 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.15.0-rc.2", features = ["jpeg", "file_watcher"] }
-# bevy-inspector-egui = "0.25"
-# bevy_asset_loader = "0.21"
-bevy_asset_loader = { git = "https://github.com/NiklasEi/bevy_asset_loader", branch = "bevy-0-15" }
+bevy = { version = "0.15.0", features = ["jpeg", "file_watcher"] }
+bevy-inspector-egui = "0.28.1"
+bevy_asset_loader = "0.22.0"
 # bevy_tweening = "0.11.0"
 # bevy_panorbit_camera = "0.19"
 # bevy_basic_camera = { path = "./libs/bevy_basic_camera" }

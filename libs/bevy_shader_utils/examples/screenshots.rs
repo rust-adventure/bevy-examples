@@ -2,22 +2,18 @@
 //! disk
 
 use bevy::{
-    prelude::*,
-    render::{
+    input::common_conditions::input_toggle_active, prelude::*, render::{
         render_resource::{AsBindGroup, ShaderRef},
         view::screenshot::{
             save_to_disk, Capturing, Screenshot,
         },
-    },
-    sprite::{Material2d, Material2dPlugin},
-    window::SystemCursorIcon,
-    winit::cursor::CursorIcon,
+    }, sprite::{Material2d, Material2dPlugin}, window::SystemCursorIcon, winit::cursor::CursorIcon
 };
-// use bevy_inspector_egui::quick::{
-//     AssetInspectorPlugin,
-// ResourceInspectorPlugin,
-//     WorldInspectorPlugin,
-// };
+use bevy_inspector_egui::quick::{
+    AssetInspectorPlugin,
+ResourceInspectorPlugin,
+    WorldInspectorPlugin,
+};
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 #[derive(Component)]
@@ -45,24 +41,24 @@ fn main() {
             ),
         )
         .add_plugins((
-            // AssetInspectorPlugin::<
-            //     ScreenshotPerlin2dMaterial,
-            // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotPerlin3dMaterial,
-            // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotSimplex2dMaterial,
-            // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotSimplex3dMaterial,
-            // >::default(),
+            AssetInspectorPlugin::<
+                ScreenshotPerlin2dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit1)),
+            AssetInspectorPlugin::<
+                ScreenshotPerlin3dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit2)),
+            AssetInspectorPlugin::<
+                ScreenshotSimplex2dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit3)),
+            AssetInspectorPlugin::<
+                ScreenshotSimplex3dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit4)),
             // AssetInspectorPlugin::<
             //     ScreenshotFresnelMaterial,
             // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotVoronoiseMaterial,
-            // >::default(),
+            AssetInspectorPlugin::<
+                ScreenshotVoronoiseMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit5)),
         ))
         .add_systems(Startup, setup)
         .add_systems(
@@ -217,6 +213,8 @@ fn setup(
         Assets<ScreenshotVoronoiseMaterial>,
     >,
 ) {
+    println!("press digit to bring up inspector, arrow key to navigate");
+
     let mut entities = vec![];
 
     entities.push(Example {
@@ -433,12 +431,12 @@ fn setup(
         Text::new(
             "Press <spacebar> to save a screenshot to disk",
         ),
-        TextStyle {
+        TextColor(Color::WHITE),
+        TextFont {
             font_size: 25.0,
-            color: Color::WHITE,
             ..default()
         },
-        Style {
+        Node {
             position_type: PositionType::Absolute,
             top: Val::Px(10.0),
             left: Val::Px(10.0),
@@ -448,12 +446,12 @@ fn setup(
 
     commands.spawn((
         Text::new(""),
-        TextStyle {
+        TextColor(Color::WHITE),
+        TextFont {
             font_size: 25.0,
-            color: Color::WHITE,
             ..default()
         },
-        Style {
+        Node {
             position_type: PositionType::Absolute,
             bottom: Val::Px(10.0),
             left: Val::Px(10.0),
