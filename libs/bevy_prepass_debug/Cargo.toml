@@ -8,4 +8,4 @@ version = "0.1.0"
 
 [dependencies]
 bevy = { workspace = true }
-bevy-inspector-egui = { workspace = true }
+# bevy-inspector-egui = { workspace = true }

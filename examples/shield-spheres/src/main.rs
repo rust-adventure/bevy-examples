@@ -1,14 +1,14 @@
 use bevy::{
-    ecs::system::Command,
+    color::palettes::css::{BLUE, ORANGE_RED},
     pbr::{
         MaterialPipeline, MaterialPipelineKey,
         NotShadowCaster,
     },
     prelude::*,
-    reflect::TypeUuid,
     render::{
         mesh::{
-            MeshVertexBufferLayout, VertexAttributeValues,
+            MeshVertexBufferLayoutRef,
+            VertexAttributeValues,
         },
         render_resource::{
             AsBindGroup, RenderPipelineDescriptor,
@@ -23,17 +23,14 @@ use itertools::Itertools;
 fn main() {
     App::new()
         .insert_resource(ClearColor(
-            Color::hex("071f3c").unwrap(),
+            Srgba::hex("071f3c").unwrap().into(),
         ))
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            watch_for_changes: true,
-            ..default()
-        }))
-        .add_state::<MyStates>()
-        .add_plugin(ShaderUtilsPlugin)
-        .add_plugin(
+        .add_plugins((
+            DefaultPlugins,
+            ShaderUtilsPlugin,
             MaterialPlugin::<CustomMaterial>::default(),
-        )
+        ))
+        .init_state::<MyStates>()
         .add_loading_state(
             LoadingState::new(MyStates::AssetLoading)
                 .continue_to_state(MyStates::Next),
@@ -41,10 +38,8 @@ fn main() {
         .add_collection_to_loading_state::<_, MyAssets>(
             MyStates::AssetLoading,
         )
-        .add_system(
-            setup.in_schedule(OnEnter(MyStates::Next)),
-        )
-        .add_system(animate_light_direction)
+        .add_systems(OnEnter(MyStates::Next), setup)
+        .add_systems(Update, animate_light_direction)
         .run();
 }
 
@@ -62,32 +57,30 @@ fn setup(
 ) {
     // ambient light
     commands.insert_resource(AmbientLight {
-        color: Color::ORANGE_RED,
+        color: ORANGE_RED.into(),
         brightness: 0.02,
     });
     const HALF_SIZE: f32 = 10.0;
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight { ..default() },
-        transform: Transform {
+    commands.spawn((
+        DirectionalLight::default(),
+        Transform {
             translation: Vec3::new(0.0, 2.0, 0.0),
             rotation: Quat::from_rotation_x(
                 -std::f32::consts::FRAC_PI_4,
             ),
             ..default()
         },
-        ..default()
-    });
+    ));
 
     // ground plane
 
-    let mut plane_mesh = Mesh::from(shape::Plane {
-        size: 100.0,
-        ..default()
-    });
+    let mut plane_mesh = Mesh::from(
+        Plane3d::default().mesh().size(100., 100.),
+    );
     plane_mesh.generate_tangents().unwrap();
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(plane_mesh),
-        material: materials.add(StandardMaterial {
+    commands.spawn((
+        Mesh3d(meshes.add(plane_mesh)),
+        MeshMaterial3d(materials.add(StandardMaterial {
             base_color: Color::rgb(1.0, 1.0, 1.0),
             base_color_texture: Some(
                 asset_server.load(
@@ -100,10 +93,9 @@ fn setup(
                 ),
             ),
             ..default()
-        }),
-        transform: Transform::from_xyz(0.0, -0.3, 0.0),
-        ..default()
-    });
+        })),
+        Transform::from_xyz(0.0, -0.3, 0.0),
+    ));
 
     let mesh = meshes.get_mut(&assets.hex_sphere).unwrap();
     if let Some(VertexAttributeValues::Float32x3(
@@ -129,10 +121,8 @@ fn setup(
 
     let custom_material =
         custom_materials.add(CustomMaterial {
-            color: Color::BLUE,
-            color_texture: None,
+            color: BLUE.into(),
             alpha_mode: AlphaMode::Blend,
-            time: 0.5,
         });
     let num_ferris = 20;
     for (z, x) in
@@ -143,19 +133,21 @@ fn setup(
             0.0,
             -z as f32 * 2.5 + 2.5,
         );
-        commands.add(SpawnShieldedFerris {
+        commands.queue(SpawnShieldedFerris {
             transform: subject_transform,
             shield: assets.hex_sphere.clone(),
             ferris: assets.ferris.clone(),
-            shield_material: custom_material.clone(),
+            shield_material: MeshMaterial3d(
+                custom_material.clone(),
+            ),
         });
     }
 
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(2.5, 2.5, 5.0)
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(2.5, 2.5, 5.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
+    ));
 }
 
 /// The Material trait is very configurable, but comes with sensible defaults for all methods.
@@ -175,7 +167,7 @@ impl Material for CustomMaterial {
     fn specialize(
         _pipeline: &MaterialPipeline<Self>,
         descriptor: &mut RenderPipelineDescriptor,
-        _layout: &MeshVertexBufferLayout,
+        _layout: &MeshVertexBufferLayoutRef,
         key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         // descriptor.primitive.cull_mode = None;
@@ -187,16 +179,10 @@ impl Material for CustomMaterial {
 }
 
 // This is the struct that will be passed to your shader
-#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
-#[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct CustomMaterial {
-    #[uniform(0)]
-    time: f32,
     #[uniform(1)]
-    color: Color,
-    #[texture(2)]
-    #[sampler(3)]
-    color_texture: Option<Handle<Image>>,
+    color: LinearRgba,
     alpha_mode: AlphaMode,
 }
 
@@ -208,7 +194,7 @@ fn animate_light_direction(
     >,
 ) {
     for mut transform in query.iter_mut() {
-        transform.rotate_y(time.delta_seconds() * 0.5);
+        transform.rotate_y(time.delta_secs() * 0.5);
     }
 }
 
@@ -216,26 +202,23 @@ pub struct SpawnShieldedFerris {
     pub transform: Transform,
     pub shield: Handle<Mesh>,
     pub ferris: Handle<Scene>,
-    pub shield_material: Handle<CustomMaterial>,
+    pub shield_material: MeshMaterial3d<CustomMaterial>,
 }
 
 impl Command for SpawnShieldedFerris {
-    fn write(self, world: &mut World) {
-        world
-            .spawn(MaterialMeshBundle {
-                mesh: self.shield,
-                material: self.shield_material,
-                transform: self.transform.clone(),
-                visibility: Visibility::Visible,
-                ..default()
-            })
-            .insert(NotShadowCaster);
+    fn apply(self, world: &mut World) {
+        world.spawn((
+            Mesh3d(self.shield),
+            self.shield_material,
+            self.transform.clone(),
+            Visibility::Visible,
+            NotShadowCaster,
+        ));
 
-        world.spawn(SceneBundle {
-            scene: self.ferris,
-            transform: self.transform.clone(),
-            ..default()
-        });
+        world.spawn((
+            SceneRoot(self.ferris),
+            self.transform.clone(),
+        ));
     }
 }
 

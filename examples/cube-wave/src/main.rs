@@ -4,17 +4,13 @@ use bevy::{
         NotShadowCaster,
     },
     prelude::*,
-    reflect::{TypePath, TypeUuid},
+    reflect::TypePath,
     render::{
-        camera::Projection,
-        mesh::{
-            MeshVertexBufferLayout, VertexAttributeValues,
-        },
-        render_asset::RenderAssets,
+        camera::{Projection, ScalingMode},
+        mesh::VertexAttributeValues,
         render_resource::{
-            AsBindGroup, AsBindGroupShaderType,
-            RenderPipelineDescriptor, ShaderRef,
-            ShaderType, SpecializedMeshPipelineError,
+            AsBindGroup, RenderPipelineDescriptor,
+            ShaderRef, SpecializedMeshPipelineError,
         },
     },
 };
@@ -25,7 +21,7 @@ use itertools::Itertools;
 fn main() {
     App::new()
         .insert_resource(ClearColor(
-            Color::hex("e3eefc").unwrap(),
+            Srgba::hex("e3eefc").unwrap().into(),
         ))
         .add_plugins((
             DefaultPlugins.set(AssetPlugin {
@@ -47,8 +43,9 @@ fn setup(
     mut custom_materials: ResMut<Assets<CubeMaterial>>,
 ) {
     let cube_size = 0.2;
-    let mut mesh =
-        Mesh::from(shape::Cube { size: cube_size });
+    let mut mesh = Mesh::from(Cuboid::from_size(
+        Vec3::splat(cube_size),
+    ));
     if let Some(VertexAttributeValues::Float32x3(
         positions,
     )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
@@ -82,48 +79,43 @@ fn setup(
                 + f32::abs((z - half) as f32))
                 as f32)
                 .abs(),
-            color: Color::rgb(0.92, 0.90, 0.73),
+            color: Color::srgb(0.92, 0.90, 0.73)
+                .to_linear(),
         });
-        commands
-            .spawn(MaterialMeshBundle {
-                mesh: mesh_handle.clone(),
-                material: material.clone(),
-                transform: Transform::from_xyz(
-                    cube_size * x as f32
-                        - num_squares as f32 * cube_size
-                            / 2.0,
-                    0.0,
-                    cube_size * z as f32
-                        - num_squares as f32 * cube_size
-                            / 2.0,
-                ),
-                ..default()
-            })
-            .insert(NotShadowCaster);
+        commands.spawn((
+            Mesh3d(mesh_handle.clone()),
+            MeshMaterial3d(material.clone()),
+            Transform::from_xyz(
+                cube_size * x as f32
+                    - num_squares as f32 * cube_size / 2.0,
+                0.0,
+                cube_size * z as f32
+                    - num_squares as f32 * cube_size / 2.0,
+            ),
+            NotShadowCaster,
+        ));
     }
 
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(2.0, 2.0, 2.0)
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(2.0, 2.0, 2.0)
             .looking_at(Vec3::ZERO, Vec3::Y),
-        projection: Projection::Orthographic(
-            OrthographicProjection {
-                scale: 0.008,
-                ..Default::default()
+        Projection::Orthographic(OrthographicProjection {
+            // scale: 0.008,
+            scaling_mode: ScalingMode::FixedHorizontal {
+                viewport_width: 10.,
             },
-        ),
-        ..default()
-    });
+            ..OrthographicProjection::default_3d()
+        }),
+    ));
 }
 
-#[derive(
-    Asset, AsBindGroup, TypeUuid, TypePath, Debug, Clone,
-)]
-#[uuid = "f690fdae-d598-42ab-8225-97e2a3f056e0"]
+#[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct CubeMaterial {
     #[uniform(0)]
     offset: f32,
     #[uniform(0)]
-    color: Color,
+    color: LinearRgba,
 }
 
 impl Material for CubeMaterial {
@@ -138,10 +130,9 @@ impl Material for CubeMaterial {
     fn specialize(
         _pipeline: &MaterialPipeline<Self>,
         descriptor: &mut RenderPipelineDescriptor,
-        _layout: &MeshVertexBufferLayout,
+        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
         _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
-        // descriptor.primitive.cull_mode = None;
         if let Some(label) = &mut descriptor.label {
             *label = format!("cubes_{}", *label).into();
         }

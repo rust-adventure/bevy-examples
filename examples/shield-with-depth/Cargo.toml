@@ -11,4 +11,4 @@ workspace = true
 bevy = { workspace = true }
 bevy_asset_loader = { workspace = true }
 bevy_shader_utils = { workspace = true }
-bevy_basic_camera = { workspace = true }
+# bevy_basic_camera = { workspace = true }

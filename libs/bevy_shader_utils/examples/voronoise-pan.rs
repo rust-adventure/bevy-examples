@@ -8,9 +8,7 @@ use bevy::{
     prelude::*,
     reflect::TypePath,
     render::render_resource::{AsBindGroup, ShaderRef},
-    sprite::{
-        Material2d, Material2dPlugin, MaterialMesh2dBundle,
-    },
+    sprite::{Material2d, Material2dPlugin},
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
 
@@ -33,20 +31,17 @@ fn setup(
     let mesh = Rectangle::default();
 
     // Spawn camera
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 
     // Spawn the quad with vertex colors
-    commands.spawn(MaterialMesh2dBundle {
-        mesh: meshes.add(mesh).into(),
-        transform: Transform::from_translation(Vec3::new(
-            0., 0., 0.,
-        ))
-        .with_scale(Vec3::splat(4024.)),
-        material: materials.add(CustomMaterial {
+    commands.spawn((
+        Mesh2d(meshes.add(mesh).into()),
+        Transform::from_translation(Vec3::new(0., 0., 0.))
+            .with_scale(Vec3::splat(4024.)),
+        MeshMaterial2d(materials.add(CustomMaterial {
             color: RED_400.into(),
-        }),
-        ..default()
-    });
+        })),
+    ));
 }
 
 /// The Material trait is very configurable, but

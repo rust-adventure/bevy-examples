@@ -2,21 +2,18 @@
 //! disk
 
 use bevy::{
-    prelude::*,
-    render::{
+    input::common_conditions::input_toggle_active, prelude::*, render::{
         render_resource::{AsBindGroup, ShaderRef},
-        view::screenshot::ScreenshotManager,
-    },
-    sprite::{
-        Material2d, Material2dPlugin, MaterialMesh2dBundle,
-    },
-    window::PrimaryWindow,
+        view::screenshot::{
+            save_to_disk, Capturing, Screenshot,
+        },
+    }, sprite::{Material2d, Material2dPlugin}, window::SystemCursorIcon, winit::cursor::CursorIcon
 };
-// use bevy_inspector_egui::quick::{
-//     AssetInspectorPlugin,
-// ResourceInspectorPlugin,
-//     WorldInspectorPlugin,
-// };
+use bevy_inspector_egui::quick::{
+    AssetInspectorPlugin,
+ResourceInspectorPlugin,
+    WorldInspectorPlugin,
+};
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 #[derive(Component)]
@@ -44,30 +41,31 @@ fn main() {
             ),
         )
         .add_plugins((
-            // AssetInspectorPlugin::<
-            //     ScreenshotPerlin2dMaterial,
-            // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotPerlin3dMaterial,
-            // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotSimplex2dMaterial,
-            // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotSimplex3dMaterial,
-            // >::default(),
+            AssetInspectorPlugin::<
+                ScreenshotPerlin2dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit1)),
+            AssetInspectorPlugin::<
+                ScreenshotPerlin3dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit2)),
+            AssetInspectorPlugin::<
+                ScreenshotSimplex2dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit3)),
+            AssetInspectorPlugin::<
+                ScreenshotSimplex3dMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit4)),
             // AssetInspectorPlugin::<
             //     ScreenshotFresnelMaterial,
             // >::default(),
-            // AssetInspectorPlugin::<
-            //     ScreenshotVoronoiseMaterial,
-            // >::default(),
+            AssetInspectorPlugin::<
+                ScreenshotVoronoiseMaterial,
+            >::default().run_if(input_toggle_active(false, KeyCode::Digit5)),
         ))
         .add_systems(Startup, setup)
         .add_systems(
             Update,
             (
                 screenshot_on_spacebar,
+                screenshot_saving,
                 example_navigation,
             ),
         )
@@ -126,7 +124,7 @@ fn example_navigation(
         .insert(Visibility::Visible);
     if let Ok(name) = names.get(entity_to_display) {
         for mut text in name_text.iter_mut() {
-            text.sections[0].value = name.to_string();
+            text.0 = name.to_string();
         }
     }
 
@@ -135,20 +133,14 @@ fn example_navigation(
     }
     match examples.0[*example_index as usize].camera_type {
         CameraType::TwoD => {
-            commands.spawn((
-                Camera2dBundle::default(),
-                ActiveCamera,
-            ));
+            commands
+                .spawn((Camera2d::default(), ActiveCamera));
         }
         CameraType::ThreeD => {
             commands.spawn((
-                Camera3dBundle {
-                    transform: Transform::from_xyz(
-                        -2.0, 2.5, 5.0,
-                    )
+                Camera3d::default(),
+                Transform::from_xyz(-2.0, 2.5, 5.0)
                     .looking_at(Vec3::ZERO, Vec3::Y),
-                    ..default()
-                },
                 ActiveCamera,
             ));
         }
@@ -156,22 +148,42 @@ fn example_navigation(
 }
 
 fn screenshot_on_spacebar(
+    mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
-    main_window: Query<Entity, With<PrimaryWindow>>,
-    mut screenshot_manager: ResMut<ScreenshotManager>,
     name_text: Query<&Text, With<ExampleName>>,
 ) {
     if input.just_pressed(KeyCode::Space) {
         let path = format!(
             "./screenshots/{}.png",
-            name_text.single().sections[0].value
+            name_text.single().0
         );
-        screenshot_manager
-            .save_screenshot_to_disk(
-                main_window.single(),
-                path,
-            )
-            .unwrap();
+
+        commands
+            .spawn(Screenshot::primary_window())
+            .observe(save_to_disk(path));
+    }
+}
+
+fn screenshot_saving(
+    mut commands: Commands,
+    screenshot_saving: Query<Entity, With<Capturing>>,
+    windows: Query<Entity, With<Window>>,
+) {
+    let Ok(window) = windows.get_single() else {
+        return;
+    };
+    match screenshot_saving.iter().count() {
+        0 => {
+            commands.entity(window).remove::<CursorIcon>();
+        }
+        x if x > 0 => {
+            commands.entity(window).insert(
+                CursorIcon::from(
+                    SystemCursorIcon::Progress,
+                ),
+            );
+        }
+        _ => {}
     }
 }
 
@@ -201,50 +213,49 @@ fn setup(
         Assets<ScreenshotVoronoiseMaterial>,
     >,
 ) {
+    println!("press digit to bring up inspector, arrow key to navigate");
+
     let mut entities = vec![];
 
     entities.push(Example {
         camera_type: CameraType::TwoD,
         entity: commands
             .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Rectangle::default())
-                        .into(),
-                    transform: Transform::default()
-                        .with_scale(Vec3::splat(4000.)),
-                    material: screenshot_perlin2d_materials
-                        .add(ScreenshotPerlin2dMaterial {
+                Mesh2d(
+                    meshes.add(Rectangle::default()).into(),
+                ),
+                Transform::default()
+                    .with_scale(Vec3::splat(4000.)),
+                MeshMaterial2d(
+                    screenshot_perlin2d_materials.add(
+                        ScreenshotPerlin2dMaterial {
                             scale: 50.0,
-                        }),
-                    visibility: Visibility::Visible,
-                    ..default()
-                },
+                        },
+                    ),
+                ),
+                Visibility::Visible,
                 Name::from("perlin-2d"),
             ))
             .id(),
     });
 
-    commands
-        .spawn((Camera2dBundle::default(), ActiveCamera));
+    commands.spawn((Camera2d::default(), ActiveCamera));
     entities.push(Example {
         camera_type: CameraType::ThreeD,
         entity: 
         // cube
         commands
             .spawn((
-                MaterialMeshBundle {
-                    mesh: meshes.add(Cuboid{ half_size: Vec3::splat(1.) }),
-                    material: screenshot_perlin3d_materials
+
+                    Mesh3d(meshes.add(Cuboid{ half_size: Vec3::splat(1.) })),
+                    MeshMaterial3d(screenshot_perlin3d_materials
                         .add(ScreenshotPerlin3dMaterial {
                             scale: 5.0,
-                        }),
-                    transform: Transform::from_xyz(
+                        })),
+                    Transform::from_xyz(
                         0.0, 0.5, 0.0,
                     ),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
+                 Visibility::Hidden,
                 Name::from("perlin-3d"),
             ))
             .id()});
@@ -252,21 +263,19 @@ fn setup(
         camera_type: CameraType::TwoD,
         entity: commands
             .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Rectangle::default())
-                        .into(),
-                    transform: Transform::default()
-                        .with_scale(Vec3::splat(4000.)),
-                    material:
-                        screenshot_simplex2d_materials.add(
-                            ScreenshotSimplex2dMaterial {
-                                scale: 50.0,
-                            },
-                        ),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
+                Mesh2d(
+                    meshes.add(Rectangle::default()).into(),
+                ),
+                Transform::default()
+                    .with_scale(Vec3::splat(4000.)),
+                MeshMaterial2d(
+                    screenshot_simplex2d_materials.add(
+                        ScreenshotSimplex2dMaterial {
+                            scale: 50.0,
+                        },
+                    ),
+                ),
+                Visibility::Hidden,
                 Name::from("simplex-2d"),
             ))
             .id(),
@@ -274,23 +283,21 @@ fn setup(
     entities.push(Example {
         camera_type: CameraType::ThreeD,
         entity: 
-        // cube
         commands
             .spawn((
-                MaterialMeshBundle {
-                    mesh: meshes.add(Cuboid{ half_size: Vec3::splat(1.) }),
-                    material:
+                Mesh3d(meshes.add(Cuboid{ half_size: Vec3::splat(1.) })),
+                    MeshMaterial3d(
                         screenshot_simplex3d_materials.add(
                             ScreenshotSimplex3dMaterial {
                                 scale: 5.0,
                             },
-                        ),
-                    transform: Transform::from_xyz(
+                        )),
+                     Transform::from_xyz(
                         0.0, 0.5, 0.0,
                     ),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
+                     Visibility::Hidden,
+
+
                 Name::from("simplex-3d"),
             ))
             .id()});
@@ -319,23 +326,21 @@ fn setup(
         camera_type: CameraType::TwoD,
         entity: commands
             .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Rectangle::default())
-                        .into(),
-                    transform: Transform::default()
-                        .with_scale(Vec3::splat(4000.)),
-                    material:
-                        screenshot_voronoise_materials.add(
-                            ScreenshotVoronoiseMaterial {
-                                x: 1.0,
-                                y: 0.0,
-                                scale: 250.0,
-                            },
-                        ),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
+                Mesh2d(
+                    meshes.add(Rectangle::default()).into(),
+                ),
+                Transform::default()
+                    .with_scale(Vec3::splat(4000.)),
+                MeshMaterial2d(
+                    screenshot_voronoise_materials.add(
+                        ScreenshotVoronoiseMaterial {
+                            x: 1.0,
+                            y: 0.0,
+                            scale: 250.0,
+                        },
+                    ),
+                ),
+                Visibility::Hidden,
                 Name::from("voronoise"),
             ))
             .id(),
@@ -344,23 +349,21 @@ fn setup(
         camera_type: CameraType::TwoD,
         entity: commands
             .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Rectangle::default())
-                        .into(),
-                    transform: Transform::default()
-                        .with_scale(Vec3::splat(4000.)),
-                    material:
-                        screenshot_voronoise_materials.add(
-                            ScreenshotVoronoiseMaterial {
-                                x: 1.0,
-                                y: 1.0,
-                                scale: 250.0,
-                            },
-                        ),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
+                Mesh2d(
+                    meshes.add(Rectangle::default()).into(),
+                ),
+                Transform::default()
+                    .with_scale(Vec3::splat(4000.)),
+                MeshMaterial2d(
+                    screenshot_voronoise_materials.add(
+                        ScreenshotVoronoiseMaterial {
+                            x: 1.0,
+                            y: 1.0,
+                            scale: 250.0,
+                        },
+                    ),
+                ),
+                Visibility::Hidden,
                 Name::from("voronoise"),
             ))
             .id(),
@@ -369,23 +372,21 @@ fn setup(
         camera_type: CameraType::TwoD,
         entity: commands
             .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Rectangle::default())
-                        .into(),
-                    transform: Transform::default()
-                        .with_scale(Vec3::splat(4000.)),
-                    material:
-                        screenshot_voronoise_materials.add(
-                            ScreenshotVoronoiseMaterial {
-                                x: 0.0,
-                                y: 0.0,
-                                scale: 250.0,
-                            },
-                        ),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
+                Mesh2d(
+                    meshes.add(Rectangle::default()).into(),
+                ),
+                Transform::default()
+                    .with_scale(Vec3::splat(4000.)),
+                MeshMaterial2d(
+                    screenshot_voronoise_materials.add(
+                        ScreenshotVoronoiseMaterial {
+                            x: 0.0,
+                            y: 0.0,
+                            scale: 250.0,
+                        },
+                    ),
+                ),
+                Visibility::Hidden,
                 Name::from("voronoise"),
             ))
             .id(),
@@ -394,23 +395,21 @@ fn setup(
         camera_type: CameraType::TwoD,
         entity: commands
             .spawn((
-                MaterialMesh2dBundle {
-                    mesh: meshes
-                        .add(Rectangle::default())
-                        .into(),
-                    transform: Transform::default()
-                        .with_scale(Vec3::splat(4000.)),
-                    material:
-                        screenshot_voronoise_materials.add(
-                            ScreenshotVoronoiseMaterial {
-                                x: 0.0,
-                                y: 1.0,
-                                scale: 250.0,
-                            },
-                        ),
-                    visibility: Visibility::Hidden,
-                    ..default()
-                },
+                Mesh2d(
+                    meshes.add(Rectangle::default()).into(),
+                ),
+                Transform::default()
+                    .with_scale(Vec3::splat(4000.)),
+                MeshMaterial2d(
+                    screenshot_voronoise_materials.add(
+                        ScreenshotVoronoiseMaterial {
+                            x: 0.0,
+                            y: 1.0,
+                            scale: 250.0,
+                        },
+                    ),
+                ),
+                Visibility::Hidden,
                 Name::from("voronoise"),
             ))
             .id(),
@@ -419,48 +418,45 @@ fn setup(
     commands.insert_resource(Examples(entities));
 
     // light
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
+    commands.spawn((
+        PointLight {
             intensity: 1500.0,
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
+        Transform::from_xyz(4.0, 8.0, 4.0),
+    ));
 
-    commands.spawn(
-        TextBundle::from_section(
+    commands.spawn((
+        Text::new(
             "Press <spacebar> to save a screenshot to disk",
-            TextStyle {
-                font_size: 25.0,
-                color: Color::WHITE,
-                ..default()
-            },
-        )
-        .with_style(Style {
+        ),
+        TextColor(Color::WHITE),
+        TextFont {
+            font_size: 25.0,
+            ..default()
+        },
+        Node {
             position_type: PositionType::Absolute,
             top: Val::Px(10.0),
             left: Val::Px(10.0),
             ..default()
-        }),
-    );
+        },
+    ));
 
     commands.spawn((
-        TextBundle::from_section(
-            "",
-            TextStyle {
-                font_size: 25.0,
-                color: Color::WHITE,
-                ..default()
-            },
-        )
-        .with_style(Style {
+        Text::new(""),
+        TextColor(Color::WHITE),
+        TextFont {
+            font_size: 25.0,
+            ..default()
+        },
+        Node {
             position_type: PositionType::Absolute,
             bottom: Val::Px(10.0),
             left: Val::Px(10.0),
             ..default()
-        }),
+        },
         ExampleName,
     ));
 }

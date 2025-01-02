@@ -6,8 +6,9 @@ members = [
   # "examples/candy-cane",
   # "examples/cartoon-water",
   # "examples/compute-3d",
-  # "examples/cube-wave",
-  # "examples/dissolve-sphere-standard-material-extensions", "examples/eight-way-sprites",
+  "examples/cube-wave",
+  "examples/dissolve-sphere-standard-material-extensions",
+  # "examples/eight-way-sprites",
   "examples/fresnel-effect",
   # "examples/infinite-tunnel",
   # "examples/pointcloud",
@@ -15,10 +16,11 @@ members = [
   # "examples/rotating-column",
   # "examples/shader-rgb-worldspace-cube",
   # "examples/shader-test-001",
-  # "examples/shield-spheres",
-  # "examples/shield-with-depth", "examples/start-menu-hades",
+  "examples/shield-spheres",
+  "examples/shield-with-depth",
+  # "examples/start-menu-hades",
   # "examples/spacecraft-noiseland",
-  # "examples/ui-button-shader",
+  "examples/ui-button-shader",
   "examples/raymarch-sphere",
   "libs/*",
   # "vendor/bevy_asset_loader/bevy_asset_loader_derive",
@@ -42,12 +44,12 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.14", features = ["jpeg", "file_watcher"] }
-bevy-inspector-egui = "0.25"
-bevy_asset_loader = "0.21"
-bevy_tweening = "0.11.0"
-bevy_panorbit_camera = "0.19"
-bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
+bevy = { version = "0.15.0", features = ["jpeg", "file_watcher"] }
+bevy-inspector-egui = "0.28.1"
+bevy_asset_loader = "0.22.0"
+# bevy_tweening = "0.11.0"
+# bevy_panorbit_camera = "0.19"
+# bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
 
