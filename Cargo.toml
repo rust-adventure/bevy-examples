@@ -3,7 +3,7 @@ license = "MIT OR Apache-2.0"
 [workspace]
 members = [
   # "examples/*",
-  # "examples/candy-cane",
+  "examples/candy-cane",
   # "examples/cartoon-water",
   # "examples/compute-3d",
   "examples/cube-wave",

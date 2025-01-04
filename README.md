@@ -11,3 +11,5 @@ This repo is a selection of contained examples using the Bevy game engine. It is
 ![](examples/spacecraft-noiseland/readme/demo.png)
 
 ![](examples/cube-wave/readme/demo.gif)
+
+![candy-canes](examples/candy-cane/readme/demo.avif)
