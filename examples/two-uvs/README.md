@@ -24,4 +24,4 @@ The second cube is applying decals from a second texture on top of the base text
 
 In effect, this is the way we're overlaying the decals on top of the uvchecker using two textures and two uv sets.
 
-![decal demo](decal-example-on-uvchecker.png)
+![decal demo](./readme/decal-example-on-uvchecker.png)
