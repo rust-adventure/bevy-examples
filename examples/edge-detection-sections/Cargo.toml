@@ -1,0 +1,10 @@
+[package]
+name = "edge-detection-sections"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { workspace = true, features = ["file_watcher"] }
+
+[lints]
+workspace = true
