@@ -2061,6 +2061,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-detection-custom-phase"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "nonmax",
+]
+
+[[package]]
 name = "edge-detection-sections"
 version = "0.1.0"
 dependencies = [
