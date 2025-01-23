@@ -55,18 +55,18 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     );
 
     // render just vertex storage texture
-    return textureLoad(vertex_id_texture, vec2u(in.uv * vec2f(dimensions)), 1);
+    // return textureLoad(vertex_id_texture, vec2u(in.uv * vec2f(dimensions)), 1);
 
     // use the differences to decide whether to show outline or not
     // step() is used to determine a cutoff for showing/not showing 
     // the outline.
     // without step() the diff would cause a intermediate mixing
     // resulting in subdued outlines.
-    // return mix(
-    //     textureSample(screen_texture, texture_sampler, in.uv),
-    //     settings.stroke_color,
-    //     step(0.001, diff)
-    // );
+    return mix(
+        textureSample(screen_texture, texture_sampler, in.uv),
+        settings.stroke_color,
+        step(0.001, diff)
+    );
 
     // render just sobel 
     // return vec4(diff,diff,diff, 1.);
