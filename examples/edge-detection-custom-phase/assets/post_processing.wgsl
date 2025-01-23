@@ -36,7 +36,7 @@ struct PostProcessSettings {
 fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
     let dimensions = textureDimensions(vertex_id_texture);
 
-    let special = textureLoad(vertex_id_texture, vec2i(in.uv * vec2f(dimensions)), 1).r;
+    let special = textureLoad(vertex_id_texture, vec2i(in.uv * vec2f(dimensions)), 0).r;
 
     // 0. is a "no stroke" value
     if special == 0. {
