@@ -13,9 +13,9 @@ members = [
   "examples/ui-button-shader",
   "examples/raymarch-sphere",
   "libs/*",
-  # "examples/two-uvs",
-  # "examples/edge-detection-sections",
-  # "examples/edge-detection-custom-phase",
+  "examples/two-uvs",
+  "examples/edge-detection-sections",
+  "examples/edge-detection-custom-phase",
   # to re-do
 
 ]
