@@ -3,8 +3,11 @@
 // modified to exist as a plugin.
 // https://github.com/bevyengine/bevy/blob/b208388af95ecd753e4710f40baf2e913bc85c17/examples/shader/shader_prepass.rs
 use bevy::{
-    asset::load_internal_asset, math::vec2,
-    pbr::NotShadowCaster, prelude::*, reflect::TypePath,
+    asset::{load_internal_asset, weak_handle},
+    math::vec2,
+    pbr::NotShadowCaster,
+    prelude::*,
+    reflect::TypePath,
     render::render_resource::*,
 };
 // use bevy_inspector_egui::{
@@ -12,7 +15,7 @@ use bevy::{
 // };
 
 const SHOW_PREPASS_SHADER_HANDLE: Handle<Shader> =
-    Handle::weak_from_u128(3223086272834592509);
+    weak_handle!("3ce3ca25-a0bd-4e4f-a239-b96564809547");
 /// Debug depth/normal/
 /// In order to function, the [`PrepassDebug`]
 /// component should be attached to the camera
@@ -131,7 +134,7 @@ impl Material for PrepassOutputMaterial {
 fn toggle_prepass_view(
     keycode: Res<ButtonInput<KeyCode>>,
     mut settings: ResMut<PrepassSettings>,
-    material_handle: Query<
+    material_handle: Single<
         &MeshMaterial3d<PrepassOutputMaterial>,
     >,
     mut materials: ResMut<Assets<PrepassOutputMaterial>>,
@@ -153,9 +156,8 @@ fn toggle_prepass_view(
             Show::MotionVectors => 3,
         };
 
-        let mat = materials
-            .get_mut(&material_handle.single().0)
-            .unwrap();
+        let mat =
+            materials.get_mut(&material_handle.0).unwrap();
         mat.settings.show_depth =
             (prepass_view == 1) as u32;
         mat.settings.show_normals =

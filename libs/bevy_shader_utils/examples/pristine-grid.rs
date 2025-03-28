@@ -64,11 +64,12 @@ fn setup(
 }
 
 fn rotate_camera(
-    mut camera: Query<&mut Transform, With<MainCamera>>,
+    mut cam_transform: Single<
+        &mut Transform,
+        With<MainCamera>,
+    >,
     time: Res<Time>,
 ) {
-    let cam_transform = camera.single_mut().into_inner();
-
     cam_transform.rotate_around(
         Vec3::ZERO,
         Quat::from_axis_angle(
