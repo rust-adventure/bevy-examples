@@ -21,6 +21,7 @@ fn main() {
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 0.02,
+            ..default()
         })
         .insert_resource(ClearColor(
             Srgba::hex("1fa9f4").unwrap().into(),

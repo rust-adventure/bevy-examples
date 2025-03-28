@@ -59,6 +59,7 @@ fn setup(
     commands.insert_resource(AmbientLight {
         color: ORANGE_RED.into(),
         brightness: 0.02,
+        ..default()
     });
     const HALF_SIZE: f32 = 10.0;
     commands.spawn((
@@ -81,7 +82,7 @@ fn setup(
     commands.spawn((
         Mesh3d(meshes.add(plane_mesh)),
         MeshMaterial3d(materials.add(StandardMaterial {
-            base_color: Color::rgb(1.0, 1.0, 1.0),
+            base_color: Color::WHITE,
             base_color_texture: Some(
                 asset_server.load(
                     "concrete/sekjcawb_2K_Albedo.jpg",

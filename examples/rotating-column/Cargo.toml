@@ -10,7 +10,6 @@ workspace = true
 
 [dependencies]
 itertools = "0.10.3"
-bevy-inspector-egui = { workspace = true }
 bevy_tweening = { workspace = true }
 bevy = { workspace = true }
 

@@ -38,6 +38,7 @@ fn main() {
         .insert_resource(AmbientLight {
             color: ORANGE_RED.into(),
             brightness: 0.02,
+            ..default()
         })
         .add_plugins((
             DefaultPlugins,
@@ -147,9 +148,7 @@ fn setup(
                 Plane3d::default().mesh().size(10., 10.),
             ),
         ),
-        MeshMaterial3d(
-            std_materials.add(Color::rgb(1.0, 1.0, 1.0)),
-        ),
+        MeshMaterial3d(std_materials.add(Color::WHITE)),
         Transform::from_xyz(0.0, 0.3, 0.0),
     ));
     commands.spawn((
@@ -158,9 +157,7 @@ fn setup(
                 Plane3d::default().mesh().size(5., 5.),
             ),
         ),
-        MeshMaterial3d(
-            std_materials.add(Color::rgb(1.0, 1.0, 1.0)),
-        ),
+        MeshMaterial3d(std_materials.add(Color::WHITE)),
         Transform::from_xyz(0.3, 0.0, 0.0).with_rotation(
             Quat::from_rotation_z(FRAC_PI_2),
         ),
