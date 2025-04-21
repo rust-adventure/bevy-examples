@@ -1,10 +1,10 @@
 [package]
 name = "edge-detection-custom-phase"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-bevy = "0.15"
+bevy.workspace = true
 nonmax = "0.5.5"
 
 [lints]

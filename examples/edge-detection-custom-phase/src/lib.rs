@@ -1,12 +1,12 @@
 use bevy::{
     core_pipeline::core_3d::{
-        graph::{Core3d, Node3d},
         CORE_3D_DEPTH_FORMAT,
+        graph::{Core3d, Node3d},
     },
     ecs::{
         entity::EntityHashSet,
         query::QueryItem,
-        system::{lifetimeless::SRes, SystemParamItem},
+        system::{SystemParamItem, lifetimeless::SRes},
     },
     math::FloatOrd,
     pbr::{
@@ -15,14 +15,18 @@ use bevy::{
         MeshUniform, RenderMeshInstances, SetMeshBindGroup,
         SetMeshViewBindGroup,
     },
+    platform::collections::{HashMap, HashSet},
     prelude::*,
     render::{
+        Extract, Render, RenderApp, RenderDebugFlags,
+        RenderSet,
         batching::{
-            gpu_preprocessing::{
-                batch_and_prepare_sorted_render_phase,
-                IndirectParametersBuffer,
-            },
             GetBatchData, GetFullBatchData,
+            gpu_preprocessing::{
+                IndirectParametersCpuMetadata,
+                UntypedPhaseIndirectParametersBuffers,
+                batch_and_prepare_sorted_render_phase,
+            },
         },
         camera::ExtractedCamera,
         diagnostic::RecordDiagnostics,
@@ -32,8 +36,8 @@ use bevy::{
             UniformComponentPlugin,
         },
         mesh::{
-            allocator::MeshAllocator, MeshVertexAttribute,
-            MeshVertexBufferLayoutRef, RenderMesh,
+            MeshVertexAttribute, MeshVertexBufferLayoutRef,
+            RenderMesh, allocator::MeshAllocator,
         },
         render_asset::RenderAssets,
         render_graph::{
@@ -42,12 +46,13 @@ use bevy::{
             ViewNodeRunner,
         },
         render_phase::{
-            sort_phase_system, AddRenderCommand,
+            AddRenderCommand,
             CachedRenderPipelinePhaseItem, DrawFunctionId,
             DrawFunctions, PhaseItem, PhaseItemExtraIndex,
             RenderCommand, RenderCommandResult,
             SetItemPipeline, SortedPhaseItem,
-            TrackedRenderPass, ViewSortedRenderPhases,
+            SortedRenderPhasePlugin, TrackedRenderPass,
+            ViewSortedRenderPhases, sort_phase_system,
         },
         render_resource::{
             BindGroup, BindGroupEntries, BindGroupLayout,
@@ -72,11 +77,10 @@ use bevy::{
         texture::{ColorAttachment, TextureCache},
         view::{
             ExtractedView, RenderVisibleEntities,
-            ViewDepthTexture, ViewTarget,
+            RetainedViewEntity, ViewDepthTexture,
+            ViewTarget,
         },
-        Extract, Render, RenderApp, RenderSet,
     },
-    utils::HashMap,
 };
 use nonmax::NonMaxU32;
 use std::ops::Range;
@@ -131,8 +135,8 @@ fn insert_section_ids(
     mut generator: ResMut<SectionGroupIdGenerator>,
     query: Query<&SectionGroupId>,
 ) {
-    if query.get(trigger.entity()).is_err() {
-        commands.entity(trigger.entity()).insert(
+    if query.get(trigger.target()).is_err() {
+        commands.entity(trigger.target()).insert(
             SectionGroupId {
                 id: generator.generate_id(),
             },
@@ -155,7 +159,11 @@ impl Plugin for SectionTexturePhasePlugin {
         ExtractComponentPlugin::<
             SectionGroupId,
         >::default(),
-        UniformComponentPlugin::<SectionGroupId>::default()
+        UniformComponentPlugin::<SectionGroupId>::default(),
+        SortedRenderPhasePlugin::<
+        SectionTexturePhase,
+        MeshPipeline,
+    >::new(RenderDebugFlags::default()),
     ));
 
         // TODO: one day with Constructs we can register a required
@@ -377,6 +385,9 @@ struct SectionTexturePhase {
     pub draw_function: DrawFunctionId,
     pub batch_range: Range<u32>,
     pub extra_index: PhaseItemExtraIndex,
+    /// Whether the mesh in question is indexed (uses an index buffer in
+    /// addition to its vertex buffer).
+    pub indexed: bool,
 }
 
 // For more information about writing a phase item, please look at the custom_phase_item example
@@ -408,7 +419,7 @@ impl PhaseItem for SectionTexturePhase {
 
     #[inline]
     fn extra_index(&self) -> PhaseItemExtraIndex {
-        self.extra_index
+        self.extra_index.clone()
     }
 
     #[inline]
@@ -440,6 +451,11 @@ impl SortedPhaseItem for SectionTexturePhase {
         // Since it is not re-exported by bevy, we just use the std sort for the purpose of the example
         items.sort_by_key(SortedPhaseItem::sort_key);
     }
+
+    #[inline]
+    fn indexed(&self) -> bool {
+        self.indexed
+    }
 }
 
 impl CachedRenderPipelinePhaseItem for SectionTexturePhase {
@@ -459,7 +475,7 @@ impl GetBatchData for SectionTexturePipeline {
     type BufferData = MeshUniform;
 
     fn get_batch_data(
-        (mesh_instances, _, mesh_allocator): &SystemParamItem<Self::Param>,
+        (mesh_instances, _render_assets, mesh_allocator): &SystemParamItem<Self::Param>,
         (_entity, main_entity): (Entity, MainEntity),
     ) -> Option<(
         Self::BufferData,
@@ -485,17 +501,33 @@ impl GetBatchData for SectionTexturePipeline {
             }
             None => 0,
         };
-
-        Some((
-            MeshUniform::new(
-                &mesh_instance.transforms,
+        let mesh_uniform = {
+            let mesh_transforms = &mesh_instance.transforms;
+            let (
+                local_from_world_transpose_a,
+                local_from_world_transpose_b,
+            ) = mesh_transforms
+                .world_from_local
+                .inverse_transpose_3x3();
+            MeshUniform {
+                world_from_local: mesh_transforms
+                    .world_from_local
+                    .to_transpose(),
+                previous_world_from_local: mesh_transforms
+                    .previous_world_from_local
+                    .to_transpose(),
+                lightmap_uv_rect: UVec2::ZERO,
+                local_from_world_transpose_a,
+                local_from_world_transpose_b,
+                flags: mesh_transforms.flags,
                 first_vertex_index,
-                None,
-            ),
-            mesh_instance
-                .should_batch()
-                .then_some(mesh_instance.mesh_asset_id),
-        ))
+                current_skin_index: u32::MAX,
+                material_and_lightmap_bind_group_slot: 0,
+                tag: 0,
+                pad: 0,
+            }
+        };
+        Some((mesh_uniform, None))
     }
 }
 impl GetFullBatchData for SectionTexturePipeline {
@@ -505,7 +537,7 @@ impl GetFullBatchData for SectionTexturePipeline {
         (mesh_instances, _, _): &SystemParamItem<
             Self::Param,
         >,
-        (_entity, main_entity): (Entity, MainEntity),
+        main_entity: MainEntity,
     ) -> Option<(NonMaxU32, Option<Self::CompareData>)>
     {
         // This should only be called during GPU building.
@@ -515,7 +547,7 @@ impl GetFullBatchData for SectionTexturePipeline {
         else {
             error!(
                 "`get_index_and_compare_data` should never be called in CPU mesh uniform building \
-                mode"
+                    mode"
             );
             return None;
         };
@@ -531,7 +563,7 @@ impl GetFullBatchData for SectionTexturePipeline {
 
     fn get_binned_batch_data(
         (mesh_instances, _render_assets, mesh_allocator): &SystemParamItem<Self::Param>,
-        (_entity, main_entity): (Entity, MainEntity),
+        main_entity: MainEntity,
     ) -> Option<Self::BufferData> {
         let RenderMeshInstances::CpuBuilding(
             ref mesh_instances,
@@ -556,43 +588,55 @@ impl GetFullBatchData for SectionTexturePipeline {
         Some(MeshUniform::new(
             &mesh_instance.transforms,
             first_vertex_index,
-            // mesh_instance.material_bindings_index.slot,
+            mesh_instance.material_bindings_index.slot,
+            None,
+            None,
             None,
         ))
     }
 
-    fn get_binned_index(
-        (mesh_instances, _, _): &SystemParamItem<
-            Self::Param,
-        >,
-        (_entity, main_entity): (Entity, MainEntity),
-    ) -> Option<NonMaxU32> {
-        // This should only be called during GPU building.
-        let RenderMeshInstances::GpuBuilding(
-            ref mesh_instances,
-        ) = **mesh_instances
-        else {
-            error!(
-                    "`get_binned_index` should never be called in CPU mesh uniform \
-                    building mode"
-                );
-            return None;
-        };
+    fn write_batch_indirect_parameters_metadata(
+        indexed: bool,
+        base_output_index: u32,
+        batch_set_index: Option<NonMaxU32>,
+        indirect_parameters_buffers: &mut UntypedPhaseIndirectParametersBuffers,
+        indirect_parameters_offset: u32,
+    ) {
+        // Note that `IndirectParameters` covers both of these structures, even
+        // though they actually have distinct layouts. See the comment above that
+        // type for more information.
+        let indirect_parameters =
+            IndirectParametersCpuMetadata {
+                base_output_index,
+                batch_set_index: match batch_set_index {
+                    None => !0,
+                    Some(batch_set_index) => {
+                        u32::from(batch_set_index)
+                    }
+                },
+            };
 
-        mesh_instances
-            .get(&main_entity)
-            .map(|entity| entity.current_uniform_index)
+        if indexed {
+            indirect_parameters_buffers.indexed.set(
+                indirect_parameters_offset,
+                indirect_parameters,
+            );
+        } else {
+            indirect_parameters_buffers.non_indexed.set(
+                indirect_parameters_offset,
+                indirect_parameters,
+            );
+        }
     }
 
-    fn get_batch_indirect_parameters_index(
-        (_, _, _): &SystemParamItem<Self::Param>,
-        _indirect_parameters_buffer: &mut IndirectParametersBuffer,
-        _entity: (Entity, MainEntity),
-        _instance_index: u32,
+    fn get_binned_index(
+        _param: &SystemParamItem<Self::Param>,
+        _query_item: MainEntity,
     ) -> Option<NonMaxU32> {
         None
     }
 }
+
 // When defining a custom phase, we need to extract it from the main world and add it to a resource
 // that will be used by the render world. We need to give that resource all views that will use
 // that phase
@@ -605,31 +649,57 @@ fn extract_camera_phases(
         Query<
             (
                 RenderEntity,
+                Entity,
                 &Camera,
                 Has<SectionsPrepass>,
             ),
             With<Camera3d>,
         >,
     >,
-    mut live_entities: Local<EntityHashSet>,
+    // cameras: Extract<
+    //     Query<
+    //         (
+    //             RenderEntity,
+    //             &Camera,
+    //             Has<SectionsPrepass>,
+    //         ),
+    //         With<Camera3d>,
+    //     >,
+    // >,
+    mut live_entities: Local<HashSet<RetainedViewEntity>>,
 ) {
     live_entities.clear();
-    for (entity, camera, sections_prepass) in &cameras {
+    for (
+        render_entity,
+        main_entity,
+        camera,
+        has_sections_prepass,
+    ) in &cameras
+    {
         if !camera.is_active {
             continue;
         }
-        if sections_prepass {
-            sections_phases.insert_or_clear(entity);
+        // This is the main camera, so we use the first subview index (0)
+        let retained_view_entity = RetainedViewEntity::new(
+            main_entity.into(),
+            None,
+            0,
+        );
+
+        if has_sections_prepass {
+            sections_phases
+                .insert_or_clear(retained_view_entity);
         } else {
-            sections_phases.remove(&entity);
+            sections_phases.remove(&retained_view_entity);
         }
-        live_entities.insert(entity);
+        live_entities.insert(retained_view_entity);
 
         commands
-            .get_entity(entity)
+            // .entity(main_entity)
+            .get_entity(render_entity)
             .expect("Camera entity wasn't synced.")
             .insert_if(SectionsPrepass, || {
-                sections_prepass
+                has_sections_prepass
             });
     }
     // Clear out all dead views.
@@ -657,18 +727,15 @@ fn queue_custom_meshes(
         ViewSortedRenderPhases<SectionTexturePhase>,
     >,
     mut views: Query<(
-        Entity,
         &ExtractedView,
         &RenderVisibleEntities,
         &Msaa,
     )>,
     has_marker: Query<(), With<DrawSection>>,
 ) {
-    for (view_entity, view, visible_entities, msaa) in
-        &mut views
-    {
-        let Some(custom_phase) =
-            custom_render_phases.get_mut(&view_entity)
+    for (view, visible_entities, msaa) in &mut views {
+        let Some(custom_phase) = custom_render_phases
+            .get_mut(&view.retained_view_entity)
         else {
             continue;
         };
@@ -740,7 +807,8 @@ fn queue_custom_meshes(
                 draw_function: draw_custom,
                 // Sorted phase items aren't batched
                 batch_range: 0..1,
-                extra_index: PhaseItemExtraIndex::NONE,
+                extra_index: PhaseItemExtraIndex::None,
+                indexed: mesh.indexed(),
             });
         }
     }
@@ -758,6 +826,7 @@ impl ViewNode for CustomDrawNode {
     type ViewQuery = (
         &'static ExtractedCamera,
         &'static ViewTarget,
+        &'static ExtractedView,
         &'static SectionTexture,
         &'static ViewDepthTexture,
     );
@@ -766,7 +835,7 @@ impl ViewNode for CustomDrawNode {
         &self,
         graph: &mut RenderGraphContext,
         render_context: &mut RenderContext<'w>,
-        (camera, _target, section_texture, depth): QueryItem<
+        (camera, _target, view, section_texture, depth): QueryItem<
             'w,
             Self::ViewQuery,
         >,
@@ -807,7 +876,7 @@ impl ViewNode for CustomDrawNode {
         // };
         // Get the phase for the current view running our node
         let Some(section_phase) =
-            section_phases.get(&view_entity)
+            section_phases.get(&view.retained_view_entity)
         else {
             return Ok(());
         };
@@ -890,7 +959,9 @@ fn prepare_section_textures(
     for (entity, camera, view, msaa, sections_prepass) in
         &views_3d
     {
-        if !sections_phases.contains_key(&entity) {
+        if !sections_phases
+            .contains_key(&view.retained_view_entity)
+        {
             continue;
         };
 

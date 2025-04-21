@@ -37,16 +37,16 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     out.clip_position = position_world_to_clip(out.world_position.xyz);
 
     #ifdef SECTION_COLORS
-        if vertex.color.r == 1. || vertex.color.r == 0. {
-            out.color = vertex.color;
-        } else {
-            out.color = (vertex.color + vec4(
-                f32(section_group),
-                0.,
-                0.,
-                0.
-            ) / 13.);
-        }
+    if vertex.color.r == 1. || vertex.color.r == 0. {
+        out.color = vertex.color;
+    } else {
+        out.color = (vertex.color + vec4(
+            f32(section_group),
+            0.,
+            0.,
+            0.
+        ) / 13.);
+    }
     #endif
 
     return out;
@@ -56,11 +56,10 @@ fn vertex(vertex: Vertex) -> VertexOutput {
 fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     #ifdef SECTION_COLORS
         // return the typically hand authored section id
-        return in.color;
+    return in.color;
     #else
-        return vec4(0.,0.,0.,0.);
+    return vec4(0., 0., 0., 0.);
         // TODO: maybe discard one day?
         // discard;
     #endif
-
 }

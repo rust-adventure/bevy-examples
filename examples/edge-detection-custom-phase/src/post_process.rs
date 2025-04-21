@@ -6,6 +6,7 @@ use bevy::{
     ecs::query::QueryItem,
     prelude::*,
     render::{
+        RenderApp,
         extract_component::{
             ComponentUniforms, DynamicUniformIndex,
             ExtractComponent, ExtractComponentPlugin,
@@ -24,7 +25,6 @@ use bevy::{
         },
         renderer::{RenderContext, RenderDevice},
         view::ViewTarget,
-        RenderApp,
     },
 };
 
@@ -179,6 +179,7 @@ impl ViewNode for PostProcessNode {
         //     .resource::<RenderAssets<GpuImage>>()
         //     .get(&section_texture.0)
         //     .unwrap();
+        // dbg!(&section_texture.sections.iter().len());
         let section_texture_view = &section_texture
             .sections
             .as_ref()
