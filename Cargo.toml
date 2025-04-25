@@ -34,7 +34,7 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.16.0-rc.5", features = ["jpeg", "file_watcher"] }
+bevy = { version = "0.16.0", features = ["jpeg", "file_watcher"] }
 # bevy-inspector-egui = "0.28.1"
 # bevy_asset_loader = "0.22.0"
 bevy_asset_loader = "0.23.0-rc.3"
