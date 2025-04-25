@@ -4,7 +4,6 @@ use bevy::{
         graph::{Core3d, Node3d},
     },
     ecs::{
-        entity::EntityHashSet,
         query::QueryItem,
         system::{SystemParamItem, lifetimeless::SRes},
     },
@@ -656,16 +655,6 @@ fn extract_camera_phases(
             With<Camera3d>,
         >,
     >,
-    // cameras: Extract<
-    //     Query<
-    //         (
-    //             RenderEntity,
-    //             &Camera,
-    //             Has<SectionsPrepass>,
-    //         ),
-    //         With<Camera3d>,
-    //     >,
-    // >,
     mut live_entities: Local<HashSet<RetainedViewEntity>>,
 ) {
     live_entities.clear();
@@ -695,7 +684,6 @@ fn extract_camera_phases(
         live_entities.insert(retained_view_entity);
 
         commands
-            // .entity(main_entity)
             .get_entity(render_entity)
             .expect("Camera entity wasn't synced.")
             .insert_if(SectionsPrepass, || {
@@ -754,7 +742,7 @@ fn queue_custom_meshes(
 
         // Since our phase can work on any 3d mesh we can reuse the default mesh 2d filter
         for (render_entity, visible_entity) in
-            visible_entities.iter::<With<Mesh3d>>()
+            visible_entities.iter::<Mesh3d>()
         {
             // We only want meshes with the marker component to be queued to our phase.
             if has_marker.get(*render_entity).is_err() {
