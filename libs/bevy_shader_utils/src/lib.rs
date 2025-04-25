@@ -1,5 +1,7 @@
 use bevy::{
-    asset::{embedded_asset, load_internal_asset},
+    asset::{
+        embedded_asset, load_internal_asset, weak_handle,
+    },
     prelude::*,
     render::render_resource::{AsBindGroup, ShaderRef},
 };
@@ -9,22 +11,22 @@ use bevy::{
 // Noise Functions
 
 const PERLIN_NOISE_2D: Handle<Shader> =
-    Handle::weak_from_u128(11918512342344596158);
+    weak_handle!("990ee5ac-3d4a-4593-841f-6b46f02abcb3");
 pub const PERLIN_NOISE_3D: Handle<Shader> =
-    Handle::weak_from_u128(11918512442344596158);
+    weak_handle!("70568ff4-c5ca-4411-b099-692926332401");
 pub const SIMPLEX_NOISE_2D: Handle<Shader> =
-    Handle::weak_from_u128(11918512542344596158);
+    weak_handle!("f6a37262-741d-442e-b990-fb2851253284");
 pub const SIMPLEX_NOISE_3D: Handle<Shader> =
-    Handle::weak_from_u128(11918512642344596158);
+    weak_handle!("6239ad8c-41e1-4302-8f03-b2e41c154764");
 // pub const FBM: Handle<Shader> =
-// Handle::weak_from_u128(11918512342344596158);
+// weak_handle!("b84472cd-83dc-4cc2-b18a-021b42d11cb8");
 pub const VORONOISE: Handle<Shader> =
-    Handle::weak_from_u128(11918512742344596158);
+    weak_handle!("06dc4bde-2702-4fe2-aff5-df69078c4b59");
 // other utility functions
 pub const MOCK_FRESNEL: Handle<Shader> =
-    Handle::weak_from_u128(11918512842344596158);
+    weak_handle!("294d2ab5-554b-41f2-a1ca-95fb3689c1c3");
 pub const PRISTINE_GRID: Handle<Shader> =
-    Handle::weak_from_u128(11918512942344596158);
+    weak_handle!("3511cc56-fc6c-44c6-bde3-1591164fbc79");
 
 /// To use the shader utility functions, add the
 /// plugin to your app.

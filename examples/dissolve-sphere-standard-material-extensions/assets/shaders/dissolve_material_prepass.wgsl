@@ -1,70 +1,149 @@
 #import bevy_pbr::{
-    prepass_bindings,
-    mesh_functions,
-    prepass_io::{Vertex, VertexOutput, FragmentOutput},
-    skinning,
-    morph,
-    mesh_view_bindings::{view, previous_view_proj},
-    rgb9e5::vec3_to_rgb9e5_,
-    pbr_prepass_functions::prepass_alpha_discard,
     pbr_prepass_functions,
+    pbr_bindings,
     pbr_bindings::material,
-    pbr_deferred_functions,
-    pbr_types::{
-        STANDARD_MATERIAL_FLAGS_UNLIT_BIT,
-STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT
-    },
+    pbr_types,
     pbr_functions,
+    pbr_functions::SampleBias,
     prepass_io,
-    pbr_types
+    mesh_bindings::mesh,
+    mesh_view_bindings::view,
 }
-#import bevy_render::instance_index::get_instance_index
 #import bevy_shader_utils::simplex_noise_3d::simplex_noise_3d
 #import bevy_render::globals::Globals
 
 @group(0) @binding(1) var<uniform> globals: Globals;
- 
-// basically all of this prepass shader is just copy/pasted from
-// the bevy pbr prepass shader.
+
+#import bevy_render::bindless::{bindless_samplers_filtering, bindless_textures_2d}
+
+#ifdef MESHLET_MESH_MATERIAL_PASS
+#import bevy_pbr::meshlet_visibility_buffer_resolve::resolve_vertex_output
+#endif
+
+#ifdef BINDLESS
+#import bevy_pbr::pbr_bindings::material_indices
+#endif  // BINDLESS
+
+#ifdef PREPASS_FRAGMENT
 @fragment
 fn fragment(
-    in: VertexOutput,
+#ifdef MESHLET_MESH_MATERIAL_PASS
+    @builtin(position) frag_coord: vec4<f32>,
+#else
+    in: prepass_io::VertexOutput,
     @builtin(front_facing) is_front: bool,
-) -> FragmentOutput {
-    var out: FragmentOutput;
+#endif
+) -> prepass_io::FragmentOutput {
+#ifdef MESHLET_MESH_MATERIAL_PASS
+    let in = resolve_vertex_output(frag_coord);
+    let is_front = true;
+#else   // MESHLET_MESH_MATERIAL_PASS
+
+#ifdef BINDLESS
+    let slot = mesh[in.instance_index].material_and_lightmap_bind_group_slot & 0xffffu;
+    let flags = pbr_bindings::material_array[material_indices[slot].material].flags;
+    let uv_transform = pbr_bindings::material_array[material_indices[slot].material].uv_transform;
+#else   // BINDLESS
+    let flags = pbr_bindings::material.flags;
+    let uv_transform = pbr_bindings::material.uv_transform;
+#endif  // BINDLESS
+
+    // If we're in the crossfade section of a visibility range, conditionally
+    // discard the fragment according to the visibility pattern.
+#ifdef VISIBILITY_RANGE_DITHER
+    pbr_functions::visibility_range_dither(in.position, in.visibility_range_dither);
+#endif  // VISIBILITY_RANGE_DITHER
+
+    pbr_prepass_functions::prepass_alpha_discard(in);
+#endif  // MESHLET_MESH_MATERIAL_PASS
+
+    var out: prepass_io::FragmentOutput;
+
+#ifdef UNCLIPPED_DEPTH_ORTHO_EMULATION
+    out.frag_depth = in.unclipped_depth;
+#endif // UNCLIPPED_DEPTH_ORTHO_EMULATION
 
 #ifdef NORMAL_PREPASS
-    out.normal = vec4(in.world_normal * 0.5 + vec3(0.5), 1.0);
+    // NOTE: Unlit bit not set means == 0 is true, so the true case is if lit
+    if (flags & pbr_types::STANDARD_MATERIAL_FLAGS_UNLIT_BIT) == 0u {
+        let double_sided = (flags & pbr_types::STANDARD_MATERIAL_FLAGS_DOUBLE_SIDED_BIT) != 0u;
+
+        let world_normal = pbr_functions::prepare_world_normal(
+            in.world_normal,
+            double_sided,
+            is_front,
+        );
+
+        var normal = world_normal;
+
+#ifdef VERTEX_UVS
+#ifdef VERTEX_TANGENTS
+#ifdef STANDARD_MATERIAL_NORMAL_MAP
+
+// TODO: Transforming UVs mean we need to apply derivative chain rule for meshlet mesh material pass
+#ifdef STANDARD_MATERIAL_NORMAL_MAP_UV_B
+        let uv = (uv_transform * vec3(in.uv_b, 1.0)).xy;
+#else
+        let uv = (uv_transform * vec3(in.uv, 1.0)).xy;
 #endif
 
-#ifdef DEPTH_CLAMP_ORTHO
-    out.frag_depth = in.clip_position_unclamped.z;
-#endif // DEPTH_CLAMP_ORTHO
+        // Fill in the sample bias so we can sample from textures.
+        var bias: SampleBias;
+#ifdef MESHLET_MESH_MATERIAL_PASS
+        bias.ddx_uv = in.ddx_uv;
+        bias.ddy_uv = in.ddy_uv;
+#else   // MESHLET_MESH_MATERIAL_PASS
+        bias.mip_bias = view.mip_bias;
+#endif  // MESHLET_MESH_MATERIAL_PASS
+
+        let Nt =
+#ifdef MESHLET_MESH_MATERIAL_PASS
+            textureSampleGrad(
+#else   // MESHLET_MESH_MATERIAL_PASS
+            textureSampleBias(
+#endif  // MESHLET_MESH_MATERIAL_PASS
+#ifdef BINDLESS
+                bindless_textures_2d[material_indices[slot].normal_map_texture],
+                bindless_samplers_filtering[material_indices[slot].normal_map_sampler],
+#else   // BINDLESS
+                pbr_bindings::normal_map_texture,
+                pbr_bindings::normal_map_sampler,
+#endif  // BINDLESS
+                uv,
+#ifdef MESHLET_MESH_MATERIAL_PASS
+                bias.ddx_uv,
+                bias.ddy_uv,
+#else   // MESHLET_MESH_MATERIAL_PASS
+                bias.mip_bias,
+#endif  // MESHLET_MESH_MATERIAL_PASS
+            ).rgb;
+        let TBN = pbr_functions::calculate_tbn_mikktspace(normal, in.world_tangent);
+
+        normal = pbr_functions::apply_normal_mapping(
+            flags,
+            TBN,
+            double_sided,
+            is_front,
+            Nt,
+        );
+
+#endif  // STANDARD_MATERIAL_NORMAL_MAP
+#endif  // VERTEX_TANGENTS
+#endif  // VERTEX_UVS
+
+        out.normal = vec4(normal * 0.5 + vec3(0.5), 1.0);
+    } else {
+        out.normal = vec4(in.world_normal * 0.5 + vec3(0.5), 1.0);
+    }
+#endif // NORMAL_PREPASS
 
 #ifdef MOTION_VECTOR_PREPASS
-    let clip_position_t = view.unjittered_clip_from_world * in.world_position;
-    let clip_position = clip_position_t.xy / clip_position_t.w;
-    let previous_clip_position_t = prepass_bindings::previous_view_uniforms.clip_from_world * in.previous_world_position;
-    let previous_clip_position = previous_clip_position_t.xy / previous_clip_position_t.w;
-    // These motion vectors are used as offsets to UV positions and are stored
-    // in the range -1,1 to allow offsetting from the one corner to the
-    // diagonally-opposite corner in UV coordinates, in either direction.
-    // A difference between diagonally-opposite corners of clip space is in the
-    // range -2,2, so this needs to be scaled by 0.5. And the V direction goes
-    // down where clip space y goes up, so y needs to be flipped.
-    out.motion_vector = (clip_position - previous_clip_position) * vec2(0.5, -0.5);
-#endif // MOTION_VECTOR_PREPASS
-
-#ifdef DEFERRED_PREPASS
-    // There isn't any material info available for this default prepass shader so we are just writing 
-    // emissive magenta out to the deferred gbuffer to be rendered by the first deferred lighting pass layer.
-    // This is here so if the default prepass fragment is used for deferred magenta will be rendered, and also
-    // as an example to show that a user could write to the deferred gbuffer if they were to start from this shader.
-    out.deferred = vec4(0u, bevy_pbr::rgb9e5::vec3_to_rgb9e5_(vec3(1.0, 0.0, 1.0)), 0u, 0u);
-    out.deferred_lighting_pass_id = 1u;
+#ifdef MESHLET_MESH_MATERIAL_PASS
+    out.motion_vector = in.motion_vector;
+#else
+    out.motion_vector = pbr_prepass_functions::calculate_motion_vector(in.world_position, in.previous_world_position);
 #endif
-
-    
+#endif
 
     // same calcuation for gaps as the material, but without color
     // output. 
@@ -73,10 +152,13 @@ fn fragment(
     var noise = simplex_noise_3d(c * noise_step);
     var threshold = sin(globals.time);
     var alpha = step(noise, threshold);
-    if alpha == 0.00 { discard; };
+    if alpha <= 0.01 { discard; };
 
     return out;
 }
-
-
-
+#else
+@fragment
+fn fragment(in: prepass_io::VertexOutput) {
+    pbr_prepass_functions::prepass_alpha_discard(in);
+}
+#endif // PREPASS_FRAGMENT

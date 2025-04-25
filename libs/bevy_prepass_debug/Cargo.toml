@@ -1,7 +1,7 @@
 [package]
 name = "bevy_prepass_debug"
 description = "Debug tooling integrating with bevy_inspector_egui"
-edition = "2021"
+edition = "2024"
 keywords = ["bevy"]
 license = "MIT"
 version = "0.1.0"

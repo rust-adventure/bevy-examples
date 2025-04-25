@@ -26,7 +26,6 @@ fn main() {
             CubeMaterialPlugin,
         ))
         .add_systems(Startup, setup)
-        .add_plugin(WorldInspectorPlugin::new())
         .add_systems(Update, cube_completed)
         .run();
 }

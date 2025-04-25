@@ -1,19 +1,17 @@
-//! An example showing how to save screenshots to
-//! disk
-
+// An example used to save screenshots of the materials to disk
 use bevy::{
-    input::common_conditions::input_toggle_active, prelude::*, render::{
+     prelude::*, render::{
         render_resource::{AsBindGroup, ShaderRef},
         view::screenshot::{
             save_to_disk, Capturing, Screenshot,
         },
     }, sprite::{Material2d, Material2dPlugin}, window::SystemCursorIcon, winit::cursor::CursorIcon
 };
-use bevy_inspector_egui::quick::{
-    AssetInspectorPlugin,
-ResourceInspectorPlugin,
-    WorldInspectorPlugin,
-};
+// use bevy_inspector_egui::quick::{
+//     AssetInspectorPlugin,
+// ResourceInspectorPlugin,
+//     WorldInspectorPlugin,
+// };
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 #[derive(Component)]
@@ -40,26 +38,26 @@ fn main() {
                 >::default(),
             ),
         )
-        .add_plugins((
-            AssetInspectorPlugin::<
-                ScreenshotPerlin2dMaterial,
-            >::default().run_if(input_toggle_active(false, KeyCode::Digit1)),
-            AssetInspectorPlugin::<
-                ScreenshotPerlin3dMaterial,
-            >::default().run_if(input_toggle_active(false, KeyCode::Digit2)),
-            AssetInspectorPlugin::<
-                ScreenshotSimplex2dMaterial,
-            >::default().run_if(input_toggle_active(false, KeyCode::Digit3)),
-            AssetInspectorPlugin::<
-                ScreenshotSimplex3dMaterial,
-            >::default().run_if(input_toggle_active(false, KeyCode::Digit4)),
-            // AssetInspectorPlugin::<
-            //     ScreenshotFresnelMaterial,
-            // >::default(),
-            AssetInspectorPlugin::<
-                ScreenshotVoronoiseMaterial,
-            >::default().run_if(input_toggle_active(false, KeyCode::Digit5)),
-        ))
+        // .add_plugins((
+        //     AssetInspectorPlugin::<
+        //         ScreenshotPerlin2dMaterial,
+        //     >::default().run_if(input_toggle_active(false, KeyCode::Digit1)),
+        //     AssetInspectorPlugin::<
+        //         ScreenshotPerlin3dMaterial,
+        //     >::default().run_if(input_toggle_active(false, KeyCode::Digit2)),
+        //     AssetInspectorPlugin::<
+        //         ScreenshotSimplex2dMaterial,
+        //     >::default().run_if(input_toggle_active(false, KeyCode::Digit3)),
+        //     AssetInspectorPlugin::<
+        //         ScreenshotSimplex3dMaterial,
+        //     >::default().run_if(input_toggle_active(false, KeyCode::Digit4)),
+        //     // AssetInspectorPlugin::<
+        //     //     ScreenshotFresnelMaterial,
+        //     // >::default(),
+        //     AssetInspectorPlugin::<
+        //         ScreenshotVoronoiseMaterial,
+        //     >::default().run_if(input_toggle_active(false, KeyCode::Digit5)),
+        // ))
         .add_systems(Startup, setup)
         .add_systems(
             Update,
@@ -129,7 +127,7 @@ fn example_navigation(
     }
 
     for entity in active_cameras.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
     match examples.0[*example_index as usize].camera_type {
         CameraType::TwoD => {
@@ -150,12 +148,12 @@ fn example_navigation(
 fn screenshot_on_spacebar(
     mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
-    name_text: Query<&Text, With<ExampleName>>,
+    name_text: Single<&Text, With<ExampleName>>,
 ) {
     if input.just_pressed(KeyCode::Space) {
         let path = format!(
             "./screenshots/{}.png",
-            name_text.single().0
+            name_text.0
         );
 
         commands
@@ -169,7 +167,7 @@ fn screenshot_saving(
     screenshot_saving: Query<Entity, With<Capturing>>,
     windows: Query<Entity, With<Window>>,
 ) {
-    let Ok(window) = windows.get_single() else {
+    let Ok(window) = windows.single() else {
         return;
     };
     match screenshot_saving.iter().count() {

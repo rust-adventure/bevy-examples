@@ -9,11 +9,11 @@ use bevy::{
     render::mesh::VertexAttributeValues,
 };
 use edge_detection_custom_phase::{
+    ATTRIBUTE_SECTION_COLOR, DrawSection, SectionGroupId,
+    SectionTexturePhasePlugin, SectionsPrepass,
     post_process::{
         PostProcessPlugin, PostProcessSettings,
     },
-    DrawSection, SectionGroupId, SectionTexturePhasePlugin,
-    SectionsPrepass, ATTRIBUTE_SECTION_COLOR,
 };
 
 fn main() {
@@ -45,19 +45,19 @@ fn main() {
                 With<DemoShape>,
             >| {
                 let Ok(has_draw_section) =
-                    query.get(trigger.entity())
+                    query.get(trigger.target())
                 else {
                     return;
                 };
                 match has_draw_section {
                     true => {
                         commands
-                            .entity(trigger.entity())
+                            .entity(trigger.target())
                             .remove::<DrawSection>();
                     }
                     false => {
                         commands
-                            .entity(trigger.entity())
+                            .entity(trigger.target())
                             .insert(DrawSection);
                     }
                 }

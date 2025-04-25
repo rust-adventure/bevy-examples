@@ -9,9 +9,8 @@ edition = "2021"
 workspace = true
 
 [dependencies]
-itertools = "0.10.3"
-bevy-inspector-egui = { workspace = true }
-bevy_tweening = { workspace = true }
+itertools = "0.14.0"
+# bevy_tweening = { workspace = true }
 bevy = { workspace = true }
 
 [dependencies.bevy_shader_utils]

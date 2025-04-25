@@ -170,7 +170,6 @@ fn setup(
     commands.insert_resource(AmbientLight { ..default() });
 
     // directional 'sun' light
-    const HALF_SIZE: f32 = 10.0;
     commands.spawn((
         DirectionalLight::default(),
         Transform {

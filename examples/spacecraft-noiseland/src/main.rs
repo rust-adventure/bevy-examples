@@ -22,6 +22,7 @@ fn main() {
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 1.0 / 5.0f32,
+            ..default()
         })
         // .insert_resource(ClearColor(
         //     Srgba::hex("071f3c").unwrap().into(),
@@ -139,12 +140,11 @@ fn animate_light_direction(
 
 fn change_position(
     mut materials: ResMut<Assets<LandMaterial>>,
-    mut ship: Query<&mut Transform, With<Ship>>,
+    mut ship: Single<&mut Transform, With<Ship>>,
     noise: Res<MyNoise>,
     time: Res<Time>,
 ) {
     for material in materials.iter_mut() {
-        let mut ship = ship.single_mut();
         material.1.ship_position = ship.translation;
         let new_x = noise.0.get([
             ship.translation.z as f64 * 0.02,

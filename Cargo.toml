@@ -1,34 +1,24 @@
-license = "MIT OR Apache-2.0"
-
 [workspace]
 members = [
   # "examples/*",
   "examples/candy-cane",
-  # "examples/cartoon-water",
-  # "examples/compute-3d",
   "examples/cube-wave",
   "examples/dissolve-sphere-standard-material-extensions",
-  # "examples/eight-way-sprites",
   "examples/fresnel-effect",
-  # "examples/infinite-tunnel",
-  # "examples/pointcloud",
-  # "examples/pressure-wave-sphere",
-  # "examples/rotating-column",
-  # "examples/shader-rgb-worldspace-cube",
-  # "examples/shader-test-001",
   "examples/shield-spheres",
   "examples/shield-with-depth",
-  # "examples/start-menu-hades",
-  "examples/spacecraft-noiseland",
+  # "examples/spacecraft-noiseland",
   "examples/ui-button-shader",
   "examples/raymarch-sphere",
   "libs/*",
   "examples/two-uvs",
-  "examples/edge-detection-sections",
   "examples/edge-detection-custom-phase",
+  # rotating-column depends on bevy_tweening
+  # might be able to use animation clips
+  # "examples/rotating-column",
 ]
-exclude = ["examples/compute-with-time"]
-
+exclude = []
+license = "MIT OR Apache-2.0"
 resolver = "2"
 
 [workspace.lints.clippy]
@@ -44,9 +34,10 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.15.0", features = ["jpeg", "file_watcher"] }
-bevy-inspector-egui = "0.28.1"
-bevy_asset_loader = "0.22.0"
+bevy = { version = "0.16.0", features = ["jpeg", "file_watcher"] }
+# bevy-inspector-egui = "0.28.1"
+# bevy_asset_loader = "0.22.0"
+bevy_asset_loader = "0.23.0-rc.3"
 # bevy_tweening = "0.11.0"
 # bevy_panorbit_camera = "0.19"
 # bevy_basic_camera = { path = "./libs/bevy_basic_camera" }

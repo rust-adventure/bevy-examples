@@ -57,6 +57,7 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
 
     // render just vertex storage texture
     // return textureLoad(vertex_id_texture, vec2u(in.uv * vec2f(dimensions)), 1);
+    // return textureSample(vertex_id_texture, vertex_id_sampler, in.uv);
 
     // use the differences to decide whether to show outline or not
     // step() is used to determine a cutoff for showing/not showing 
@@ -85,36 +86,26 @@ fn sobel(
     let offseti: vec2i = vec2i(offset);
     let xy = vec2i(uv * vec2f(dimensions));
 
-    let px_center     : f32 = textureLoad(vertex_id_texture, xy, 0).r;
+    let px_center: f32 = textureLoad(vertex_id_texture, xy, 0).r;
 
-    let px_left       : f32 = textureLoad(vertex_id_texture, xy + vec2i(-offseti.x, 0), 0).r;
-    let px_left_up    : f32 = textureLoad(vertex_id_texture, xy + vec2i(-offseti.x, 1), 0).r;
-    let px_left_down  : f32 = textureLoad(vertex_id_texture, xy + vec2i(-offseti.x, -offseti.y), 0).r;
+    let px_left: f32 = textureLoad(vertex_id_texture, xy + vec2i(-offseti.x, 0), 0).r;
+    let px_left_up: f32 = textureLoad(vertex_id_texture, xy + vec2i(-offseti.x, 1), 0).r;
+    let px_left_down: f32 = textureLoad(vertex_id_texture, xy + vec2i(-offseti.x, -offseti.y), 0).r;
 
-    let px_up         : f32 = textureLoad(vertex_id_texture, xy + vec2i(0,offseti.y), 0).r;
+    let px_up: f32 = textureLoad(vertex_id_texture, xy + vec2i(0, offseti.y), 0).r;
 
-    let px_right      : f32 = textureLoad(vertex_id_texture, xy + vec2i(offseti.x, 0), 0).r;
-    let px_right_up   : f32 = textureLoad(vertex_id_texture, xy + vec2i(offseti.x, offseti.y), 0).r;
-    let px_right_down : f32 = textureLoad(vertex_id_texture, xy + vec2i(offseti.x, -offseti.y), 0).r;
+    let px_right: f32 = textureLoad(vertex_id_texture, xy + vec2i(offseti.x, 0), 0).r;
+    let px_right_up: f32 = textureLoad(vertex_id_texture, xy + vec2i(offseti.x, offseti.y), 0).r;
+    let px_right_down: f32 = textureLoad(vertex_id_texture, xy + vec2i(offseti.x, -offseti.y), 0).r;
 
-    let px_down       : f32 = textureLoad(vertex_id_texture, xy + vec2i(0, -offseti.y), 0).r;
+    let px_down: f32 = textureLoad(vertex_id_texture, xy + vec2i(0, -offseti.y), 0).r;
 
     return max(
         abs(
-              1 * px_left_down
-            + 2 * px_left
-            + 1 * px_left_up
-            - 1 * px_right_down
-            - 2 * px_right
-            - 1 * px_right_up
+            1 * px_left_down + 2 * px_left + 1 * px_left_up - 1 * px_right_down - 2 * px_right - 1 * px_right_up
         ),
         abs(
-              1 * px_left_up
-            + 2 * px_up
-            + 1 * px_right_up
-            - 1 * px_left_down
-            - 2 * px_down
-            - 1 * px_right_down
+            1 * px_left_up + 2 * px_up + 1 * px_right_up - 1 * px_left_down - 2 * px_down - 1 * px_right_down
         )
     );
 }
@@ -128,13 +119,10 @@ fn roberts(
 ) -> f32 {
     let xy = vec2u(uv * vec2f(dimensions));
     let px_center: f32 = textureLoad(vertex_id_texture, xy, 0).r;
-    let px_left  : f32 = textureLoad(vertex_id_texture, xy - offset.xz, 0).r;
-    let px_right : f32 = textureLoad(vertex_id_texture, xy + offset.xz, 0).r;
-    let px_up    : f32 = textureLoad(vertex_id_texture, xy + offset.zy, 0).r;
-    let px_down  : f32 = textureLoad(vertex_id_texture, xy - offset.zy, 0).r;
+    let px_left: f32 = textureLoad(vertex_id_texture, xy - offset.xz, 0).r;
+    let px_right: f32 = textureLoad(vertex_id_texture, xy + offset.xz, 0).r;
+    let px_up: f32 = textureLoad(vertex_id_texture, xy + offset.zy, 0).r;
+    let px_down: f32 = textureLoad(vertex_id_texture, xy - offset.zy, 0).r;
 
-    return abs(px_left - px_center)  +
-           abs(px_right - px_center) +
-           abs(px_up - px_center)    +
-           abs(px_down - px_center);
+    return abs(px_left - px_center) + abs(px_right - px_center) + abs(px_up - px_center) + abs(px_down - px_center);
 }
