@@ -16,6 +16,7 @@ members = [
   # rotating-column depends on bevy_tweening
   # might be able to use animation clips
   # "examples/rotating-column",
+  "concepts/*",
 ]
 exclude = []
 license = "MIT OR Apache-2.0"
