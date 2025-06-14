@@ -1,28 +1,9 @@
-use std::f32::consts::PI;
-
-use bevy::{
-    color::palettes::tailwind::*,
-    image::{ImageSampler, ImageSamplerDescriptor},
-    math::VectorSpace,
-    prelude::*,
-    render::{
-        render_asset::RenderAssetUsages,
-        render_resource::{
-            Extent3d, TextureDimension, TextureFormat,
-        },
-    },
-};
-use image::{
-    DynamicImage, ImageBuffer, imageops::FilterType,
-};
+use bevy::{color::palettes::tailwind::*, prelude::*};
+use image::{DynamicImage, ImageBuffer};
 
 fn main() -> AppExit {
     App::new()
         .insert_resource(ClearColor(SLATE_950.into()))
-        // .insert_resource(AmbientLight {
-        //     brightness: 1_000.,
-        //     ..default()
-        // })
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, startup)
         .add_systems(FixedUpdate, rotate)
