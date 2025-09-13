@@ -19,16 +19,15 @@ struct MyEvent {
 }
 
 fn on_my_event(
-    trigger: Trigger<MyEvent>,
+    my_event: On<MyEvent>,
     mut commands: Commands,
 ) {
     info!(
-        target=?trigger.target(),
-        event=?trigger.event(),
+        event=?my_event.event(),
         "on_my_event",
     );
     let Some(rest) =
-        trigger.event().spawn_n_times.checked_sub(1)
+        my_event.event().spawn_n_times.checked_sub(1)
     else {
         info!("done recursing");
         return;

@@ -8,13 +8,12 @@ fn main() {
             (startup, trigger_event).chain(),
         )
         .add_observer(
-            |trigger: Trigger<CatchFire>,
+            |catch_fire: On<CatchFire>,
              names: Query<&Name>|
              -> Result {
                 info!(
-                    target=?trigger.target(),
-                    event=?trigger.event(),
-                    name=?names.get(trigger.target())?,
+                    event=?catch_fire.event(),
+                    name=?names.get(catch_fire.entity)?,
                     "on_my_event",
                 );
                 Ok(())
@@ -39,15 +38,17 @@ fn trigger_event(
     entity: Single<Entity, With<Flamable>>,
 ) {
     info!("trigger");
-    commands.trigger_targets(CatchFire, *entity);
+    commands.trigger(CatchFire { entity: *entity });
 }
 
 #[derive(Component)]
 struct Flamable;
 
-#[derive(Debug, Event)]
-#[event(auto_propagate, traversal = &'static ItemOf)]
-struct CatchFire;
+#[derive(Debug, EntityEvent)]
+#[entity_event(auto_propagate, propagate = &'static ItemOf)]
+struct CatchFire {
+    entity: Entity,
+}
 
 #[derive(Debug, Component)]
 #[relationship(relationship_target = Inventory)]

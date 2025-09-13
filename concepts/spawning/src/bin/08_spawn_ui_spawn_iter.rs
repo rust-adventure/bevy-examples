@@ -32,25 +32,19 @@ fn setup(mut commands: Commands) {
                     parent
                         .spawn(button("New Game"))
                         .observe(
-                            |_trigger: Trigger<
-                                Pointer<Click>,
-                            >| {
+                            |_: On<Pointer<Click>>| {
                                 info!("New Game");
                             },
                         );
                     parent
                         .spawn(button("Options"))
                         .observe(
-                            |_trigger: Trigger<
-                                Pointer<Click>,
-                            >| {
+                            |_: On<Pointer<Click>>| {
                                 info!("Options");
                             },
                         );
                     parent.spawn(button("Quit")).observe(
-                        |_trigger: Trigger<
-                            Pointer<Click>,
-                        >| {
+                        |_: On<Pointer<Click>>| {
                             info!("Quit");
                         },
                     );
