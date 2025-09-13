@@ -1,7 +1,7 @@
 use bevy::{
     core_pipeline::{
+        FullscreenShader,
         core_3d::graph::{Core3d, Node3d},
-        fullscreen_vertex_shader::fullscreen_shader_vertex_state,
     },
     ecs::query::QueryItem,
     prelude::*,
@@ -13,8 +13,8 @@ use bevy::{
             UniformComponentPlugin,
         },
         render_graph::{
-            NodeRunError, RenderGraphApp,
-            RenderGraphContext, RenderLabel, ViewNode,
+            NodeRunError, RenderGraphContext,
+            RenderGraphExt, RenderLabel, ViewNode,
             ViewNodeRunner,
         },
         render_resource::{
@@ -236,6 +236,7 @@ impl ViewNode for PostProcessNode {
                             view: post_process.destination,
                             resolve_target: None,
                             ops: Operations::default(),
+                            depth_slice: None,
                         },
                     )],
                     depth_stencil_attachment: None,
@@ -306,6 +307,9 @@ impl FromWorld for PostProcessPipeline {
         let shader =
             world.load_asset("post_processing.wgsl");
 
+        let fullscreen_shader =
+            world.get_resource::<FullscreenShader>().expect("FullscreenShader Resource is required for post-process").to_vertex_state();
+
         let pipeline_id = world
             .resource_mut::<PipelineCache>()
             // This will add the pipeline to the cache and queue its creation
@@ -313,13 +317,13 @@ impl FromWorld for PostProcessPipeline {
                 label: Some("post_process_pipeline".into()),
                 layout: vec![layout.clone()],
                 // This will setup a fullscreen triangle for the vertex state
-                vertex: fullscreen_shader_vertex_state(),
+                vertex: fullscreen_shader,
                 fragment: Some(FragmentState {
                     shader,
                     shader_defs: vec![],
                     // Make sure this matches the entry point of your shader.
                     // It can be anything as long as it matches here and in the shader.
-                    entry_point: "fragment".into(),
+                    entry_point: Some("fragment".into()),
                     targets: vec![Some(ColorTargetState {
                         format: ViewTarget::TEXTURE_FORMAT_HDR,
                     //     format: if key

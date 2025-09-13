@@ -1,10 +1,11 @@
 use bevy::{
     asset::embedded_asset,
     color::palettes::tailwind::*,
-    ecs::{component::HookContext, world::DeferredWorld},
+    ecs::{lifecycle::HookContext, world::DeferredWorld},
     pbr::{ExtendedMaterial, MaterialExtension},
     prelude::*,
-    render::render_resource::{AsBindGroup, ShaderRef},
+    render::render_resource::AsBindGroup,
+    shader::ShaderRef,
 };
 
 /// To use the utility functions, add the

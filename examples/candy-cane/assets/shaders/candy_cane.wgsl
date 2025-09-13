@@ -26,7 +26,7 @@ struct Stripe {
 #import bevy_shader_utils::simplex_noise_3d
 #import bevy_shader_utils::simplex_noise_2d
 
-@group(2) @binding(100)
+@group(#{MATERIAL_BIND_GROUP}) @binding(100)
 var<storage, read> stripes: array<Stripe>;
 
 @fragment

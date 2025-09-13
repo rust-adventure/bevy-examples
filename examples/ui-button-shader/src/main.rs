@@ -3,6 +3,7 @@
 use bevy::prelude::*;
 use bevy::reflect::TypePath;
 use bevy::render::render_resource::*;
+use bevy::shader::ShaderRef;
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {

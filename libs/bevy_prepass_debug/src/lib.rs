@@ -3,19 +3,20 @@
 // modified to exist as a plugin.
 // https://github.com/bevyengine/bevy/blob/b208388af95ecd753e4710f40baf2e913bc85c17/examples/shader/shader_prepass.rs
 use bevy::{
-    asset::{load_internal_asset, weak_handle},
+    asset::{load_internal_asset, uuid_handle},
+    light::NotShadowCaster,
     math::vec2,
-    pbr::NotShadowCaster,
     prelude::*,
     reflect::TypePath,
     render::render_resource::*,
+    shader::ShaderRef,
 };
 // use bevy_inspector_egui::{
 //     prelude::*, quick::ResourceInspectorPlugin,
 // };
 
 const SHOW_PREPASS_SHADER_HANDLE: Handle<Shader> =
-    weak_handle!("3ce3ca25-a0bd-4e4f-a239-b96564809547");
+    uuid_handle!("3ce3ca25-a0bd-4e4f-a239-b96564809547");
 /// Debug depth/normal/
 /// In order to function, the [`PrepassDebug`]
 /// component should be attached to the camera

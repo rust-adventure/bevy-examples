@@ -1,11 +1,11 @@
 // An example used to save screenshots of the materials to disk
 use bevy::{
      prelude::*, render::{
-        render_resource::{AsBindGroup, ShaderRef},
+        render_resource::AsBindGroup,
         view::screenshot::{
             save_to_disk, Capturing, Screenshot,
         },
-    }, sprite::{Material2d, Material2dPlugin}, window::SystemCursorIcon, winit::cursor::CursorIcon
+    }, shader::ShaderRef, sprite_render::{Material2d, Material2dPlugin}, window::{CursorIcon, SystemCursorIcon} 
 };
 // use bevy_inspector_egui::quick::{
 //     AssetInspectorPlugin,

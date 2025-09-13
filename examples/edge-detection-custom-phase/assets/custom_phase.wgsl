@@ -4,7 +4,7 @@
 }
 #import bevy_pbr::mesh_bindings::mesh;
 
-@group(2) @binding(0) var<uniform> section_group: u32;
+@group(3) @binding(0) var<uniform> section_group: u32;
 
 struct Vertex {
     // This is needed if you are using batching and/or gpu preprocessing

@@ -1,15 +1,12 @@
 use bevy::{
+    anti_alias::fxaa::Fxaa,
     color::palettes::tailwind::{BLUE_400, RED_400},
-    core_pipeline::{
-        fxaa::Fxaa,
-        prepass::{
-            DepthPrepass, MotionVectorPrepass,
-            NormalPrepass,
-        },
+    core_pipeline::prepass::{
+        DepthPrepass, MotionVectorPrepass, NormalPrepass,
     },
+    mesh::VertexAttributeValues,
     pbr::{ExtendedMaterial, OpaqueRendererMethod},
     prelude::*,
-    render::mesh::VertexAttributeValues,
 };
 
 use bevy_prepass_debug::PrepassDebugPlugin;

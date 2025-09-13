@@ -6,6 +6,7 @@ use bevy::{
     render::{
         render_resource::*, storage::ShaderStorageBuffer,
     },
+    shader::ShaderRef,
 };
 
 /// This example uses a shader source file from the assets subdirectory

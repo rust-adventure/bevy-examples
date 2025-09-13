@@ -25,7 +25,7 @@ struct BlockoutMaterial {
     line_size: vec2f
 }
 
-@group(2) @binding(100)
+@group(#{MATERIAL_BIND_GROUP}) @binding(100)
 var<uniform> extension: BlockoutMaterial;
 
 @fragment
