@@ -81,8 +81,8 @@ fn setup(
         })
         .with_children(|parent| {
             for i in 0..18 {
-                parent
-                    .spawn(Node {
+                parent.spawn((
+                    Node {
                         aspect_ratio: Some(1.),
                         width: Val::Percent(100.),
                         height: Val::Auto,
@@ -90,12 +90,11 @@ fn setup(
                         justify_content:
                             JustifyContent::Center,
                         ..default()
-                    })
-                    .with_children(|parent| {
-                        parent.spawn((
-                            MaterialNode(
-                                heart_ui_materials
-                                    .add(HeartUiMaterial {
+                    },
+                    children![(
+                        MaterialNode(
+                            heart_ui_materials.add(
+                                HeartUiMaterial {
                                     color:
                                         LinearRgba::WHITE,
                                     time: 0.,
@@ -106,20 +105,21 @@ fn setup(
                                         * 2.0
                                         - 1.0),
                                     offset: i as f32 * 10.,
-                                }),
+                                }
                             ),
-                            Node {
-                                aspect_ratio: Some(1.),
-                                width: Val::Percent(100.),
-                                height: Val::Percent(100.),
-                                ..default()
-                            },
-                        ));
-                    });
+                        ),
+                        Node {
+                            aspect_ratio: Some(1.),
+                            width: Val::Percent(100.),
+                            height: Val::Percent(100.),
+                            ..default()
+                        },
+                    )],
+                ));
             }
         });
-    commands
-        .spawn(Node {
+    commands.spawn((
+        Node {
             position_type: PositionType::Absolute,
             right: Val::Px(0.),
             bottom: Val::Px(0.),
@@ -130,25 +130,24 @@ fn setup(
             align_items: AlignItems::Center,
             justify_content: JustifyContent::Center,
             ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn((
-                MaterialNode(heart_ui_materials.add(
-                    HeartUiMaterial {
-                        color: LinearRgba::WHITE,
-                        time: 0.,
-                        fill_level: 0.,
-                        offset: 0.,
-                    },
-                )),
-                Node {
-                    aspect_ratio: Some(1.),
-                    width: Val::Percent(100.),
-                    height: Val::Percent(100.),
-                    ..default()
+        },
+        children![(
+            MaterialNode(heart_ui_materials.add(
+                HeartUiMaterial {
+                    color: LinearRgba::WHITE,
+                    time: 0.,
+                    fill_level: 0.,
+                    offset: 0.,
                 },
-            ));
-        });
+            )),
+            Node {
+                aspect_ratio: Some(1.),
+                width: Val::Percent(100.),
+                height: Val::Percent(100.),
+                ..default()
+            },
+        )],
+    ));
 }
 
 #[derive(AsBindGroup, Asset, TypePath, Debug, Clone)]
