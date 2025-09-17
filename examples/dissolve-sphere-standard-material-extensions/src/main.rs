@@ -111,6 +111,7 @@ fn setup(
                 // can be used in forward or deferred mode.
                 opaque_render_method:
                     OpaqueRendererMethod::Auto,
+                    alpha_mode: AlphaMode::Mask(0.1),
                 // in deferred mode, only the PbrInput can be modified (uvs, color and other material properties),
                 // in forward mode, the output can also be modified after lighting is applied.
                 // see the fragment shader `extended_material.wgsl` for more info.
@@ -148,62 +149,54 @@ fn setup(
     ));
 
     // red point light
-    commands
-        .spawn((
-            Transform::from_xyz(1.0, 2.0, 0.0),
-            PointLight {
-                intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
-                color: RED_400.into(),
-                shadows_enabled: true,
-                ..default()
-            },
-        ))
-        .with_children(|builder| {
-            builder.spawn((
-                Mesh3d(
-                    meshes
-                        .add(Sphere { radius: 0.1 }.mesh()),
-                ),
-                MeshMaterial3d(materials.add(
-                    StandardMaterial {
-                        base_color: RED_400.into(),
-                        emissive: LinearRgba::new(
-                            100., 0., 0., 0.,
-                        ),
-                        ..default()
-                    },
-                )),
-            ));
-        });
+    commands.spawn((
+        Transform::from_xyz(1.0, 2.0, 0.0),
+        PointLight {
+            intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
+            color: RED_400.into(),
+            shadows_enabled: true,
+            ..default()
+        },
+        children![(
+            Mesh3d(
+                meshes.add(Sphere { radius: 0.1 }.mesh()),
+            ),
+            MeshMaterial3d(materials.add(
+                StandardMaterial {
+                    base_color: RED_400.into(),
+                    emissive: LinearRgba::new(
+                        100., 0., 0., 0.,
+                    ),
+                    ..default()
+                },
+            )),
+        )],
+    ));
 
     // blue point light
-    commands
-        .spawn((
-            Transform::from_xyz(0.0, 4.0, 0.0),
-            PointLight {
-                intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
-                color: BLUE_400.into(),
-                shadows_enabled: true,
-                ..default()
-            },
-        ))
-        .with_children(|builder| {
-            builder.spawn((
-                Mesh3d(
-                    meshes
-                        .add(Sphere { radius: 0.1 }.mesh()),
-                ),
-                MeshMaterial3d(materials.add(
-                    StandardMaterial {
-                        base_color: BLUE_400.into(),
-                        emissive: LinearRgba::new(
-                            0.0, 0.0, 100.0, 0.0,
-                        ),
-                        ..default()
-                    },
-                )),
-            ));
-        });
+    commands.spawn((
+        Transform::from_xyz(0.0, 4.0, 0.0),
+        PointLight {
+            intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
+            color: BLUE_400.into(),
+            shadows_enabled: true,
+            ..default()
+        },
+        children![(
+            Mesh3d(
+                meshes.add(Sphere { radius: 0.1 }.mesh()),
+            ),
+            MeshMaterial3d(materials.add(
+                StandardMaterial {
+                    base_color: BLUE_400.into(),
+                    emissive: LinearRgba::new(
+                        0.0, 0.0, 100.0, 0.0,
+                    ),
+                    ..default()
+                },
+            )),
+        )],
+    ));
 
     // directional 'sun' light
     commands.spawn((
