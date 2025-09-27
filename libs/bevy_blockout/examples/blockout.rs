@@ -1,16 +1,14 @@
-use std::f32::consts::PI;
-
 use bevy::{
+    camera::Exposure,
     color::palettes::tailwind::*,
-    core_pipeline::{
-        bloom::Bloom, tonemapping::Tonemapping,
-    },
+    core_pipeline::tonemapping::Tonemapping,
+    light::light_consts::lux,
     pbr::{
         Atmosphere, AtmosphereSettings, ExtendedMaterial,
-        light_consts::lux,
     },
+    post_process::bloom::Bloom,
     prelude::*,
-    render::camera::Exposure,
+    render::view::Hdr,
 };
 use bevy_blockout::{BlockoutMaterialExt, BlockoutPlugin};
 
@@ -125,9 +123,9 @@ fn setup(
         Camera3d::default(),
         // HDR is required for atmospheric scattering to be properly applied to the scene
         Camera {
-            hdr: true,
             ..default()
         },
+        Hdr,
         Transform::from_xyz(-50.2, 20., 50.0)
             .looking_at(Vec3::Y * 0.1, Vec3::Y),
         // This is the component that enables atmospheric scattering for a camera

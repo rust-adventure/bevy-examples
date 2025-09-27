@@ -1,7 +1,7 @@
 use bevy::{
-    color::palettes::tailwind::*,
-    prelude::*,
-    render::render_resource::{AsBindGroup, ShaderRef},
+    color::palettes::tailwind::*, prelude::*,
+    render::render_resource::AsBindGroup,
+    shader::ShaderRef,
 };
 // use bevy_panorbit_camera::{
 //     PanOrbitCamera, PanOrbitCameraPlugin,

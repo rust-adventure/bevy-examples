@@ -13,7 +13,8 @@ use bevy::{
     },
     prelude::*,
     reflect::TypePath,
-    render::render_resource::{AsBindGroup, ShaderRef},
+    render::render_resource::AsBindGroup,
+    shader::ShaderRef,
 };
 use bevy_prepass_debug::PrepassDebugPlugin;
 

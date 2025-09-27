@@ -8,10 +8,10 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, startup)
         .add_observer(
-            |trigger: Trigger<OnAdd, ExampleComponent>| {
+            |trigger: On<Add, ExampleComponent>| {
                 info!(
                     observer=?trigger.observer(),
-                    target= ?trigger.target(),
+                    target= ?trigger.entity,
                     event=?trigger.event(),
                     "on_add (global)",
                 );
@@ -39,19 +39,19 @@ fn startup(mut commands: Commands) {
     commands.entity(id3).insert(ExampleComponent(100));
 }
 
-fn on_add(trigger: Trigger<OnAdd, ExampleComponent>) {
+fn on_add(trigger: On<Add, ExampleComponent>) {
     info!(
         observer=?trigger.observer(),
-        target= ?trigger.target(),
+        target= ?trigger.entity,
         event=?trigger.event(),
         "on_add",
     );
 }
 
-fn special(trigger: Trigger<OnAdd, ExampleComponent>) {
+fn special(trigger: On<Add, ExampleComponent>) {
     info!(
         observer=?trigger.observer(),
-        target= ?trigger.target(),
+        target= ?trigger.entity,
         event=?trigger.event(),
         "special",
     );

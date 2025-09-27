@@ -3,19 +3,19 @@ use bevy::{
     input::common_conditions::input_just_pressed,
     prelude::*,
 };
-use bevy_inspector_egui::{
-    bevy_egui::EguiPlugin, quick::WorldInspectorPlugin,
-};
+// use bevy_inspector_egui::{
+//     bevy_egui::EguiPlugin, quick::WorldInspectorPlugin,
+// };
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(SLATE_950.into()))
         .add_plugins((
             DefaultPlugins,
-            EguiPlugin {
-                enable_multipass_for_primary_context: true,
-            },
-            WorldInspectorPlugin::new(),
+            // EguiPlugin {
+            //     enable_multipass_for_primary_context: true,
+            // },
+            // WorldInspectorPlugin::new(),
         ))
         .add_systems(Startup, setup)
         .add_systems(

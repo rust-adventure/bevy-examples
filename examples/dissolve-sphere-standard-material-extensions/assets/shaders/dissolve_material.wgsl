@@ -63,5 +63,4 @@ fn fragment(
     if output_color.a == 0.0 { discard; } else {
         return output_color;
     }
-    return output_color;
 }

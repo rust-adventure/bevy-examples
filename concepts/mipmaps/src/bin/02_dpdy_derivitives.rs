@@ -1,17 +1,12 @@
-use std::f32::consts::PI;
-
 use bevy::{
     color::palettes::tailwind::*,
-    image::{ImageSampler, ImageSamplerDescriptor},
-    math::VectorSpace,
+    mesh::MeshVertexBufferLayoutRef,
+    pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
-    render::{
-        render_asset::RenderAssetUsages,
-        render_resource::{
-            AsBindGroup, Extent3d, ShaderRef,
-            TextureDimension, TextureFormat,
-        },
+    render::render_resource::{
+        AsBindGroup, RenderPipelineDescriptor,
     },
+    shader::ShaderRef,
 };
 use image::{
     DynamicImage, ImageBuffer, imageops::FilterType,
@@ -221,10 +216,10 @@ impl Material for DpDyMaterial {
         "dpdy_material.wgsl".into()
     }
     fn specialize(
-            _pipeline: &bevy::pbr::MaterialPipeline<Self>,
-            descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-            _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
-            _key: bevy::pbr::MaterialPipelineKey<Self>,
+            _pipeline: &MaterialPipeline,
+            descriptor: &mut RenderPipelineDescriptor,
+            _layout: &MeshVertexBufferLayoutRef,
+            _key: MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError>{
         // don't cull backfaces
         descriptor.primitive.cull_mode = None;

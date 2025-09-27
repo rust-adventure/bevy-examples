@@ -8,17 +8,20 @@ use bevy::{
         system::{SystemParamItem, lifetimeless::SRes},
     },
     math::FloatOrd,
+    mesh::{
+        MeshVertexAttribute, MeshVertexBufferLayoutRef,
+    },
     pbr::{
         DrawMesh, MeshInputUniform, MeshPipeline,
         MeshPipelineKey, MeshPipelineViewLayoutKey,
         MeshUniform, RenderMeshInstances, SetMeshBindGroup,
-        SetMeshViewBindGroup,
+        SetMeshViewBindGroup, SetMeshViewEmptyBindGroup,
     },
     platform::collections::{HashMap, HashSet},
     prelude::*,
     render::{
         Extract, Render, RenderApp, RenderDebugFlags,
-        RenderSet,
+        RenderSystems,
         batching::{
             GetBatchData, GetFullBatchData,
             gpu_preprocessing::{
@@ -34,14 +37,11 @@ use bevy::{
             ExtractComponent, ExtractComponentPlugin,
             UniformComponentPlugin,
         },
-        mesh::{
-            MeshVertexAttribute, MeshVertexBufferLayoutRef,
-            RenderMesh, allocator::MeshAllocator,
-        },
+        mesh::{RenderMesh, allocator::MeshAllocator},
         render_asset::RenderAssets,
         render_graph::{
-            NodeRunError, RenderGraphApp,
-            RenderGraphContext, RenderLabel, ViewNode,
+            NodeRunError, RenderGraphContext,
+            RenderGraphExt, RenderLabel, ViewNode,
             ViewNodeRunner,
         },
         render_phase::{
@@ -129,13 +129,13 @@ impl SectionGroupIdGenerator {
 }
 
 fn insert_section_ids(
-    trigger: Trigger<OnInsert, Mesh3d>,
+    inserted: On<Insert, Mesh3d>,
     mut commands: Commands,
     mut generator: ResMut<SectionGroupIdGenerator>,
     query: Query<&SectionGroupId>,
 ) {
-    if query.get(trigger.target()).is_err() {
-        commands.entity(trigger.target()).insert(
+    if query.get(inserted.entity).is_err() {
+        commands.entity(inserted.entity).insert(
             SectionGroupId {
                 id: generator.generate_id(),
             },
@@ -186,12 +186,12 @@ impl Plugin for SectionTexturePhasePlugin {
             .add_systems(
                 Render,
                 (
-                    sort_phase_system::<SectionTexturePhase>.in_set(RenderSet::PhaseSort),
+                    sort_phase_system::<SectionTexturePhase>.in_set(RenderSystems::PhaseSort),
                     batch_and_prepare_sorted_render_phase::<SectionTexturePhase, SectionTexturePipeline>
-                        .in_set(RenderSet::PrepareResources),
-                    prepare_section_data_bind_group.in_set(RenderSet::PrepareBindGroups),
-                    queue_custom_meshes.in_set(RenderSet::QueueMeshes),
-                    prepare_section_textures.in_set(RenderSet::PrepareResources),
+                        .in_set(RenderSystems::PrepareResources),
+                    prepare_section_data_bind_group.in_set(RenderSystems::PrepareBindGroups),
+                    queue_custom_meshes.in_set(RenderSystems::QueueMeshes),
+                    prepare_section_textures.in_set(RenderSystems::PrepareResources),
                 ),
             );
 
@@ -301,6 +301,15 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
                             key,
                         ),
                     )
+                    .main_layout
+                    .clone(),
+                self.mesh_pipeline
+                    .get_view_layout(
+                        MeshPipelineViewLayoutKey::from(
+                            key,
+                        ),
+                    )
+                    .empty_layout
                     .clone(),
                 // Bind group 1 is the mesh uniform
                 self.mesh_pipeline
@@ -314,13 +323,13 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
             vertex: VertexState {
                 shader: self.shader_handle.clone(),
                 shader_defs: shader_defs.clone(),
-                entry_point: "vertex".into(),
+                entry_point: Some("vertex".into()),
                 buffers: vec![vertex_buffer_layout],
             },
             fragment: Some(FragmentState {
                 shader: self.shader_handle.clone(),
                 shader_defs,
-                entry_point: "fragment".into(),
+                entry_point: Some("fragment".into()),
                 targets: vec![Some(ColorTargetState {
                     format: if key
                         .contains(MeshPipelineKey::HDR)
@@ -362,10 +371,12 @@ type DrawMesh3dSectionTexture = (
     SetItemPipeline,
     // This will set the view bindings in group 0
     SetMeshViewBindGroup<0>,
+    // This will set an empty bind group in group 1
+    SetMeshViewEmptyBindGroup<1>,
     // This will set the mesh bindings in group 1
-    SetMeshBindGroup<1>,
+    SetMeshBindGroup<2>,
     // Set
-    SetSectionDataBindGroup<2>,
+    SetSectionDataBindGroup<3>,
     // This will draw the mesh
     DrawMesh,
 );
@@ -825,6 +836,7 @@ impl ViewNode for CustomDrawNode {
         render_context: &mut RenderContext<'w>,
         (camera, _target, view, section_texture, depth): QueryItem<
             'w,
+            '_,
             Self::ViewQuery,
         >,
         world: &'w World,

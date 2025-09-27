@@ -1,6 +1,6 @@
 use bevy::{
     pbr::MaterialExtension, prelude::*, reflect::TypePath,
-    render::render_resource::*,
+    render::render_resource::*, shader::ShaderRef,
 };
 
 #[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]

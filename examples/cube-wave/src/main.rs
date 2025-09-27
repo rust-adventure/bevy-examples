@@ -1,18 +1,16 @@
 use bevy::{
-    pbr::{
-        MaterialPipeline, MaterialPipelineKey,
-        NotShadowCaster,
+    light::NotShadowCaster,
+    mesh::{
+        MeshVertexBufferLayoutRef, VertexAttributeValues,
     },
+    pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
     reflect::TypePath,
-    render::{
-        camera::{Projection, ScalingMode},
-        mesh::VertexAttributeValues,
-        render_resource::{
-            AsBindGroup, RenderPipelineDescriptor,
-            ShaderRef, SpecializedMeshPipelineError,
-        },
+    render::render_resource::{
+        AsBindGroup, RenderPipelineDescriptor,
+        SpecializedMeshPipelineError,
     },
+    shader::ShaderRef,
 };
 // use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_shader_utils::ShaderUtilsPlugin;
@@ -102,9 +100,10 @@ fn setup(
             .looking_at(Vec3::ZERO, Vec3::Y),
         Projection::Orthographic(OrthographicProjection {
             // scale: 0.008,
-            scaling_mode: ScalingMode::FixedHorizontal {
-                viewport_width: 10.,
-            },
+            scaling_mode:
+                bevy::camera::ScalingMode::FixedHorizontal {
+                    viewport_width: 10.,
+                },
             ..OrthographicProjection::default_3d()
         }),
     ));
@@ -128,9 +127,9 @@ impl Material for CubeMaterial {
     }
 
     fn specialize(
-        _pipeline: &MaterialPipeline<Self>,
+        _pipeline: &MaterialPipeline,
         descriptor: &mut RenderPipelineDescriptor,
-        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
+        _layout: &MeshVertexBufferLayoutRef,
         _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         if let Some(label) = &mut descriptor.label {

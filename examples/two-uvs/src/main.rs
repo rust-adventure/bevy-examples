@@ -1,9 +1,9 @@
 use bevy::{
+    mesh::VertexAttributeValues,
     pbr::{ExtendedMaterial, MaterialExtension},
     prelude::*,
-    render::{
-        mesh::VertexAttributeValues, render_resource::*,
-    },
+    render::render_resource::*,
+    shader::ShaderRef,
 };
 
 fn main() {

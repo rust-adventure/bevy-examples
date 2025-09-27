@@ -21,8 +21,8 @@ struct MyExtendedMaterial {
     quantize_steps: u32,
 }
 
-@group(2) @binding(100) var material_color_texture: texture_2d<f32>;
-@group(2) @binding(101) var material_color_sampler: sampler;
+@group(#{MATERIAL_BIND_GROUP}) @binding(100) var material_color_texture: texture_2d<f32>;
+@group(#{MATERIAL_BIND_GROUP}) @binding(101) var material_color_sampler: sampler;
 
 @fragment
 fn fragment(

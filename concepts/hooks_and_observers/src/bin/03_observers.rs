@@ -1,4 +1,4 @@
-use bevy::{ecs::world::OnDespawn, prelude::*};
+use bevy::prelude::*;
 
 fn main() {
     App::new()
@@ -32,53 +32,53 @@ fn startup(mut commands: Commands) {
 struct ExampleComponent(i32);
 
 fn on_add(
-    trigger: Trigger<OnAdd, ExampleComponent>,
+    add: On<Add, ExampleComponent>,
     query: Query<&ExampleComponent>,
 ) {
     info!(
-        target = ?trigger.target(),
-        value = ?query.get(trigger.target()),
+        target = ?add.entity,
+        value = ?query.get(add.entity),
         "on_add",
     );
 }
 
 fn on_insert(
-    trigger: Trigger<OnInsert, ExampleComponent>,
+    insert: On<Insert, ExampleComponent>,
     query: Query<&ExampleComponent>,
 ) {
     info!(
-        target = ?trigger.target(),
-        value = ?query.get(trigger.target()),
+        target = ?insert.entity,
+        value = ?query.get(insert.entity),
         "on_insert",
     );
 }
 fn on_replace(
-    trigger: Trigger<OnReplace, ExampleComponent>,
+    replace: On<Replace, ExampleComponent>,
     query: Query<&ExampleComponent>,
 ) {
     info!(
-        target = ?trigger.target(),
-        value = ?query.get(trigger.target()),
+        target = ?replace.entity,
+        value = ?query.get(replace.entity),
         "on_replace",
     );
 }
 fn on_remove(
-    trigger: Trigger<OnRemove, ExampleComponent>,
+    remove: On<Remove, ExampleComponent>,
     query: Query<&ExampleComponent>,
 ) {
     info!(
-        target = ?trigger.target(),
-        value = ?query.get(trigger.target()),
+        target = ?remove.entity,
+        value = ?query.get(remove.entity),
         "on_remove",
     );
 }
 fn on_despawn(
-    trigger: Trigger<OnDespawn, ExampleComponent>,
+    despawn: On<Despawn, ExampleComponent>,
     query: Query<&ExampleComponent>,
 ) {
     info!(
-        target = ?trigger.target(),
-        value = ?query.get(trigger.target()),
+        target = ?despawn.entity,
+        value = ?query.get(despawn.entity),
         "on_despawn",
     );
 }

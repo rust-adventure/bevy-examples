@@ -5,8 +5,9 @@ use bevy::{
         GREEN_400, SLATE_800, SLATE_950,
     },
     gltf::GltfPlugin,
+    mesh::VertexAttributeValues,
     prelude::*,
-    render::mesh::VertexAttributeValues,
+    render::view::Hdr,
 };
 use edge_detection_custom_phase::{
     ATTRIBUTE_SECTION_COLOR, DrawSection, SectionGroupId,
@@ -38,26 +39,26 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(Update, (rotate, vertical))
         .add_observer(
-            |trigger: Trigger<Pointer<Click>>,
+            |clicked: On<Pointer<Click>>,
              mut commands: Commands,
              query: Query<
                 Has<DrawSection>,
                 With<DemoShape>,
             >| {
                 let Ok(has_draw_section) =
-                    query.get(trigger.target())
+                    query.get(clicked.entity)
                 else {
                     return;
                 };
                 match has_draw_section {
                     true => {
                         commands
-                            .entity(trigger.target())
+                            .entity(clicked.entity)
                             .remove::<DrawSection>();
                     }
                     false => {
                         commands
-                            .entity(trigger.target())
+                            .entity(clicked.entity)
                             .insert(DrawSection);
                     }
                 }
@@ -425,10 +426,11 @@ fn setup(
             .looking_at(Vec3::new(0., 1., 0.), Vec3::Y),
         Camera {
             clear_color: Color::from(SLATE_950).into(),
-            // THIS ONLY WORKS WITH HDR CAMERAS
-            hdr: true,
+
             ..default()
         },
+        // THIS ONLY WORKS WITH HDR CAMERAS
+        Hdr,
         // disable msaa for simplicity
         Msaa::Off,
         PostProcessSettings {

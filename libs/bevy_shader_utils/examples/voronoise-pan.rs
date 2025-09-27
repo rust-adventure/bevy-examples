@@ -7,8 +7,9 @@ use bevy::{
     color::palettes::tailwind::*,
     prelude::*,
     reflect::TypePath,
-    render::render_resource::{AsBindGroup, ShaderRef},
-    sprite::{Material2d, Material2dPlugin},
+    render::render_resource::AsBindGroup,
+    shader::ShaderRef,
+    sprite_render::{Material2d, Material2dPlugin},
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
 

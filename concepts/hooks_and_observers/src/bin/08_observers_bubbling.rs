@@ -7,10 +7,9 @@ fn main() {
             Startup,
             (startup, trigger_event).chain(),
         )
-        .add_observer(|trigger: Trigger<MyEvent>| {
+        .add_observer(|my_event: On<MyEvent>| {
             info!(
-                target=?trigger.target(),
-                event=?trigger.event(),
+                event=?my_event.event(),
                 "on_my_event",
             );
         })
@@ -35,14 +34,18 @@ fn trigger_event(
     entity: Single<Entity, With<Marker>>,
 ) {
     info!("trigger");
-    commands.trigger_targets(MyEvent { n: 0 }, *entity);
+    commands.trigger(MyEvent {
+        n: 0,
+        entity: *entity,
+    });
 }
 
 #[derive(Component)]
 struct Marker;
 
-#[derive(Debug, Event)]
-#[event(auto_propagate, traversal = &'static ChildOf)]
+#[derive(Debug, EntityEvent)]
+#[entity_event(propagate, auto_propagate)]
 struct MyEvent {
     n: usize,
+    entity: Entity,
 }
