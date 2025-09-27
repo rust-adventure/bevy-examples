@@ -111,7 +111,7 @@ fn setup(
                 // can be used in forward or deferred mode.
                 opaque_render_method:
                     OpaqueRendererMethod::Auto,
-                    alpha_mode: AlphaMode::Mask(0.1),
+                alpha_mode: AlphaMode::Blend,
                 // in deferred mode, only the PbrInput can be modified (uvs, color and other material properties),
                 // in forward mode, the output can also be modified after lighting is applied.
                 // see the fragment shader `extended_material.wgsl` for more info.
@@ -134,7 +134,6 @@ fn setup(
         DepthPrepass,
         NormalPrepass,
         MotionVectorPrepass,
-        Fxaa::default(),
     ));
     // ground plane
     commands.spawn((
