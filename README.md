@@ -35,7 +35,7 @@ A dissolve effect that takes advantage of a custom prepass shader.
 
 ### edge-detection-custom-phase
 
-[edge detection](examples/edge-detection-custom-phase/readme/full-output.avif)
+![edge detection](examples/edge-detection-custom-phase/readme/full-output.avif)
 
 Outlines can be achieved in many ways, and the source for edge detection with something like a sobel filter can come from depth prepass, normal data, or anywhere else.
 This demo uses a custom render phase and artist-authored vertex colors to control where outlines show up.
