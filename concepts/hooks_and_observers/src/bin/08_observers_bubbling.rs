@@ -7,12 +7,15 @@ fn main() {
             Startup,
             (startup, trigger_event).chain(),
         )
-        .add_observer(|my_event: On<MyEvent>| {
-            info!(
-                event=?my_event.event(),
-                "on_my_event",
-            );
-        })
+        .add_observer(
+            |my_event: On<MyEvent>, names: Query<&Name>| {
+                info!(
+                    event=?my_event.event(),
+                    name=?names.get(my_event.entity),
+                    "on_my_event",
+                );
+            },
+        )
         .run();
 }
 
