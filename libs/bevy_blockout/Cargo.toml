@@ -7,12 +7,12 @@ homepage = "https://github.com/rust-adventure/bevy-examples/libs/bevy_blockout"
 keywords = ["bevy", "wgpu"]
 license = "MIT"
 name = "bevy_blockout"
-version = "0.2.0-rc.1"
+version = "0.2.0"
 exclude = ["/screenshots", "/assets", "/examples"]
 
 
 [dependencies]
-bevy = "0.17.0-rc.2"
+bevy = "0.17.0"
 
 [dev-dependencies]
 # bevy-inspector-egui = { workspace = true }
