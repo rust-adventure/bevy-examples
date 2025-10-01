@@ -1,10 +1,6 @@
 use bevy::{
-    color::palettes::tailwind::*,
-    ecs::{
-        relationship::RelatedSpawner,
-        spawn::{SpawnIter, SpawnWith},
-    },
-    prelude::*,
+    color::palettes::tailwind::*, ecs::spawn::SpawnIter,
+    prelude::*, ui_widgets::observe,
 };
 
 fn main() {
@@ -26,31 +22,26 @@ fn setup(mut commands: Commands) {
             row_gap: Val::Px(10.),
             ..default()
         },
-        Children::spawn((
-            SpawnWith(
-                |parent: &mut RelatedSpawner<ChildOf>| {
-                    parent
-                        .spawn(button("New Game"))
-                        .observe(
-                            |_: On<Pointer<Click>>| {
-                                info!("New Game");
-                            },
-                        );
-                    parent
-                        .spawn(button("Options"))
-                        .observe(
-                            |_: On<Pointer<Click>>| {
-                                info!("Options");
-                            },
-                        );
-                    parent.spawn(button("Quit")).observe(
-                        |_: On<Pointer<Click>>| {
-                            info!("Quit");
-                        },
-                    );
-                },
+        children![
+            (
+                button("New Game"),
+                observe(|_: On<Pointer<Click>>| {
+                    info!("New Game");
+                }),
             ),
-            Spawn((
+            (
+                button("Options"),
+                observe(|_: On<Pointer<Click>>| {
+                    info!("Options");
+                }),
+            ),
+            (
+                button("Quit"),
+                observe(|_: On<Pointer<Click>>| {
+                    info!("Quit");
+                }),
+            ),
+            (
                 Node {
                     width: Val::Px(200.),
                     justify_content:
@@ -59,11 +50,18 @@ fn setup(mut commands: Commands) {
                 },
                 Children::spawn(SpawnIter(
                     (0..9).into_iter().map(|index| {
-                        Text::new(index.to_string())
+                        (
+                            Text::new(index.to_string()),
+                            observe(
+                              move |_: On<Pointer<Click>>| {
+                                    info!("{index}");
+                                },
+                            ),
+                        )
                     }),
                 )),
-            )),
-        )),
+            ),
+        ],
     ));
 
     commands.spawn(Camera2d::default());

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bevy.workspace = true
+bevy = { workspace = true, features = ["experimental_bevy_ui_widgets"] }
 
 [lints]
 workspace = true
