@@ -12,7 +12,7 @@ members = [
   "libs/*",
   "examples/two-uvs",
   "examples/edge-detection-custom-phase",
-  "concepts/*",
+  "concepts/*", "examples/dappled-lighting",
 ]
 # "examples/spacecraft-noiseland",
 # rotating-column depends on bevy_tweening
