@@ -2242,6 +2242,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "cube-sphere"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "cube-wave"
 version = "0.1.0"
 dependencies = [
