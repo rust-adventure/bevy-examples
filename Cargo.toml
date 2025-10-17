@@ -15,6 +15,7 @@ members = [
   "concepts/*",
   "examples/dappled-lighting",
   "examples/cube-sphere",
+  "examples/visibility-2d-mesh",
 ]
 # "examples/spacecraft-noiseland",
 # rotating-column depends on bevy_tweening
@@ -46,6 +47,7 @@ bevy = { version = "0.17.0", features = ["jpeg", "file_watcher"] }
 # bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
+itertools = "0.14"
 
 # [patch.crates-io]
 # bevy = { git = "https://github.com/bevyengine/bevy" }
