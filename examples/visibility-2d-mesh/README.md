@@ -6,8 +6,5 @@ This is an incubating example showing a 2d visibility mesh generated each frame.
 
 ---
 
-- Mesh2d
-  - manual, naive raycasting
-  - optimizations (obvhs, etc)
-- Avian Collider + raycasting
-- VisMesh2d
+- manual, naive raycasting
+- optimizations (obvhs, etc)
