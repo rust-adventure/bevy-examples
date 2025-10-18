@@ -1,4 +1,7 @@
-use bevy::{color::palettes::tailwind::GREEN_400, mesh::VertexAttributeValues, prelude::*};
+use bevy::{
+    color::palettes::tailwind::*, math::FloatOrd,
+    mesh::VertexAttributeValues, prelude::*,
+};
 use itertools::Itertools;
 
 #[derive(Default)]
@@ -6,8 +9,10 @@ pub struct VisibilityMeshPlugin;
 
 impl Plugin for VisibilityMeshPlugin {
     fn build(&self, app: &mut App) {
-        // Running directly after propagation ensures that the mesh is up to date at the beginning of each frame
-        // which in turn allows placing the visibility mesh as a child of an entity
+        // Running directly after propagation ensures that
+        // the mesh is up to date at the beginning of each
+        // frame which in turn allows placing the
+        // visibility mesh as a child of an entity
         app.add_systems(
             PostUpdate,
             calculate_visibility
@@ -15,7 +20,6 @@ impl Plugin for VisibilityMeshPlugin {
         );
     }
 }
-
 
 #[derive(Resource)]
 pub struct RayIndex(pub u32);
@@ -41,6 +45,7 @@ pub struct Player;
 #[derive(Component)]
 pub struct Obstacle;
 
+#[derive(Debug)]
 struct VisibilityData {
     mesh2d: Mesh2d,
     index: usize,
@@ -61,7 +66,8 @@ fn calculate_visibility(
 ) -> Result {
     let player_position = player.translation().xy();
 
-    // get all positions of vertices in global world space
+    // get all positions of vertices in global world
+    // space
     let all_positions = query.iter().filter(|(mesh2d, _)| {
         // exclude visibility mesh from processing
         mesh2d.0 != visibility_mesh.0
@@ -102,174 +108,132 @@ fn calculate_visibility(
         })
         .peekable();
 
-    let mut triangle_bases: Vec<[f32; 3]> = vec![];
-    // todo: maybe track the positions?
-    let mut skip_to: Option<(Mesh2d, usize)> = None;
-    let mut current_vertex: Option<Vec2> = None;
-    info!("\n\n");
-    let mut initial_hue = 0.;
+    let mut hits = vec![];
+    for visibility_data in vertex_iterator {
+        let closest_hit = 
+            all_positions.iter()
+            // for each mesh, make all walls that are in
+            // that mesh by connecting two vertices on
+            // the perimeter
+            .flat_map(|mesh_vertices| {
+                mesh_vertices
+                    .iter()
+                    .circular_tuple_windows()
+                    .map(|(a, b)| {
+                        (
+                            a.global_position,
+                            b.global_position,
+                        )
+                    })
+            })
+            // raycast against all walls from
+            // player position, return hits.
+            .filter_map(|wall|{
+            let Some(intersection_point) = intersect(
+                (
+                    player_position,
+                    visibility_data.global_position,
+                ),
+                wall,
+            ) else {
+                info!(?visibility_data, "intersect return None");
+                return None;
+            };
 
-    // }
-    let mut i = 0;
-    while let Some(VisibilityData {
-        mesh2d,
-        index,
-        angle_from_player,
-        global_position,
-    }) = vertex_iterator.next()
-    {
-        if ray_index.0 == i {
-        gizmos.line_2d(
-            player_position,
-            global_position.xy(),
-            GREEN_400,
-        );
-        }
-        i += 1;
+            // check if is in bounds of line segment
+            let margin_bias = 1.;
+            let x_min = wall.0.x.min(wall.1.x) - margin_bias;
+            let y_min = wall.0.y.min(wall.1.y) - margin_bias;
+            let x_max = wall.0.x.max(wall.1.x) + margin_bias;
+            let y_max = wall.0.y.max(wall.1.y) + margin_bias;
 
-        // info!(
-        //     ?global_position,
-        //     ?angle_from_player,
-        //     // handle_id=?skip_to.as_ref().map(|h| h.0.id()),
-        //     skip_index=?skip_to.as_ref().map(|h| h.1),
-        //     vertex_index=index,
-        // );
-        match skip_to {
-            Some((ref skip_mesh2d, ref skip_index))
-                if skip_mesh2d == mesh2d
-                    && skip_index == index =>
+            let player_to_vertex_gradient = (visibility_data
+                .global_position
+                - player_position)
+                .normalize()
+                .signum();
+            let player_to_hit_gradient = (intersection_point
+                - player_position)
+                .normalize()
+                .signum();
+
+            if intersection_point.x >= x_min
+                && intersection_point.x <= x_max
+                && intersection_point.y >= y_min
+                && intersection_point.y <= y_max
+                // TODO: test horizontal/vertical lines?
+                && player_to_vertex_gradient == player_to_hit_gradient
             {
-                info!(?global_position, "skipping");
-                // gizmos.line_2d(
-                //     player_position,
-                //     global_position.xy(),
-                //     // Color::Oklcha(Oklcha {
-                //     //     lightness: 1.,
-                //     //     chroma: 1.,
-                //     //     hue: initial_hue,
-                //     //     alpha: 1.,
-                //     // }),
+                gizmos.linestrip_2d(
+                  [  player_position,
+                    intersection_point],
+                    GREEN_400,
+                );
+                // gizmos.circle_2d(
+                //     intersection_point,
+                //     10.,
                 //     RED_400,
                 // );
-
-                // player position is "center"
-                // theoretically we could use indices and only add this vertex once
-                // for now we use a more naive "every three vertex positions are a triangle" approach
-                triangle_bases.push([0., 0., 0.]);
-                triangle_bases.push([
-                    global_position.x - player_position.x,
-                    global_position.y - player_position.y,
-                    0.,
-                ]);
-                triangle_bases.push([
-                    current_vertex.unwrap().x
-                        - player_position.x,
-                    current_vertex.unwrap().y
-                        - player_position.y,
-                    0.,
-                ]);
-
-                // write global positions if we switch back to global vismeshes
-                // triangle_bases.push(player_position);
-                // triangle_bases
-                //     .push(global_position.clone());
-                // triangle_bases
-                //     .push(current_vertex.unwrap());
-
-                // todo: not just next index
-                // if angle of next index is less than current, its "behind"
-                // also works if find() doesn't find it.
-                let mesh = meshes.get(&mesh2d.0).ok_or(
-                    "mesh2d unavailable in meshes database",
-                )?;
-
-                let VertexAttributeValues::Float32x3(positions) =
-                    mesh.attribute(Mesh::ATTRIBUTE_POSITION).ok_or("Mesh2d mesh asset doesn't have positions. WEIRD")? else {
-                        return Err(BevyError::from("Mesh2d Vertices are not in format".to_string()));
-                };
-                // info!(len=?positions.len(), skip_in);
-                // if next vertex position is out of the list, cycle around to 0
-                let new_skip_index: usize = positions
-                    .iter()
-                    .enumerate()
-                    .cycle()
-                    .nth(skip_index + 1)
-                    .unwrap()
-                    .0;
-
-                // calc angle of position from player
-                let next_vertex = all_positions.iter().flatten().find(|visibility_data| {
-                    &visibility_data.mesh2d == mesh2d && new_skip_index == visibility_data.index
-                }).expect("looping around vertices should always find a vertex");
-
-                // if current angle > next angle, then next vertex is "behind"
-                if angle_from_player
-                    < &next_vertex.angle_from_player
-                {
-                    if let Some(next) =
-                        vertex_iterator.peek()
-                    {
-                        info!("next'ing the gap");
-                        skip_to = Some((
-                            next.mesh2d.clone(),
-                            next.index,
-                        ));
-                        current_vertex =
-                            Some(global_position.clone());
-                    }
-                } else {
-                    skip_to = Some((
-                        skip_mesh2d.clone(),
-                        new_skip_index,
-                    ));
-                    current_vertex =
-                        Some(global_position.clone());
-                }
-
-                continue;
+                return Some(intersection_point);
+            } else {
+                return None;
             }
-            Some(_) => {
-                info!("continue!");
-                // abuse that triangle face winding is counter-clockwise
-                // to skip forward in iterator.
-                continue;
-            }
-            None => {
-                info!(?global_position, "starting at");
-                current_vertex =
-                    Some(global_position.clone());
-                skip_to =
-                    Some((mesh2d.clone(), *index + 1));
-                // gizmos.line_2d(
-                //     player_position,
-                //     global_position.xy(),
-                //     // Color::Oklcha(Oklcha {
-                //     //     lightness: 1.,
-                //     //     chroma: 1.,
-                //     //     hue: initial_hue,
-                //     //     alpha: 1.,
-                //     // }),
-                //     GREEN_400,
-                // );
-                initial_hue += 30.;
-            }
-        }
+        })
+        .min_by(|hit_a, hit_b| {
+            hit_a.distance(player_position).total_cmp(&hit_b.distance(player_position))
+        });
+
+        hits.push(closest_hit.unwrap());
+        gizmos.circle_2d(
+            closest_hit.unwrap(),
+            10.,
+            RED_400,
+        );
     }
 
-    // dbg!(triangle_bases);
+    // assume hits are sorted
+    let triangles: Vec<[f32; 3]> = hits
+        .iter()
+        .circular_tuple_windows()
+        .flat_map(|(hit_a, hit_b)| {
+            [
+                // player_position.extend(1.).to_array(),
+                [0.;3],
+                (hit_b - player_position).extend(1.).to_array(),
+                (hit_a - player_position).extend(1.).to_array(),
+            ]
+        })
+        .collect();
 
-    // for (x,y,z) in  triangle_bases.iter().tuple_windows() {
-    //        gizmos.line_2d(
-    //                     *x,*y,
-    //                     GREEN_400,
-    //                 );
-    //             }
     let vismesh =
         meshes.get_mut(&visibility_mesh.0).unwrap();
     vismesh.insert_attribute(
         Mesh::ATTRIBUTE_POSITION,
-        triangle_bases,
+        triangles,
     );
 
     Ok(())
+}
+
+// 
+fn intersect(
+    line_1: (Vec2, Vec2),
+    line_2: (Vec2, Vec2),
+) -> Option<Vec2> {
+    let line_1_3d =
+        (line_1.0.extend(1.), line_1.1.extend(1.));
+    let line_2_3d =
+        (line_2.0.extend(1.), line_2.1.extend(1.));
+
+    let line_1_cross = line_1_3d.0.cross(line_1_3d.1);
+    let line_2_cross = line_2_3d.0.cross(line_2_3d.1);
+
+    let cross_cross = line_1_cross.cross(line_2_cross);
+    if cross_cross.z.abs() < f32::EPSILON {
+        return None;
+    }
+    Some(Vec2::new(
+        cross_cross.x / cross_cross.z,
+        cross_cross.y / cross_cross.z,
+    ))
 }
