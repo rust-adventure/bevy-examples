@@ -4,8 +4,8 @@ use bevy::{
     prelude::*,
 };
 // use bevy_inspector_egui::{
-//     bevy_egui::EguiPlugin, quick::WorldInspectorPlugin,
-// };
+//     bevy_egui::EguiPlugin,
+// quick::WorldInspectorPlugin, };
 
 fn main() {
     App::new()
@@ -13,8 +13,8 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             // EguiPlugin {
-            //     enable_multipass_for_primary_context: true,
-            // },
+            //     enable_multipass_for_primary_context:
+            // true, },
             // WorldInspectorPlugin::new(),
         ))
         .add_systems(Startup, setup)

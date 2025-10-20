@@ -1,6 +1,6 @@
-//! Observers *can* be on the same entity as the target
-//! which makes Trigger::observer and Trigger::target the
-//! same entity
+//! Observers *can* be on the same entity as the
+//! target which makes Trigger::observer and
+//! Trigger::target the same entity
 use bevy::prelude::*;
 
 fn main() {

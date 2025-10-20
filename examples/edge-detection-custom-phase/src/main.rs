@@ -23,7 +23,8 @@ fn main() {
         .add_plugins((
             DefaultPlugins.set(
                 GltfPlugin::default()
-                    // Map a custom glTF attribute name to a `MeshVertexAttribute`.
+                    // Map a custom glTF attribute name to a
+                    // `MeshVertexAttribute`.
                     .add_custom_vertex_attribute(
                         "SECTION_COLOR",
                         ATTRIBUTE_SECTION_COLOR,
@@ -77,14 +78,16 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
-    // a number of shapes, all with their vertex colors set
-    // in fairly arbitrary ways. Typically this is done by
-    // using the normal information to calulate colors for
+    // a number of shapes, all with their vertex
+    // colors set in fairly arbitrary ways.
+    // Typically this is done by using the normal
+    // information to calulate colors for
     // the faces, but in practice these colors will be
-    // hand-selected by an artist in software like Blender
-    // where they can then control which lines appear based
-    // on where they create "edges" by selecting sufficiently
-    // different colored faces.
+    // hand-selected by an artist in software like
+    // Blender where they can then control which
+    // lines appear based on where they create
+    // "edges" by selecting sufficiently different
+    // colored faces.
     let shapes = [
         meshes.add({
             let mesh = Cuboid::default().mesh().build();
@@ -359,8 +362,9 @@ fn setup(
             Rotates,
             DrawSection,
             DemoShape,
-            // TODO: more testing for SectionGroupId overrides
-            // until then, probably not end-user usable
+            // TODO: more testing for SectionGroupId
+            // overrides until then, probably
+            // not end-user usable
             // SectionGroupId { id: 3 },
         ));
     }

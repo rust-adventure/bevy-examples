@@ -162,7 +162,8 @@ fn build_mips(
     //             Vec2::splat(10.),
     //         )),
     //     ),
-    //     MeshMaterial3d(materials.add(StandardMaterial {
+    //     MeshMaterial3d(materials.
+    // add(StandardMaterial {
     //         base_color_texture: Some(
     //             manual_mips.x2048.clone(),
     //         ),
@@ -172,8 +173,9 @@ fn build_mips(
     //     Transform::from_xyz(0.0, 0.0, 0.0),
     // ));
     // commands.spawn((
-    //     Mesh3d(meshes.add(Cuboid::new(5., 5., 5.))),
-    //     MeshMaterial3d(materials.add(StandardMaterial {
+    //     Mesh3d(meshes.add(Cuboid::new(5., 5.,
+    // 5.))),     MeshMaterial3d(materials.
+    // add(StandardMaterial {
     //         base_color_texture: Some(
     //             manual_mips.x2048.clone(),
     //         ),
@@ -205,12 +207,16 @@ fn build_mip(image: &Image) -> Option<DynamicImage> {
     Some(dynamic_image)
 }
 
-// This struct defines the data that will be passed to your shader
+// This struct defines the data that will be
+// passed to your shader
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct DpDyMaterial {}
 
-/// The Material trait is very configurable, but comes with sensible defaults for all methods.
-/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
+/// The Material trait is very configurable, but
+/// comes with sensible defaults for all methods.
+/// You only need to implement functions for
+/// features that need non-default behavior. See
+/// the Material api docs for details!
 impl Material for DpDyMaterial {
     fn fragment_shader() -> ShaderRef {
         "dpdy_material.wgsl".into()

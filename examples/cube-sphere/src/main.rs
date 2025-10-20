@@ -1,9 +1,11 @@
-//! A CubeSphere implementation, in the same style as upstream Bevy's
-//! mesh primitives.
+//! A CubeSphere implementation, in the same style
+//! as upstream Bevy's mesh primitives.
 //!
-//! A CubeSphere is an "inflated" cube to form a sphere. It avoids the
-//! downsides of UVSpheres and IcoSpheres in a way that makes planet surfaces
-//! more amenable. (ex: UVSphere triangles pinch at the poles)
+//! A CubeSphere is an "inflated" cube to form a
+//! sphere. It avoids the downsides of UVSpheres
+//! and IcoSpheres in a way that makes planet
+//! surfaces more amenable. (ex: UVSphere
+//! triangles pinch at the poles)
 use bevy::{
     asset::RenderAssetUsages,
     mesh::{Indices, PrimitiveTopology},
@@ -61,7 +63,8 @@ fn setup(
     ));
 }
 
-// CubeSphere and CubeSphereBuilder mirrors the patterns for meshes from Bevy
+// CubeSphere and CubeSphereBuilder mirrors the
+// patterns for meshes from Bevy
 struct CubeSphere;
 
 #[derive(Default)]
@@ -72,13 +75,19 @@ struct CubeSphereBuilder {
 impl CubeSphereBuilder {
     /// Sets the subdivisions of the plane mesh.
     ///
-    /// 0 - is the original plane geometry, the 4 points in the XZ plane.
+    /// 0 - is the original plane geometry, the 4
+    /// points in the XZ plane.
     ///
-    /// 1 - is split by 1 line in the middle of the plane on both the X axis and the Z axis,
-    ///     resulting in a plane with 4 quads / 8 triangles.
+    /// 1 - is split by 1 line in the middle of
+    /// the plane on both the X axis and the Z
+    /// axis,     resulting in a plane with 4
+    /// quads / 8 triangles.
     ///
-    /// 2 - is a plane split by 2 lines on both the X and Z axes, subdividing the plane into 3
-    ///     equal sections along each axis, resulting in a plane with 9 quads / 18 triangles.
+    /// 2 - is a plane split by 2 lines on both
+    /// the X and Z axes, subdividing the plane
+    /// into 3     equal sections along each
+    /// axis, resulting in a plane with 9 quads /
+    /// 18 triangles.
     #[inline]
     pub fn subdivisions(
         mut self,
@@ -103,11 +112,12 @@ impl From<CubeSphere> for Mesh {
     }
 }
 
-// The actual builder logic. Could be implemented more efficiently
-// and with fewer allocations.
+// The actual builder logic. Could be implemented
+// more efficiently and with fewer allocations.
 // UVs are also "todo"
 //
-// This implementation builds up each face of the cube, and inflates.
+// This implementation builds up each face of the
+// cube, and inflates.
 impl MeshBuilder for CubeSphereBuilder {
     fn build(&self) -> Mesh {
         let directions = [
@@ -138,11 +148,14 @@ impl MeshBuilder for CubeSphereBuilder {
             .iter()
             .enumerate()
             .flat_map(|(face_id, list)| {
-                // local_face_index indexes go up to resolution^2 - 1.
-                // so the last vertex in a face with a resolution of
-                // 10 is index 99 (100 indices, starting at 0).
+                // local_face_index indexes go up to
+                // resolution^2 - 1.
+                // so the last vertex in a face with a
+                // resolution of 10 is index
+                // 99 (100 indices, starting at 0).
                 //
-                // that makes the *index* of the second face's vertices
+                // that makes the *index* of the second
+                // face's vertices
                 // start at 100 and end at 199.
                 list.iter().map(move |local_idx| {
                     let num_indices = self.subdivisions

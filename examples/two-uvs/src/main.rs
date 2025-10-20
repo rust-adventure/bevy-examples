@@ -131,8 +131,10 @@ fn rotate_things(
 
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 struct DecalsExtension {
-    // We need to ensure that the bindings of the base material and the extension do not conflict,
-    // so we start from binding slot 100, leaving slots 0-99 for the base material.
+    // We need to ensure that the bindings of the base
+    // material and the extension do not conflict,
+    // so we start from binding slot 100, leaving slots
+    // 0-99 for the base material.
     #[texture(100)]
     #[sampler(101)]
     decals: Option<Handle<Image>>,

@@ -65,7 +65,8 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     let mut mesh = Sphere::default().mesh().uv(32, 18);
-    // let mut mesh = Mesh::from(shape::Cube { size: 1.0 });
+    // let mut mesh = Mesh::from(shape::Cube { size:
+    // 1.0 });
     if let Some(VertexAttributeValues::Float32x3(
         positions,
     )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
@@ -151,7 +152,9 @@ fn setup(
     commands.spawn((
         Transform::from_xyz(1.0, 2.0, 0.0),
         PointLight {
-            intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
+            intensity: 1600.0, /* lumens - roughly a 100W
+                                * non-halogen
+                                * incandescent bulb */
             color: RED_400.into(),
             shadows_enabled: true,
             ..default()
@@ -176,7 +179,9 @@ fn setup(
     commands.spawn((
         Transform::from_xyz(0.0, 4.0, 0.0),
         PointLight {
-            intensity: 1600.0, // lumens - roughly a 100W non-halogen incandescent bulb
+            intensity: 1600.0, /* lumens - roughly a 100W
+                                * non-halogen
+                                * incandescent bulb */
             color: BLUE_400.into(),
             shadows_enabled: true,
             ..default()
@@ -226,13 +231,14 @@ fn animate_light_direction(
 }
 
 // fn change_color(
-//     mut materials: ResMut<Assets<dissolve_sphere_standard_material_extension::StandardMaterial>>,
+//     mut materials:
+// ResMut<Assets<dissolve_sphere_standard_material_extension::StandardMaterial>>,
 //     time: Res<Time>,
 // ) {
 //     for material in materials.iter_mut() {
-//         // material.1.base_color = Color::rgb(0.4,0.4,0.4);
-//         material.1.time = time.elapsed_seconds();
-//     }
+//         // material.1.base_color =
+// Color::rgb(0.4,0.4,0.4);         material.1.
+// time = time.elapsed_seconds();     }
 // }
 
 #[derive(Component)]

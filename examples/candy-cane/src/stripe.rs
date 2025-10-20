@@ -1,4 +1,6 @@
-//! Demonstrates using a custom extension to the `StandardMaterial` to modify the results of the builtin pbr shader.
+//! Demonstrates using a custom extension to the
+//! `StandardMaterial` to modify the results of
+//! the builtin pbr shader.
 
 use bevy::{
     pbr::{ExtendedMaterial, MaterialExtension},
@@ -9,7 +11,8 @@ use bevy::{
     shader::ShaderRef,
 };
 
-/// This example uses a shader source file from the assets subdirectory
+/// This example uses a shader source file from
+/// the assets subdirectory
 const SHADER_ASSET_PATH: &str = "shaders/candy_cane.wgsl";
 
 pub struct StripeMaterialPlugin;
@@ -53,8 +56,10 @@ impl From<Stripe> for [f32; 8] {
 
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct CandyCaneMaterial {
-    // We need to ensure that the bindings of the base material and the extension do not conflict,
-    // so we start from binding slot 100, leaving slots 0-99 for the base material.
+    // We need to ensure that the bindings of the base
+    // material and the extension do not conflict,
+    // so we start from binding slot 100, leaving slots
+    // 0-99 for the base material.
     #[storage(100, read_only)]
     pub stripes_buffer: Handle<ShaderStorageBuffer>,
 }

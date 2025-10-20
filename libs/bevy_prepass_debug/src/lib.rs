@@ -93,8 +93,9 @@ enum Show {
     Normals,
     MotionVectors,
 }
-// #[derive(Reflect, Resource, Default, InspectorOptions)]
-// #[reflect(Resource, InspectorOptions)]
+// #[derive(Reflect, Resource, Default,
+// InspectorOptions)] #[reflect(Resource,
+// InspectorOptions)]
 #[derive(Reflect, Resource, Default)]
 #[reflect(Resource)]
 struct PrepassSettings {

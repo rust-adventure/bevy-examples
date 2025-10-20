@@ -86,8 +86,10 @@ use std::ops::Range;
 
 pub mod post_process;
 
-// A "high" random id should be used for custom attributes to ensure consistent sorting and avoid collisions with other attributes.
-// See the MeshVertexAttribute docs for more info.
+// A "high" random id should be used for custom
+// attributes to ensure consistent sorting and
+// avoid collisions with other attributes. See the
+// MeshVertexAttribute docs for more info.
 pub const ATTRIBUTE_SECTION_COLOR: MeshVertexAttribute =
     MeshVertexAttribute::new(
         "_SECTION_COLOR",
@@ -165,10 +167,12 @@ impl Plugin for SectionTexturePhasePlugin {
     >::new(RenderDebugFlags::default()),
     ));
 
-        // TODO: one day with Constructs we can register a required
-        // component that implements FromWorld, not Default
-        // app.register_required_components::<Mesh3d, SectionGroupId>();
-        // until then, observers.
+        // TODO: one day with Constructs we can register a
+        // required component that implements
+        // FromWorld, not Default
+        // app.register_required_components::<Mesh3d,
+        // SectionGroupId>(); until then,
+        // observers.
         app.add_observer(insert_section_ids);
 
         let Some(render_app) =
@@ -208,7 +212,8 @@ impl Plugin for SectionTexturePhasePlugin {
         else {
             return;
         };
-        // The pipeline needs the RenderDevice to be created and it's only available once plugins
+        // The pipeline needs the RenderDevice to be
+        // created and it's only available once plugins
         // are intialized
         render_app
             .init_resource::<SectionTexturePipeline>();
@@ -219,13 +224,17 @@ impl Plugin for SectionTexturePhasePlugin {
 pub struct SectionTexturePipeline {
     /// The base mesh pipeline defined by bevy
     ///
-    /// Since we want to draw using an existing bevy mesh we want to reuse the default
+    /// Since we want to draw using an existing
+    /// bevy mesh we want to reuse the default
     /// pipeline as much as possible
     mesh_pipeline: MeshPipeline,
-    /// Stores the shader used for this pipeline directly on the pipeline.
-    /// This isn't required, it's only done like this for simplicity.
+    /// Stores the shader used for this pipeline
+    /// directly on the pipeline. This isn't
+    /// required, it's only done like this for
+    /// simplicity.
     shader_handle: Handle<Shader>,
-    /// Stores the bind group layout for additional component data
+    /// Stores the bind group layout for
+    /// additional component data
     /// like that weird mesh_id substitute
     section_data_layout: BindGroupLayout,
 }
@@ -252,8 +261,9 @@ impl FromWorld for SectionTexturePipeline {
         }
     }
 }
-// For more information on how SpecializedMeshPipeline work, please look at the
-// specialized_mesh_pipeline example
+// For more information on how
+// SpecializedMeshPipeline work, please look at
+// the specialized_mesh_pipeline example
 impl SpecializedMeshPipeline for SectionTexturePipeline {
     type Key = MeshPipelineKey;
 
@@ -285,13 +295,16 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
                     .at_shader_location(1),
             );
         }
-        // This will automatically generate the correct `VertexBufferLayout` based on the vertex attributes
+        // This will automatically generate the correct
+        // `VertexBufferLayout` based on the vertex
+        // attributes
         let vertex_buffer_layout =
             layout.0.get_layout(&vertex_attributes)?;
 
         Ok(RenderPipelineDescriptor {
             label: Some("Specialized Mesh Pipeline".into()),
-            // We want to reuse the data from bevy so we use the same bind groups as the default
+            // We want to reuse the data from bevy so we use
+            // the same bind groups as the default
             // mesh pipeline
             layout: vec![
                 // Bind group 0 is the view uniform
@@ -358,15 +371,17 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
                 stencil: default(),
                 bias: default(),
             }),
-            // It's generally recommended to specialize your pipeline for MSAA,
-            // but it's not always possible
+            // It's generally recommended to specialize your
+            // pipeline for MSAA, but it's not
+            // always possible
             multisample: MultisampleState::default(),
             zero_initialize_workgroup_memory: false,
         })
     }
 }
 
-// We will reuse render commands already defined by bevy to draw a 3d mesh
+// We will reuse render commands already defined
+// by bevy to draw a 3d mesh
 type DrawMesh3dSectionTexture = (
     SetItemPipeline,
     // This will set the view bindings in group 0
@@ -381,13 +396,18 @@ type DrawMesh3dSectionTexture = (
     DrawMesh,
 );
 
-// This is the data required when you define a custom phase in bevy. More specifically this is the
-// data required when using a ViewSortedRenderPhase. This would look differently if we wanted a
-// batched render phase. Sorted phase are a bit easier to implement, but a batched phased would
+// This is the data required when you define a
+// custom phase in bevy. More specifically this is
+// the data required when using a
+// ViewSortedRenderPhase. This would look
+// differently if we wanted a batched render
+// phase. Sorted phase are a bit easier to
+// implement, but a batched phased would
 // look similar.
 //
-// If you want to see how a batched phase implementation looks, you should look at the Opaque2d
-// phase.
+// If you want to see how a batched phase
+// implementation looks, you should look at the
+// Opaque2d phase.
 struct SectionTexturePhase {
     pub sort_key: FloatOrd,
     pub entity: (Entity, MainEntity),
@@ -395,12 +415,15 @@ struct SectionTexturePhase {
     pub draw_function: DrawFunctionId,
     pub batch_range: Range<u32>,
     pub extra_index: PhaseItemExtraIndex,
-    /// Whether the mesh in question is indexed (uses an index buffer in
-    /// addition to its vertex buffer).
+    /// Whether the mesh in question is indexed
+    /// (uses an index buffer in addition to
+    /// its vertex buffer).
     pub indexed: bool,
 }
 
-// For more information about writing a phase item, please look at the custom_phase_item example
+// For more information about writing a phase
+// item, please look at the custom_phase_item
+// example
 impl PhaseItem for SectionTexturePhase {
     #[inline]
     fn entity(&self) -> Entity {
@@ -456,9 +479,13 @@ impl SortedPhaseItem for SectionTexturePhase {
 
     #[inline]
     fn sort(items: &mut [Self]) {
-        // bevy normally uses radsort instead of the std slice::sort_by_key
-        // radsort is a stable radix sort that performed better than `slice::sort_by_key` or `slice::sort_unstable_by_key`.
-        // Since it is not re-exported by bevy, we just use the std sort for the purpose of the example
+        // bevy normally uses radsort instead of the std
+        // slice::sort_by_key radsort is a stable
+        // radix sort that performed better than
+        // `slice::sort_by_key` or
+        // `slice::sort_unstable_by_key`. Since it
+        // is not re-exported by bevy, we just use the std
+        // sort for the purpose of the example
         items.sort_by_key(SortedPhaseItem::sort_key);
     }
 
@@ -612,9 +639,10 @@ impl GetFullBatchData for SectionTexturePipeline {
         indirect_parameters_buffers: &mut UntypedPhaseIndirectParametersBuffers,
         indirect_parameters_offset: u32,
     ) {
-        // Note that `IndirectParameters` covers both of these structures, even
-        // though they actually have distinct layouts. See the comment above that
-        // type for more information.
+        // Note that `IndirectParameters` covers both of
+        // these structures, even though they
+        // actually have distinct layouts. See the comment
+        // above that type for more information.
         let indirect_parameters =
             IndirectParametersCpuMetadata {
                 base_output_index,
@@ -647,9 +675,11 @@ impl GetFullBatchData for SectionTexturePipeline {
     }
 }
 
-// When defining a custom phase, we need to extract it from the main world and add it to a resource
-// that will be used by the render world. We need to give that resource all views that will use
-// that phase
+// When defining a custom phase, we need to
+// extract it from the main world and add it to a
+// resource that will be used by the render world.
+// We need to give that resource all views that
+// will use that phase
 fn extract_camera_phases(
     mut commands: Commands,
     mut sections_phases: ResMut<
@@ -679,7 +709,8 @@ fn extract_camera_phases(
         if !camera.is_active {
             continue;
         }
-        // This is the main camera, so we use the first subview index (0)
+        // This is the main camera, so we use the first
+        // subview index (0)
         let retained_view_entity = RetainedViewEntity::new(
             main_entity.into(),
             None,
@@ -707,9 +738,11 @@ fn extract_camera_phases(
     });
 }
 
-// This is a very important step when writing a custom phase.
+// This is a very important step when writing a
+// custom phase.
 //
-// This system determines which mesh will be added to the phase.
+// This system determines which mesh will be added
+// to the phase.
 #[allow(clippy::too_many_arguments)]
 fn queue_custom_meshes(
     custom_draw_functions: Res<
@@ -751,11 +784,13 @@ fn queue_custom_meshes(
 
         let rangefinder = view.rangefinder3d();
 
-        // Since our phase can work on any 3d mesh we can reuse the default mesh 2d filter
+        // Since our phase can work on any 3d mesh we can
+        // reuse the default mesh 2d filter
         for (render_entity, visible_entity) in
             visible_entities.iter::<Mesh3d>()
         {
-            // We only want meshes with the marker component to be queued to our phase.
+            // We only want meshes with the marker component
+            // to be queued to our phase.
             if has_marker.get(*render_entity).is_err() {
                 continue;
             }
@@ -770,9 +805,11 @@ fn queue_custom_meshes(
                 continue;
             };
 
-            // Specialize the key for the current mesh entity
-            // For this example we only specialize based on the mesh topology
-            // but you could have more complex keys and that's where you'd need to create those keys
+            // Specialize the key for the current mesh
+            // entity For this example we only
+            // specialize based on the mesh topology
+            // but you could have more complex keys and
+            // that's where you'd need to create those keys
             let mut mesh_key = view_key;
             mesh_key |=
                 MeshPipelineKey::from_primitive_topology(
@@ -796,10 +833,12 @@ fn queue_custom_meshes(
                 .distance_translation(
                     &mesh_instance.translation,
                 );
-            // At this point we have all the data we need to create a phase item and add it to our
+            // At this point we have all the data we need to
+            // create a phase item and add it to our
             // phase
             custom_phase.add(SectionTexturePhase {
-                // Sort the data based on the distance to the view
+                // Sort the data based on the distance to
+                // the view
                 sort_key: FloatOrd(distance),
                 entity: (*render_entity, *visible_entity),
                 pipeline: pipeline_id,
@@ -813,7 +852,8 @@ fn queue_custom_meshes(
     }
 }
 
-// Render label used to order our render graph node that will render our phase
+// Render label used to order our render graph
+// node that will render our phase
 #[derive(
     RenderLabel, Debug, Clone, Hash, PartialEq, Eq,
 )]
@@ -853,8 +893,8 @@ impl ViewNode for CustomDrawNode {
         let diagnostics =
             render_context.diagnostic_recorder();
 
-        // this target writes directly to output. keeping as
-        // maybe potentially useful for debug?
+        // this target writes directly to output. keeping
+        // as maybe potentially useful for debug?
         // let color_attachments =
         //     [Some(target.get_color_attachment())];
         // write to the section texture
@@ -874,7 +914,8 @@ impl ViewNode for CustomDrawNode {
         // else {
         //     return Ok(());
         // };
-        // Get the phase for the current view running our node
+        // Get the phase for the current view running our
+        // node
         let Some(section_phase) =
             section_phases.get(&view.retained_view_entity)
         else {
@@ -884,7 +925,8 @@ impl ViewNode for CustomDrawNode {
         let depth_stencil_attachment =
             Some(depth.get_attachment(StoreOp::Store));
 
-        // This will generate a task to generate the command buffer in parallel
+        // This will generate a task to generate the
+        // command buffer in parallel
         render_context.add_command_buffer_generation_task(move |render_device| {
             #[cfg(feature = "trace")]
             let _ = info_span!("custom_section_pass").entered();
@@ -929,7 +971,8 @@ impl ViewNode for CustomDrawNode {
 
 #[derive(Component)]
 pub struct SectionTexture {
-    /// The section texture generated by the plugin.
+    /// The section texture generated by the
+    /// plugin.
     pub sections: Option<ColorAttachment>,
     /// The size of the textures.
     pub size: Extent3d,

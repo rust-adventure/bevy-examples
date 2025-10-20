@@ -36,7 +36,9 @@ fn setup(
     >,
     mut images: ResMut<Assets<Image>>,
 ) {
-    // Error out if clustered decals (and so light textures) aren't supported on the current platform.
+    // Error out if clustered decals (and so light
+    // textures) aren't supported on the current
+    // platform.
     if !decal::clustered::clustered_decals_are_usable(
         &render_device,
         &render_adapter,
@@ -159,7 +161,8 @@ fn setup(
     ));
 }
 
-// The material that will be used to generate the light texture image
+// The material that will be used to generate the
+// light texture image
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct LightTextureMaterial {
     #[texture(1)]

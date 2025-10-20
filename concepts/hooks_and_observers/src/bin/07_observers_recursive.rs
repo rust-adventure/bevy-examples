@@ -32,7 +32,16 @@ fn on_my_event(
         info!("done recursing");
         return;
     };
+    commands.queue(MyCommand(rest));
     commands.trigger(MyEvent {
         spawn_n_times: rest,
     });
+}
+
+struct MyCommand(usize);
+
+impl Command for MyCommand {
+    fn apply(self, world: &mut World) -> () {
+        info!(int=?self.0)
+    }
 }

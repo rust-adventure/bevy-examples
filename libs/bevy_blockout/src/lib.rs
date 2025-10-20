@@ -59,20 +59,23 @@ impl Plugin for BlockoutPlugin {
     }
 }
 
-/// A Component that is mostly intended for use when
-/// using Reflection data in places like Blender.
-/// (perhaps using skein or another blender integration)
+/// A Component that is mostly intended for use
+/// when using Reflection data in places like
+/// Blender. (perhaps using skein or another
+/// blender integration)
 ///
-/// It will configure the Blockout material using the
-/// pre-defined StandardMaterial from the glTF file.
+/// It will configure the Blockout material using
+/// the pre-defined StandardMaterial from the glTF
+/// file.
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 #[component(on_add = on_add_use_blockout_material)]
 pub struct UseBlockoutMaterial;
 
 ///
-/// The on_add hook that will run when the component is
-/// added when spawning the glTF scene.
+/// The on_add hook that will run when the
+/// component is added when spawning the glTF
+/// scene.
 fn on_add_use_blockout_material(
     mut world: DeferredWorld,
     HookContext { entity, .. }: HookContext,
@@ -108,8 +111,8 @@ fn on_add_use_blockout_material(
         .insert(MeshMaterial3d(blockout_material));
 }
 
-/// warning: not all of these are relevant at the moment
-/// This is just an early release.
+/// warning: not all of these are relevant at the
+/// moment This is just an early release.
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct BlockoutMaterialExt {
     #[uniform(100)]
@@ -125,7 +128,7 @@ pub struct BlockoutMaterialExt {
 impl Default for BlockoutMaterialExt {
     fn default() -> Self {
         Self {
-            line_color: Color::WHITE.into(), //SLATE_50.into(),
+            line_color: Color::WHITE.into(), /* SLATE_50.into(), */
             color: SLATE_400.into(),
             cell_multiplier: Vec2::splat(10.),
             line_size: Vec2::splat(0.1),

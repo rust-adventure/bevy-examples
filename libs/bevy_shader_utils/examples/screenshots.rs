@@ -1,11 +1,16 @@
-// An example used to save screenshots of the materials to disk
+// An example used to save screenshots of the
+// materials to disk
 use bevy::{
-     prelude::*, render::{
+    prelude::*,
+    render::{
         render_resource::AsBindGroup,
         view::screenshot::{
-            save_to_disk, Capturing, Screenshot,
+            Capturing, Screenshot, save_to_disk,
         },
-    }, shader::ShaderRef, sprite_render::{Material2d, Material2dPlugin}, window::{CursorIcon, SystemCursorIcon} 
+    },
+    shader::ShaderRef,
+    sprite_render::{Material2d, Material2dPlugin},
+    window::{CursorIcon, SystemCursorIcon},
 };
 // use bevy_inspector_egui::quick::{
 //     AssetInspectorPlugin,
@@ -151,10 +156,8 @@ fn screenshot_on_spacebar(
     name_text: Single<&Text, With<ExampleName>>,
 ) {
     if input.just_pressed(KeyCode::Space) {
-        let path = format!(
-            "./screenshots/{}.png",
-            name_text.0
-        );
+        let path =
+            format!("./screenshots/{}.png", name_text.0);
 
         commands
             .spawn(Screenshot::primary_window())
@@ -211,7 +214,9 @@ fn setup(
         Assets<ScreenshotVoronoiseMaterial>,
     >,
 ) {
-    println!("press digit to bring up inspector, arrow key to navigate");
+    println!(
+        "press digit to bring up inspector, arrow key to navigate"
+    );
 
     let mut entities = vec![];
 
@@ -280,25 +285,24 @@ fn setup(
     });
     entities.push(Example {
         camera_type: CameraType::ThreeD,
-        entity: 
-        commands
+        entity: commands
             .spawn((
-                Mesh3d(meshes.add(Cuboid{ half_size: Vec3::splat(1.) })),
-                    MeshMaterial3d(
-                        screenshot_simplex3d_materials.add(
-                            ScreenshotSimplex3dMaterial {
-                                scale: 5.0,
-                            },
-                        )),
-                     Transform::from_xyz(
-                        0.0, 0.5, 0.0,
+                Mesh3d(meshes.add(Cuboid {
+                    half_size: Vec3::splat(1.),
+                })),
+                MeshMaterial3d(
+                    screenshot_simplex3d_materials.add(
+                        ScreenshotSimplex3dMaterial {
+                            scale: 5.0,
+                        },
                     ),
-                     Visibility::Hidden,
-
-
+                ),
+                Transform::from_xyz(0.0, 0.5, 0.0),
+                Visibility::Hidden,
                 Name::from("simplex-3d"),
             ))
-            .id()});
+            .id(),
+    });
 
     // entities.push(
     //     // cube

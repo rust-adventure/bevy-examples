@@ -1,9 +1,11 @@
-//! Demonstrates the use of [`UiMaterials`](UiMaterial) and how to change material values
+//! Demonstrates the use of
+//! [`UiMaterials`](UiMaterial) and how to change
+//! material values
 
-use bevy::prelude::*;
-use bevy::reflect::TypePath;
-use bevy::render::render_resource::*;
-use bevy::shader::ShaderRef;
+use bevy::{
+    prelude::*, reflect::TypePath,
+    render::render_resource::*, shader::ShaderRef,
+};
 use bevy_shader_utils::ShaderUtilsPlugin;
 
 fn main() {

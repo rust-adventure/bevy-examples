@@ -92,30 +92,32 @@ fn setup(
     ));
 
     // commands.spawn((
-    //     Mesh3d(meshes.add(Cuboid::from_size(Vec3::new(
+    //     Mesh3d(meshes.
+    // add(Cuboid::from_size(Vec3::new(
     //         10., 4., 20.,
     //     )))),
     //     Transform::from_xyz(10.0, 1., 0.0),
-    //     MeshMaterial3d(materials.add(ExtendedMaterial {
-    //         base: StandardMaterial {
-    //             base_color: SKY_400.into(),
-    //             ..default()
+    //     MeshMaterial3d(materials.
+    // add(ExtendedMaterial {         base:
+    // StandardMaterial {             base_color:
+    // SKY_400.into(),             ..default()
     //         },
-    //         extension: BlockoutMaterialExt::default(),
-    //     })),
+    //         extension:
+    // BlockoutMaterialExt::default(),     })),
     // ));
     // commands.spawn((
-    //     Mesh3d(meshes.add(Cuboid::from_size(Vec3::new(
+    //     Mesh3d(meshes.
+    // add(Cuboid::from_size(Vec3::new(
     //         10., 4., 20.,
     //     )))),
     //     Transform::from_xyz(10.0, 1., 0.0),
-    //     MeshMaterial3d(materials.add(ExtendedMaterial {
-    //         base: StandardMaterial {
-    //             base_color: SKY_400.into(),
-    //             ..default()
+    //     MeshMaterial3d(materials.
+    // add(ExtendedMaterial {         base:
+    // StandardMaterial {             base_color:
+    // SKY_400.into(),             ..default()
     //         },
-    //         extension: BlockoutMaterialExt::default(),
-    //     })),
+    //         extension:
+    // BlockoutMaterialExt::default(),     })),
     // ));
     // camera
     commands.spawn((
@@ -160,11 +162,14 @@ fn setup(
     commands.spawn((
         DirectionalLight {
             shadows_enabled: true,
-            // lux::RAW_SUNLIGHT is recommended for use with this feature, since
-            // other values approximate sunlight *post-scattering* in various
-            // conditions. RAW_SUNLIGHT in comparison is the illuminance of the
-            // sun unfiltered by the atmosphere, so it is the proper input for
-            // sunlight to be filtered by the atmosphere.
+            // lux::RAW_SUNLIGHT is recommended for use with
+            // this feature, since other values
+            // approximate sunlight *post-scattering* in
+            // various conditions. RAW_SUNLIGHT
+            // in comparison is the illuminance of the
+            // sun unfiltered by the atmosphere, so it is
+            // the proper input for sunlight to
+            // be filtered by the atmosphere.
             illuminance: lux::RAW_SUNLIGHT,
             ..default()
         },
@@ -197,11 +202,11 @@ fn rotate_camera(
 }
 
 // fn dynamic_scene(
-//     mut suns: Query<&mut Transform, With<DirectionalLight>>,
-//     time: Res<Time>,
+//     mut suns: Query<&mut Transform,
+// With<DirectionalLight>>,     time: Res<Time>,
 // ) {
 //     suns.iter_mut().for_each(|mut tf| {
-//         tf.rotate_x(-time.delta_secs() * PI / 10.0);
-//         dbg!(tf);
+//         tf.rotate_x(-time.delta_secs() * PI /
+// 10.0);         dbg!(tf);
 //     });
 // }

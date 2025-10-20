@@ -20,7 +20,8 @@ pub const SIMPLEX_NOISE_2D: Handle<Shader> =
 pub const SIMPLEX_NOISE_3D: Handle<Shader> =
     uuid_handle!("6239ad8c-41e1-4302-8f03-b2e41c154764");
 // pub const FBM: Handle<Shader> =
-// uuid_handle!("b84472cd-83dc-4cc2-b18a-021b42d11cb8");
+// uuid_handle!("
+// b84472cd-83dc-4cc2-b18a-021b42d11cb8");
 pub const VORONOISE: Handle<Shader> =
     uuid_handle!("06dc4bde-2702-4fe2-aff5-df69078c4b59");
 // other utility functions
