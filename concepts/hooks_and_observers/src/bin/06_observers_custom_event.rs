@@ -9,10 +9,16 @@ fn main() {
             |my_global_event: On<MyGlobalEvent>| {
                 info!(
                     event=?my_global_event.event(),
-                    "on_my_event (global)",
+                    "on_my_global_event (global)",
                 );
             },
         )
+        .add_observer(|my_event: On<MyEvent>| {
+            info!(
+                event=?my_event.event(),
+                "on_my_event (global)",
+            );
+        })
         .run();
 }
 
@@ -38,6 +44,6 @@ struct MyEvent {
 fn on_my_event(my_event: On<MyEvent>) {
     info!(
         event=?my_event.event(),
-        "on_my_event",
+        "on_my_event (local)",
     );
 }
