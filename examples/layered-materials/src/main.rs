@@ -126,6 +126,7 @@ fn setup(
 }
 
 #[derive(Debug, Default, Clone, Reflect, Asset, AsBindGroup)]
+#[bindless(index_table(range(0..6)))]
 struct LayeredMaterial {
     #[texture(0, dimension = "2d_array")]
     #[sampler(1)]
