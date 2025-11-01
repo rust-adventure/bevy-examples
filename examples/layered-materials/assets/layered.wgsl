@@ -2,10 +2,18 @@
 #import bevy_pbr::{
     forward_io::{VertexOutput, FragmentOutput},
     mesh_bindings,
+    mesh_view_bindings,
     pbr_bindings,
-    pbr_functions::{alpha_discard, apply_pbr_lighting, main_pass_post_lighting_processing},
+    pbr_functions::{
+        alpha_discard, apply_pbr_lighting, apply_normal_mapping,
+        calculate_tbn_mikktspace, main_pass_post_lighting_processing
+    },
     pbr_fragment::pbr_input_from_vertex_output,
-    pbr_types::{PbrInput, STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE},
+    pbr_types::{
+        PbrInput,
+        STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE,
+        STANDARD_MATERIAL_FLAGS_TWO_COMPONENT_NORMAL_MAP
+    },
 }
 
 #ifdef BINDLESS
@@ -36,20 +44,10 @@ struct LayeredMaterialBindings {
 
 #endif // BINDLESS
 
-fn layered_material_default(in: VertexOutput, is_front: bool) -> PbrInput {
-    var pbr_input = pbr_input_from_vertex_output(in, is_front, false);
-
-    pbr_input.material.parallax_depth_scale = 0.0;
-    pbr_input.material.flags = STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE;
-
-    return pbr_input;
-}
-
-@fragment
-fn fragment(
+fn layered_material_default(
     in: VertexOutput,
-    @builtin(front_facing) is_front: bool,
-) -> FragmentOutput {
+    is_front: bool,
+) -> PbrInput {
 #ifdef BINDLESS
     let slot = mesh_bindings::mesh[in.instance_index].material_and_lightmap_bind_group_slot & 0xffffu;
     let base_color_texture = bindless_textures_2d_array[layered_material_bindings[slot].base_color_texture];
@@ -84,12 +82,40 @@ fn fragment(
             index = 1;
         }
     }
-    
-    var pbr_input = layered_material_default(in, is_front);
-    pbr_input.material.base_color = textureSample(base_color_texture, base_color_sampler, in.uv, index);
 
+    let double_sided = false;
+
+    var pbr_input = pbr_input_from_vertex_output(in, is_front, double_sided);
+    pbr_input.material.parallax_depth_scale = 0.0;
+    pbr_input.material.flags = STANDARD_MATERIAL_FLAGS_ALPHA_MODE_OPAQUE | STANDARD_MATERIAL_FLAGS_TWO_COMPONENT_NORMAL_MAP;
+    
+    pbr_input.material.base_color = textureSample(base_color_texture, base_color_sampler, in.uv, index);
     // alpha discard
     pbr_input.material.base_color = alpha_discard(pbr_input.material, pbr_input.material.base_color);
+
+    /// Add the normal from the normal map to the world normal
+    let TBN = calculate_tbn_mikktspace(pbr_input.world_normal, in.world_tangent);
+    let Nt = textureSampleBias(
+        normal_map_texture,
+        normal_map_sampler,
+        in.uv,
+        index,
+        mesh_view_bindings::view.mip_bias,
+    ).rgb;
+    pbr_input.N = apply_normal_mapping(pbr_input.material.flags, TBN, double_sided, is_front, Nt);
+
+    return pbr_input;
+}
+
+@fragment
+fn fragment(
+    in: VertexOutput,
+    @builtin(front_facing) is_front: bool,
+) -> FragmentOutput {
+    var pbr_input = layered_material_default(
+        in,
+        is_front,
+    );
 
     var out: FragmentOutput;
     // apply lighting

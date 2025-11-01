@@ -143,21 +143,4 @@ impl Material for LayeredMaterial {
     fn fragment_shader() -> ShaderRef {
         "layered.wgsl".into()
     }
-
-    fn specialize(
-        _pipeline: &bevy::pbr::MaterialPipeline,
-        descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-        _layout: &bevy::mesh::MeshVertexBufferLayoutRef,
-        _key: bevy::pbr::MaterialPipelineKey<Self>,
-    ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
-        if let Some(fragment) = descriptor.fragment.as_mut() {
-            let shader_defs = &mut fragment.shader_defs;
-
-            #[expect(clippy::single_element_loop, reason = "To be updated")]
-            for shader_def in ["STANDARD_MATERIAL_NORMAL_MAP"] {
-                shader_defs.push(shader_def.into());
-            }
-        }
-        Ok(())
-    }
 }
