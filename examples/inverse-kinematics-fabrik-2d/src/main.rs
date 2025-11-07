@@ -44,30 +44,97 @@ fn startup(
 
     commands.spawn(Camera2d::default());
 
+    let root_position = Transform::default();
+    let joint_1_position =
+        Transform::from_xyz(100., 200., 0.);
+    let joint_2_position =
+        Transform::from_xyz(100., 100., 0.);
+
+    commands.spawn((
+        Name::new("IKRoot"),
+        InverseKinematics,
+        root_position,
+        BoneLength(
+            root_position
+                .translation
+                .distance(joint_1_position.translation),
+        ),
+        children![
+            // bones
+            (
+                Name::new("Joint1"),
+                joint_1_position,
+                BoneLength(
+                    joint_1_position.translation.distance(
+                        joint_2_position.translation
+                    ),
+                ),
+                children![(
+                    Name::new("Joint2"),
+                    joint_2_position,
+                )]
+            )
+        ],
+    ));
+
     // let root_position = Transform::default();
-    // let joint_1_position =
-    //     Transform::from_xyz(100., 200., 0.);
+    // let joint_position =
+    // Transform::from_xyz(30., 30., 0.);
     // let joint_2_position =
-    //     Transform::from_xyz(100., 100., 0.);
+    //     Transform::from_xyz(30., 30., 0.);
 
     // commands.spawn((
     //     Name::new("IKRoot"),
     //     InverseKinematics,
     //     root_position,
-    //     BoneLength(
-    //         root_position
-    //             .translation
-    //             .distance(joint_1_position.translation),
-    //     ),
-    //     children![
+    //     BoneLength(joint_position.translation.
+    // length()),     children![
     //         // bones
     //         (
     //             Name::new("Joint1"),
-    //             joint_1_position,
+    //             joint_position,
     //             BoneLength(
-    //                 joint_1_position.translation.distance(
-    //                     joint_2_position.translation
-    //                 ),
+    //
+    // joint_position.translation.length(),
+    //             ),
+    //             children![
+    //                 // bones
+    //                 (
+    //                     Name::new("Joint1"),
+    //                     joint_position,
+    //                     BoneLength(
+    //                         joint_position
+    //                             .translation
+    //                             .length(),
+    //                     ),
+    //                     children![
+    //                         // bones
+    //                         (
+    //
+    // Name::new("Joint1"),
+    // joint_position,
+    // BoneLength(
+    // joint_position
+    // .translation
+    // .length(),
+    // ),
+    // children![
+    // // bones
+    // (
+    // Name::new("Joint1"),
+    // joint_position,
+    // BoneLength(
+    // joint_position
+    // .translation
+    // .length(),
+    // ),
+    // children![         // bones
+    //         (
+    //             Name::new("Joint1"),
+    //             joint_position,
+    //             BoneLength(
+    //
+    // joint_position.translation.length(),
     //             ),
     //             children![(
     //                 Name::new("Joint2"),
@@ -76,80 +143,15 @@ fn startup(
     //             )]
     //         )
     //     ],
+    //                                 )
+    //                             ],
+    //                         )
+    //                     ],
+    //                 )
+    //             ],
+    //         )
+    //     ],
     // ));
-
-    let root_position = Transform::default();
-    let joint_position = Transform::from_xyz(30., 30., 0.);
-    let joint_2_position =
-        Transform::from_xyz(30., 30., 0.);
-
-    commands.spawn((
-        Name::new("IKRoot"),
-        InverseKinematics,
-        root_position,
-        BoneLength(joint_position.translation.length()),
-        children![
-            // bones
-            (
-                Name::new("Joint1"),
-                joint_position,
-                BoneLength(
-                    joint_position.translation.length(),
-                ),
-                children![
-                    // bones
-                    (
-                        Name::new("Joint1"),
-                        joint_position,
-                        BoneLength(
-                            joint_position
-                                .translation
-                                .length(),
-                        ),
-                        children![
-                            // bones
-                            (
-                                Name::new("Joint1"),
-                                joint_position,
-                                BoneLength(
-                                    joint_position
-                                        .translation
-                                        .length(),
-                                ),
-                                children![
-                                    // bones
-                                    (
-                                        Name::new("Joint1"),
-                                        joint_position,
-                                        BoneLength(
-                                            joint_position
-                                                .translation
-                                                .length(),
-                                        ),
-                                        children![
-            // bones
-            (
-                Name::new("Joint1"),
-                joint_position,
-                BoneLength(
-                    joint_position.translation.length(),
-                ),
-                children![(
-                    Name::new("Joint2"),
-                    EndEffector,
-                    joint_2_position,
-                )]
-            )
-        ],
-                                    )
-                                ],
-                            )
-                        ],
-                    )
-                ],
-            )
-        ],
-    ));
 }
 
 fn debug_transforms(
@@ -169,7 +171,6 @@ fn update(
         &BoneLength,
         &InverseKinematics,
     )>,
-    end_effectors: Query<(), With<EndEffector>>,
     ik_bones: Query<
         &BoneLength,
         Without<InverseKinematics>,
@@ -190,7 +191,7 @@ fn update(
         return;
     };
 
-    for (root_entity, root_bone_length, ik) in
+    'ik_bodies: for (root_entity, root_bone_length, ik) in
         ik_roots.iter()
     {
         // dotted_gizmos.arrow_2d(
@@ -199,16 +200,18 @@ fn update(
         //     PINK_400.with_alpha(0.4),
         // );
 
-        // loop start
-        // use childof relationship to iter bones
-        let total_length = children
-            .iter_descendants(root_entity)
-            .filter_map(|entity| {
-                bone_lengths.get(entity).ok()
-            })
-            .map(|bone| bone.0)
-            .sum::<f32>()
-            + root_bone_length.0;
+        // use `ChildOf` relationship to iter bones and
+        // sum the length of all bones.
+        // `iter_descendants` doesn't include the root
+        // element, so we add the root bone length
+        let total_length = root_bone_length.0
+            + children
+                .iter_descendants(root_entity)
+                .filter_map(|entity| {
+                    bone_lengths.get(entity).ok()
+                })
+                .map(|bone| bone.0)
+                .sum::<f32>();
 
         // info!(?total_length);
 
@@ -219,94 +222,98 @@ fn update(
         );
 
         // if target isn't reachable, return
-        // if the total_length of the bones is less than
-        // the distance required to reach the mouse, then
-        // we can't make it to the target
         //
-        // TODO: mouse_position is relative to world center,
-        // and should be relative to IK root
+        // if the `total_length` of the bones is less than
+        // the distance required to reach the mouse, then
+        // we can't make it to the target mouse location
+        //
+        // TODO: mouse_position is relative to world
+        // center, and should be relative to IK
+        // root
         if total_length < mouse_position.0.length() {
             // warn!("mouse is out of reach!");
             return;
         }
-        // temporarily cache global positions for mutation
-        let mut current_positions = vec![
-            (
+
+        // We use this `Vec` to store the calculations
+        // we make that mutate the `GlobalPosition`s.
+        // After the loop ends, we take this `Vec` and
+        // use the values to update the `Transform`
+        // components
+        let mut current_positions: Vec<_> = std::iter::once((
             global_transforms.get(root_entity).expect("bones should have GlobalTransform components").translation().xy(),
             root_bone_length,
-            )
-        ];
-        for entity in children.iter_descendants(root_entity)
-        {
-            current_positions.push(
-                (
-                    global_transforms.get(entity).expect("bones should have GlobalTransform components").translation().xy(),
-                    bone_lengths.get(entity).unwrap_or(&BoneLength(0.0))
-                ));
-        }
+        ))
+        .chain(children.iter_descendants(root_entity).map(|entity| (
+            global_transforms.get(entity).expect("bones should have GlobalTransform components").translation().xy(),
+            bone_lengths.get(entity).unwrap_or(&BoneLength(0.0))
+        ))).collect();
 
-        // let current_root_position = transforms
-        //     .get(root_entity)
-        //     .unwrap()
-        //     .translation
-        //     .xy();
-
-        let end_effector_entity = children
+        // end effector is the last joint without a child
+        let end_effector = children
             .iter_descendants(root_entity)
-            .find(|entity| {
-                end_effectors.get(*entity).is_ok()
+            .last()
+            .and_then(|entity| {
+                global_transforms.get(entity).ok()
             })
-            .expect("ik chains need an EndEffector joint");
-        let end_effector = global_transforms
-            .get(end_effector_entity)
-            .unwrap()
+            .expect("there should be a final bone")
             .translation()
             .xy();
 
+        // `diff` is "how far off is the end joint from
+        // the target"
         let mut diff =
             end_effector.distance(mouse_position.0);
-        let mut i = 0;
-        loop {
-            if diff < TOLERANCE {
-                break;
-            }
-            if i > 10 {
-                info!("break because of i");
-                break;
-            }
-            i += 1;
 
-            // forward/backward pass
+        let mut iterations = 0;
+        while diff > TOLERANCE && iterations < 10 {
+            iterations += 1;
 
-            // Backward Pass
+            // #########################################
+            // #                                       #
+            // #  Paper calls this the "Forward Pass"  #
+            // #                                       #
+            // #########################################
+            //
+            // which is an iteration from the end_effector
+            // bone, to the root bone
+            if let Some((pos, _)) =
+                current_positions.last_mut()
             {
-                let (pos, _) = current_positions
-                    .last_mut()
-                    .expect("bones list to have a bone");
-
                 pos.x = mouse_position.0.x;
                 pos.y = mouse_position.0.y;
+            } else {
+                error!("bones list to have a bone");
+                continue 'ik_bodies;
             }
 
-            for (idx_p2, idx_p1) in (0..current_positions
-                .len())
-                .into_iter()
+            // options here are using `windows_mut` from
+            // `lending_iterator` https://docs.rs/lending-iterator/latest/lending_iterator/#windows_mut
+            // or using peekable.
+            // We could also use indices, but I prefer
+            // avoiding indices when possible
+            let mut it = current_positions
+                .iter_mut()
                 .rev()
-                .tuple_windows()
+                .peekable();
+            while let (Some(p2), Some(p1)) =
+                (it.next(), it.peek_mut())
             {
-                let vector = current_positions[idx_p2].0
-                    - current_positions[idx_p1].0;
-                current_positions[idx_p1].0 =
-                    current_positions[idx_p2].0
-                        - vector.normalize()
-                            * current_positions[idx_p1].1.0;
+                let vector = p2.0 - p1.0;
+                p1.0 = p2.0 - vector.normalize() * p1.1.0;
             }
-            // Forward Pass
-            {
-                let (pos, _) = current_positions
-                    .first_mut()
-                    .expect("bones list to have a bone");
 
+            // #########################################
+            // #                                       #
+            // # Paper calls this the "Backward Pass"  #
+            // #                                       #
+            // #########################################
+
+            // which is an iteration from the root to
+            // the end_effector
+            if let Some((pos, _)) =
+                current_positions.first_mut()
+            {
                 let root_translation = global_transforms
                     .get(root_entity)
                     .unwrap()
@@ -315,23 +322,28 @@ fn update(
 
                 pos.x = root_translation.x;
                 pos.y = root_translation.y;
+            } else {
+                error!("bones list to have a bone");
+                continue 'ik_bodies;
             }
 
-            for (idx_p1, idx_p2) in (0..current_positions
-                .len())
-                .into_iter()
-                .tuple_windows()
+            // options here are using `windows_mut` from
+            // `lending_iterator` https://docs.rs/lending-iterator/latest/lending_iterator/#windows_mut
+            // or using peekable.
+            // We could also use indices, but I prefer
+            // avoiding indices when possible
+            let mut it = current_positions
+                .iter_mut()
+                .rev()
+                .peekable();
+            while let (Some(p2), Some(p1)) =
+                (it.next(), it.peek_mut())
             {
-                let vector = current_positions[idx_p1].0
-                    - current_positions[idx_p2].0;
-                current_positions[idx_p2].0 =
-                    current_positions[idx_p1].0
-                        - vector.normalize()
-                            * current_positions[idx_p1].1.0;
+                let vector = p1.0 - p2.0;
+                p2.0 = p1.0 - vector.normalize() * p1.1.0;
             }
 
-            // set diff
-            // distance, not normalized distance
+            // set diff and loop again
             diff = current_positions
                 .last()
                 .unwrap()
@@ -352,9 +364,11 @@ fn update(
         let mut it = current_positions.into_iter();
         let _ = it.next().unwrap().0;
 
-        // commands.entity(root_entity).insert();
-
-        let mut current_root_position = global_transforms
+        // Update all `Transform`s by taking global
+        // positions and converting them to
+        // relative measurements suitable
+        // for `Transform`
+        let current_root_position = global_transforms
             .get(root_entity)
             .unwrap()
             .translation()
@@ -370,9 +384,6 @@ fn update(
             transform.translation.x = relative.x;
             transform.translation.y = relative.y;
         }
-        // for  in current_positions
-        // {
-        // }
     }
 }
 
@@ -387,7 +398,8 @@ fn observe_mouse(
 ) {
     let cursor_position = schmove.pointer_location.position;
     let (camera, camera_transform) = *camera_query;
-    // Calculate a world position based on the cursor's position.
+    // Calculate a world position based on the
+    // cursor's position.
     let Ok(world_position) = camera.viewport_to_world_2d(
         camera_transform,
         cursor_position,
