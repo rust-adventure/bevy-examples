@@ -50,32 +50,32 @@ fn startup(
     let joint_2_position =
         Transform::from_xyz(100., 100., 0.);
 
-    // commands.spawn((
-    //     Name::new("IKRoot"),
-    //     InverseKinematics,
-    //     root_position,
-    //     BoneLength(
-    //         root_position
-    //             .translation
-    //             .distance(joint_1_position.translation),
-    //     ),
-    //     children![
-    //         // bones
-    //         (
-    //             Name::new("Joint1"),
-    //             joint_1_position,
-    //             BoneLength(
-    //                 joint_1_position.translation.distance(
-    //                     joint_2_position.translation
-    //                 ),
-    //             ),
-    //             children![(
-    //                 Name::new("Joint2"),
-    //                 joint_2_position,
-    //             )]
-    //         )
-    //     ],
-    // ));
+    commands.spawn((
+        Name::new("IKRoot"),
+        InverseKinematics,
+        root_position,
+        BoneLength(
+            root_position
+                .translation
+                .distance(joint_1_position.translation),
+        ),
+        children![
+            // bones
+            (
+                Name::new("Joint1"),
+                joint_1_position,
+                BoneLength(
+                    joint_1_position.translation.distance(
+                        joint_2_position.translation
+                    ),
+                ),
+                children![(
+                    Name::new("Joint2"),
+                    joint_2_position,
+                )]
+            )
+        ],
+    ));
 
     commands.spawn((
         Name::new("IKRoot"),
@@ -267,7 +267,7 @@ fn update(
             < (root_translation - mouse_position.0).length()
         {
             // warn!("mouse is out of reach!");
-            return;
+            continue 'ik_bodies;
         }
 
         // We use this `Vec` to store the calculations
@@ -403,10 +403,8 @@ fn update(
         // positions and converting them to
         // relative measurements suitable
         // for `Transform`
-        let mut current_root_position = root_translation;
 
-        let mut it = current_positions.into_iter();
-        // let _ = it.next().unwrap().0;
+        let it = current_positions.into_iter();
         for (
             (_, (previous_node_global_position, _)),
             (entity, (global_position, _)),
@@ -417,9 +415,7 @@ fn update(
         {
             let relative = global_position
                 - previous_node_global_position;
-            // info!(?previous, prev_name=?names.get(previous.0).unwrap(), ?relative, name=?names.get(entity).unwrap());
 
-            // current_root_position = global_position;
             let mut transform =
                 transforms.get_mut(entity).unwrap();
             transform.translation.x = relative.x;
