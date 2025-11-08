@@ -52,127 +52,99 @@ fn startup(
                 .translation
                 .distance(joint_1_position.translation),
         ),
-        children![
-            // bones
-            (
-                Name::new("Joint1"),
-                joint_1_position,
-                BoneLength(
-                    joint_1_position.translation.distance(
-                        joint_2_position.translation
-                    ),
-                ),
-                children![(
-                    Name::new("Joint2"),
-                    joint_2_position,
-                )]
-            )
-        ],
+        children![(
+            Name::new("Joint1"),
+            joint_1_position,
+            BoneLength(
+                joint_1_position
+                    .translation
+                    .distance(joint_2_position.translation),
+            ),
+            children![(
+                Name::new("Joint2"),
+                joint_2_position,
+            )]
+        )],
     ));
-
-    commands.spawn((
-        Name::new("IKRoot"),
-        InverseKinematics,
-        root_position
-            .with_translation(Vec3::new(200., 0., 0.)),
-        BoneLength(
-            root_position
-                .translation
-                .distance(joint_1_position.translation),
-        ),
-        children![
-            // bones
-            (
-                Name::new("Joint1"),
-                joint_1_position,
-                BoneLength(
-                    joint_1_position.translation.distance(
-                        joint_2_position.translation
-                    ),
-                ),
-                children![(
-                    Name::new("Joint2"),
-                    joint_2_position,
-                )]
-            )
-        ],
-    ));
-
-    // let root_position = Transform::default();
-    // let joint_position =
-    // Transform::from_xyz(30., 30., 0.);
-    // let joint_2_position =
-    //     Transform::from_xyz(30., 30., 0.);
 
     // commands.spawn((
     //     Name::new("IKRoot"),
     //     InverseKinematics,
-    //     root_position,
-    //     BoneLength(joint_position.translation.
-    // length()),     children![
+    //     root_position
+    //         .with_translation(Vec3::new(200., 0.,
+    // 0.)),     BoneLength(
+    //         root_position
+    //             .translation
+    //
+    // .distance(joint_1_position.translation),
+    //     ),
+    //     children![
     //         // bones
     //         (
     //             Name::new("Joint1"),
-    //             joint_position,
+    //             joint_1_position,
     //             BoneLength(
     //
-    // joint_position.translation.length(),
-    //             ),
-    //             children![
-    //                 // bones
-    //                 (
-    //                     Name::new("Joint1"),
-    //                     joint_position,
-    //                     BoneLength(
-    //                         joint_position
-    //                             .translation
-    //                             .length(),
-    //                     ),
-    //                     children![
-    //                         // bones
-    //                         (
+    // joint_1_position.translation.distance(
     //
-    // Name::new("Joint1"),
-    // joint_position,
-    // BoneLength(
-    // joint_position
-    // .translation
-    // .length(),
-    // ),
-    // children![
-    // // bones
-    // (
-    // Name::new("Joint1"),
-    // joint_position,
-    // BoneLength(
-    // joint_position
-    // .translation
-    // .length(),
-    // ),
-    // children![         // bones
-    //         (
-    //             Name::new("Joint1"),
-    //             joint_position,
-    //             BoneLength(
-    //
-    // joint_position.translation.length(),
-    //             ),
+    // joint_2_position.translation
+    // ),             ),
     //             children![(
     //                 Name::new("Joint2"),
-    //                 EndEffector,
     //                 joint_2_position,
     //             )]
     //         )
     //     ],
-    //                                 )
-    //                             ],
-    //                         )
-    //                     ],
-    //                 )
-    //             ],
-    //         )
-    //     ],
     // ));
+
+    // let root_position = Transform::default();
+    // let joint_position = Transform::from_xyz(30., 30., 0.);
+    // let joint_2_position =
+    //     Transform::from_xyz(30., 30., 0.);
+
+    // ooh wow does rustfmt not like this nesting lol
+    // this outer closure is so that rustfmt doesn't
+    // touch this flapjack stack of bones. There is
+    // no other purpose for it.
+    #[rustfmt::skip]
+    let spawn_lots = || {
+    // commands.spawn((
+    //     Name::new("IKRoot"),
+    //     InverseKinematics,
+    //     root_position,
+    //     BoneLength(joint_position.translation.length()),
+    //     children![(
+    //         Name::new("Joint1"),
+    //         joint_position,
+    //         BoneLength(joint_position.translation.length()),
+    //         children![(
+    //             Name::new("Joint2"),
+    //             joint_position,
+    //             BoneLength(joint_position.translation.length()),
+    //             children![(
+    //                 Name::new("Joint3"),
+    //                 joint_position,
+    //                 BoneLength(joint_position.translation.length()),
+    //                 children![(
+    //                     Name::new("Joint4"),
+    //                     joint_position,
+    //                     BoneLength(joint_position.translation.length()),
+    //                     children![(
+    //                         Name::new("Joint5"),
+    //                         joint_position,
+    //                         BoneLength(joint_position.translation.length()),
+    //                         children![(
+    //                             Name::new("Joint6"),
+    //                             joint_2_position,
+    //                         )]
+    //                     )],
+    //                 )],
+    //             )],
+    //         )],
+    //     )],
+    // ));
+    };
+    spawn_lots();
 }
 
 fn debug_transforms(
@@ -199,14 +171,17 @@ fn update(
     mut transforms: Query<&mut Transform>,
     global_transforms: Query<&GlobalTransform>,
 ) {
-    // if there's no mouse_position, just skip everything
-    // the mouse_position is our "target" so if we don't
-    // have one, there is no target
+    // if there's no mouse_position, just skip
+    // everything the mouse_position is our
+    // "target" so if we don't have one, there is
+    // no target
     let Some(mouse_position) = mouse_position else {
         return;
     };
 
     // iterate over all ik bodies in the scene
+    // using 'ik_bodies as a label in case we have to
+    // abandon a specific ik root's processing
     'ik_bodies: for (root_entity, root_bone_length) in
         ik_roots.iter()
     {
@@ -258,7 +233,30 @@ fn update(
         if total_length
             < (root_translation - mouse_position.0).length()
         {
-            // warn!("mouse is out of reach!");
+            // mouse is out of reach!
+            // orient all bones in straight line to mouse
+            // direction
+            let mouse_vector = (mouse_position.0
+                - root_translation)
+                .normalize();
+
+            for (a, b) in std::iter::once(root_entity)
+                .chain(
+                    children.iter_descendants(root_entity),
+                )
+                .tuple_windows()
+            {
+                // get the bone length of the first node
+                // and use it to figure out the position
+                // entity b should be at.
+                let bone_a = bone_lengths.get(a).unwrap();
+                let bone_vector = mouse_vector * bone_a.0;
+                let mut transform =
+                    transforms.get_mut(b).unwrap();
+                transform.translation.x = bone_vector.x;
+                transform.translation.y = bone_vector.y;
+            }
+
             continue 'ik_bodies;
         }
 
@@ -389,13 +387,10 @@ fn update(
             );
         }
 
-        // info!(?current_positions);
-
         // Update all `Transform`s by taking global
         // positions and converting them to
         // relative measurements suitable
         // for `Transform`
-
         let it = current_positions.into_iter();
         for (
             (_, (previous_node_global_position, _)),
