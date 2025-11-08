@@ -176,10 +176,10 @@ fn startup(
 }
 
 fn debug_transforms(
-    query: Query<(&GlobalTransform, &Name)>,
+    query: Query<&GlobalTransform>,
     mut gizmos: Gizmos,
 ) {
-    for (transform, name) in &query {
+    for transform in &query {
         gizmos.axes_2d(*transform, 30.);
     }
 }
