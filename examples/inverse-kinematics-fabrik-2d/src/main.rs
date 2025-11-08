@@ -132,7 +132,7 @@ fn startup(
     // touch this flapjack stack of bones. There is
     // no other purpose for it.
     #[rustfmt::skip]
-    let mut spawn_lots = || {
+    let spawn_lots = || {
     // commands.spawn((
     //     Name::new("IKRoot"),
     //     InverseKinematics,
