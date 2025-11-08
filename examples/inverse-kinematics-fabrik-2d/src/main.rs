@@ -35,7 +35,7 @@ fn startup(
         line_scale: 10.,
     };
 
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
 
     let root_position = Transform::default();
     let joint_1_position =
