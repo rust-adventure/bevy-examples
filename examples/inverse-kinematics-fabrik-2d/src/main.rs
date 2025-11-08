@@ -246,10 +246,6 @@ fn update(
         // if the `total_length` of the bones is less than
         // the distance required to reach the mouse, then
         // we can't make it to the target mouse location
-        //
-        // TODO: mouse_position is relative to world
-        // center, and should be relative to IK
-        // root
         let root_translation = global_transforms
             .get(root_entity)
             .unwrap()
@@ -489,8 +485,8 @@ fn update(
 
         // Duplicate logic: REFACTOR NEEDED
         let Some((
-            (last_position, last_bone),
-            (next_to_last_position, next_to_last_bone),
+            (last_position, _),
+            (next_to_last_position, _),
         )) = current_positions
             .iter()
             .rev()
