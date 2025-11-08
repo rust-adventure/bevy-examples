@@ -123,8 +123,8 @@ fn startup(
     ));
 
     // let root_position = Transform::default();
-    // let joint_position = Transform::from_xyz(30., 30., 0.);
-    // let joint_2_position =
+    // let joint_position = Transform::from_xyz(30.,
+    // 30., 0.); let joint_2_position =
     //     Transform::from_xyz(30., 30., 0.);
 
     // ooh wow does rustfmt not like this nesting lol
