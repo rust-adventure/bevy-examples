@@ -1,8 +1,4 @@
-use bevy::{
-    color::palettes::{css::MAGENTA, tailwind::*},
-    prelude::*,
-    window::PrimaryWindow,
-};
+use bevy::{color::palettes::tailwind::*, prelude::*};
 use itertools::Itertools;
 
 fn main() {
@@ -24,9 +20,6 @@ struct InverseKinematics;
 
 #[derive(Debug, Component, Clone)]
 struct BoneLength(f32);
-
-#[derive(Debug, Component)]
-struct EndEffector;
 
 fn startup(
     mut commands: Commands,
@@ -205,7 +198,6 @@ fn update(
     mouse_position: Option<Res<MousePosition>>,
     mut transforms: Query<&mut Transform>,
     global_transforms: Query<&GlobalTransform>,
-    names: Query<&Name>,
 ) {
     // if there's no mouse_position, just skip everything
     // the mouse_position is our "target" so if we don't
