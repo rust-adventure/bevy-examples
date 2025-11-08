@@ -50,10 +50,38 @@ fn startup(
     let joint_2_position =
         Transform::from_xyz(100., 100., 0.);
 
+    // commands.spawn((
+    //     Name::new("IKRoot"),
+    //     InverseKinematics,
+    //     root_position,
+    //     BoneLength(
+    //         root_position
+    //             .translation
+    //             .distance(joint_1_position.translation),
+    //     ),
+    //     children![
+    //         // bones
+    //         (
+    //             Name::new("Joint1"),
+    //             joint_1_position,
+    //             BoneLength(
+    //                 joint_1_position.translation.distance(
+    //                     joint_2_position.translation
+    //                 ),
+    //             ),
+    //             children![(
+    //                 Name::new("Joint2"),
+    //                 joint_2_position,
+    //             )]
+    //         )
+    //     ],
+    // ));
+
     commands.spawn((
         Name::new("IKRoot"),
         InverseKinematics,
-        root_position,
+        root_position
+            .with_translation(Vec3::new(200., 0., 0.)),
         BoneLength(
             root_position
                 .translation
@@ -155,10 +183,10 @@ fn startup(
 }
 
 fn debug_transforms(
-    query: Query<&Transform>,
+    query: Query<(&GlobalTransform, &Name)>,
     mut gizmos: Gizmos,
 ) {
-    for transform in &query {
+    for (transform, name) in &query {
         gizmos.axes_2d(*transform, 30.);
     }
 }
@@ -166,32 +194,28 @@ fn debug_transforms(
 const TOLERANCE: f32 = 1.;
 
 fn update(
-    ik_roots: Query<(
-        Entity,
-        &BoneLength,
-        &InverseKinematics,
-    )>,
-    ik_bones: Query<
-        &BoneLength,
-        Without<InverseKinematics>,
+    ik_roots: Query<
+        (Entity, &BoneLength),
+        With<InverseKinematics>,
     >,
     children: Query<&Children>,
-    parents: Query<&ChildOf>,
     bone_lengths: Query<&BoneLength>,
-    // target: mouse
     mut gizmos: Gizmos,
     mut dotted_gizmos: Gizmos<DottedGizmos>,
-    camera_query: Single<(&Camera, &GlobalTransform)>,
     mouse_position: Option<Res<MousePosition>>,
-    mut commands: Commands,
     mut transforms: Query<&mut Transform>,
     global_transforms: Query<&GlobalTransform>,
+    names: Query<&Name>,
 ) {
+    // if there's no mouse_position, just skip everything
+    // the mouse_position is our "target" so if we don't
+    // have one, there is no target
     let Some(mouse_position) = mouse_position else {
         return;
     };
 
-    'ik_bodies: for (root_entity, root_bone_length, ik) in
+    // iterate over all ik bodies in the scene
+    'ik_bodies: for (root_entity, root_bone_length) in
         ik_roots.iter()
     {
         // dotted_gizmos.arrow_2d(
@@ -216,7 +240,11 @@ fn update(
         // info!(?total_length);
 
         gizmos.circle_2d(
-            Isometry2d::IDENTITY,
+            global_transforms
+                .get(root_entity)
+                .unwrap()
+                .translation()
+                .xy(),
             total_length,
             SLATE_400,
         );
@@ -230,7 +258,14 @@ fn update(
         // TODO: mouse_position is relative to world
         // center, and should be relative to IK
         // root
-        if total_length < mouse_position.0.length() {
+        let root_translation = global_transforms
+            .get(root_entity)
+            .unwrap()
+            .translation()
+            .xy();
+        if total_length
+            < (root_translation - mouse_position.0).length()
+        {
             // warn!("mouse is out of reach!");
             return;
         }
@@ -241,11 +276,13 @@ fn update(
         // use the values to update the `Transform`
         // components
         let mut current_positions: Vec<_> = std::iter::once((
-            global_transforms.get(root_entity).expect("bones should have GlobalTransform components").translation().xy(),
+            root_translation,
             root_bone_length,
         ))
         .chain(children.iter_descendants(root_entity).map(|entity| (
-            global_transforms.get(entity).expect("bones should have GlobalTransform components").translation().xy(),
+            global_transforms.get(entity)
+                .expect("bones should have GlobalTransform components")
+                .translation().xy(),
             bone_lengths.get(entity).unwrap_or(&BoneLength(0.0))
         ))).collect();
 
@@ -261,10 +298,17 @@ fn update(
             .xy();
 
         // `diff` is "how far off is the end joint from
-        // the target"
+        // the target?"
         let mut diff =
             end_effector.distance(mouse_position.0);
 
+        // loop for forward/backward passes
+        // keeps track of iteration count because
+        // if the bones can't physically reach the point
+        // the loop will never finish
+        //
+        // 10 iterations is an entirely arbitrary number
+        // of maximum iterations.
         let mut iterations = 0;
         while diff > TOLERANCE && iterations < 10 {
             iterations += 1;
@@ -314,12 +358,6 @@ fn update(
             if let Some((pos, _)) =
                 current_positions.first_mut()
             {
-                let root_translation = global_transforms
-                    .get(root_entity)
-                    .unwrap()
-                    .translation()
-                    .xy();
-
                 pos.x = root_translation.x;
                 pos.y = root_translation.y;
             } else {
@@ -332,15 +370,13 @@ fn update(
             // or using peekable.
             // We could also use indices, but I prefer
             // avoiding indices when possible
-            let mut it = current_positions
-                .iter_mut()
-                .rev()
-                .peekable();
-            while let (Some(p2), Some(p1)) =
+            let mut it =
+                current_positions.iter_mut().peekable();
+            while let (Some((p1, p1_bone)), Some((p2, _))) =
                 (it.next(), it.peek_mut())
             {
-                let vector = p1.0 - p2.0;
-                p2.0 = p1.0 - vector.normalize() * p1.1.0;
+                let vector = *p1 - *p2;
+                *p2 = *p1 - vector.normalize() * p1_bone.0;
             }
 
             // set diff and loop again
@@ -361,23 +397,28 @@ fn update(
             );
         }
 
-        let mut it = current_positions.into_iter();
-        let _ = it.next().unwrap().0;
+        // info!(?current_positions);
 
         // Update all `Transform`s by taking global
         // positions and converting them to
         // relative measurements suitable
         // for `Transform`
-        let current_root_position = global_transforms
-            .get(root_entity)
-            .unwrap()
-            .translation()
-            .xy();
-        for (entity, (global_position, _)) in
-            children.iter_descendants(root_entity).zip(it)
+        let mut current_root_position = root_translation;
+
+        let mut it = current_positions.into_iter();
+        // let _ = it.next().unwrap().0;
+        for (
+            (_, (previous_node_global_position, _)),
+            (entity, (global_position, _)),
+        ) in std::iter::once(root_entity)
+            .chain(children.iter_descendants(root_entity))
+            .zip(it)
+            .tuple_windows()
         {
-            let relative =
-                global_position - current_root_position;
+            let relative = global_position
+                - previous_node_global_position;
+            // info!(?previous, prev_name=?names.get(previous.0).unwrap(), ?relative, name=?names.get(entity).unwrap());
+
             // current_root_position = global_position;
             let mut transform =
                 transforms.get_mut(entity).unwrap();
@@ -390,26 +431,34 @@ fn update(
 #[derive(Resource)]
 struct MousePosition(Vec2);
 
+// a system that updates a `Resource` with the
+// current world position of the mouse.
+//
+// We use the mouse world position to drive the
+// IK target position
 fn observe_mouse(
     schmove: On<Pointer<Move>>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
     mouse_position: Option<ResMut<MousePosition>>,
     mut commands: Commands,
 ) {
-    let cursor_position = schmove.pointer_location.position;
     let (camera, camera_transform) = *camera_query;
+
     // Calculate a world position based on the
-    // cursor's position.
+    // cursor's viewport position.
     let Ok(world_position) = camera.viewport_to_world_2d(
         camera_transform,
-        cursor_position,
+        schmove.pointer_location.position,
     ) else {
         return;
     };
 
     if let Some(mut mp) = mouse_position {
+        // update the mouse position
         mp.0 = world_position;
     } else {
+        // insert the Resource the first chance we get.
+        // Could also init to 0 when building the app
         commands
             .insert_resource(MousePosition(world_position));
     }
