@@ -3,7 +3,7 @@ use itertools::Itertools;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(SLATE_950.into()))
+        .insert_resource(ClearColor(SKY_950.into()))
         .init_gizmo_group::<DottedGizmos>()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, startup)
@@ -21,10 +21,15 @@ struct InverseKinematics;
 #[derive(Debug, Component, Clone)]
 struct BoneLength(f32);
 
+// #[derive(Debug, Component, Clone)]
+// struct BoneAngleInital(f32);
+
 fn startup(
     mut commands: Commands,
     mut config_store: ResMut<GizmoConfigStore>,
     window: Single<Entity, With<Window>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands.entity(*window).observe(observe_mouse);
 
@@ -52,6 +57,17 @@ fn startup(
                 .translation
                 .distance(joint_1_position.translation),
         ),
+        Mesh2d(
+            meshes.add(Capsule2d::new(
+                5.0,
+                root_position
+                    .translation
+                    .distance(joint_1_position.translation),
+            )),
+        ),
+        MeshMaterial2d(
+            materials.add(Color::hsl(200., 0.95, 0.7)),
+        ),
         children![(
             Name::new("Joint1"),
             joint_1_position,
@@ -60,6 +76,17 @@ fn startup(
                     .translation
                     .distance(joint_2_position.translation),
             ),
+            Mesh2d(meshes.add(
+                Capsule2d::new(
+                    5.0,
+                    joint_1_position.translation.distance(
+                        joint_2_position.translation
+                    )
+                )
+            ),),
+            MeshMaterial2d(
+                materials.add(Color::hsl(200., 0.95, 0.7)),
+            ),
             children![(
                 Name::new("Joint2"),
                 joint_2_position,
@@ -67,35 +94,33 @@ fn startup(
         )],
     ));
 
-    // commands.spawn((
-    //     Name::new("IKRoot"),
-    //     InverseKinematics,
-    //     root_position
-    //         .with_translation(Vec3::new(200., 0.,
-    // 0.)),     BoneLength(
-    //         root_position
-    //             .translation
-    //
-    // .distance(joint_1_position.translation),
-    //     ),
-    //     children![
-    //         // bones
-    //         (
-    //             Name::new("Joint1"),
-    //             joint_1_position,
-    //             BoneLength(
-    //
-    // joint_1_position.translation.distance(
-    //
-    // joint_2_position.translation
-    // ),             ),
-    //             children![(
-    //                 Name::new("Joint2"),
-    //                 joint_2_position,
-    //             )]
-    //         )
-    //     ],
-    // ));
+    commands.spawn((
+        Name::new("IKRoot"),
+        InverseKinematics,
+        root_position
+            .with_translation(Vec3::new(200., 0., 0.)),
+        BoneLength(
+            root_position
+                .translation
+                .distance(joint_1_position.translation),
+        ),
+        children![
+            // bones
+            (
+                Name::new("Joint1"),
+                joint_1_position,
+                BoneLength(
+                    joint_1_position.translation.distance(
+                        joint_2_position.translation
+                    ),
+                ),
+                children![(
+                    Name::new("Joint2"),
+                    joint_2_position,
+                )]
+            )
+        ],
+    ));
 
     // let root_position = Transform::default();
     // let joint_position = Transform::from_xyz(30., 30., 0.);
@@ -107,7 +132,7 @@ fn startup(
     // touch this flapjack stack of bones. There is
     // no other purpose for it.
     #[rustfmt::skip]
-    let spawn_lots = || {
+    let mut spawn_lots = || {
     // commands.spawn((
     //     Name::new("IKRoot"),
     //     InverseKinematics,
@@ -249,12 +274,15 @@ fn update(
                 // get the bone length of the first node
                 // and use it to figure out the position
                 // entity b should be at.
-                let bone_a = bone_lengths.get(a).unwrap();
-                let bone_vector = mouse_vector * bone_a.0;
-                let mut transform =
-                    transforms.get_mut(b).unwrap();
-                transform.translation.x = bone_vector.x;
-                transform.translation.y = bone_vector.y;
+                // let bone_a = bone_lengths.get(a).unwrap();
+                // let bone_vector = mouse_vector * bone_a.0;
+                // let mut transform =
+                //     transforms.get_mut(b).unwrap();
+                // transform.translation.x = bone_vector.x;
+                // transform.translation.y = bone_vector.y;
+                // transform.rotation = Quat::IDENTITY;
+
+                // replicate code from rotation calculations
             }
 
             continue 'ik_bodies;
@@ -387,14 +415,34 @@ fn update(
             );
         }
 
+        info!(?current_positions);
+
+        // Update Root node rotation
+        let relative =
+            current_positions[1].0 - current_positions[0].0;
+
+        // set "root" to its proper rotation
+        // let mut transform =
+        //     transforms.get_mut(root_entity).unwrap();
+        let angle = relative.to_angle();
+        let current_rotation =
+            Quat::from_axis_angle(Vec3::Z, angle);
+        let mut transform =
+            transforms.get_mut(root_entity).unwrap();
+        transform.rotation = current_rotation;
+
         // Update all `Transform`s by taking global
         // positions and converting them to
         // relative measurements suitable
         // for `Transform`
-        let it = current_positions.into_iter();
+        let it = current_positions.iter();
         for (
-            (_, (previous_node_global_position, _)),
+            (
+                root_entity,
+                (previous_node_global_position, _),
+            ),
             (entity, (global_position, _)),
+            (last_entity, (last_pos, _)),
         ) in std::iter::once(root_entity)
             .chain(children.iter_descendants(root_entity))
             .zip(it)
@@ -403,11 +451,98 @@ fn update(
             let relative = global_position
                 - previous_node_global_position;
 
+            // set "root" to its proper rotation
+            // let mut transform =
+            //     transforms.get_mut(root_entity).unwrap();
+            let angle = relative.to_angle();
+            let parent = Transform::from_xyz(
+                previous_node_global_position.x,
+                previous_node_global_position.y,
+                0.,
+            )
+            .with_rotation(
+                Quat::from_axis_angle(Vec3::Z, angle),
+            );
+
+            let current_node = Transform::from_xyz(
+                global_position.x,
+                global_position.y,
+                0.,
+            )
+            .with_rotation(
+                Quat::from_axis_angle(
+                    Vec3::Z,
+                    (last_pos - global_position).to_angle(),
+                ),
+            );
+            let (scale, rotation, translation) =
+                (parent.compute_affine().inverse()
+                    * current_node.compute_affine())
+                .to_scale_rotation_translation();
+
             let mut transform =
                 transforms.get_mut(entity).unwrap();
-            transform.translation.x = relative.x;
-            transform.translation.y = relative.y;
+            transform.scale = scale;
+            transform.rotation = rotation;
+            transform.translation = translation;
         }
+
+        // Duplicate logic: REFACTOR NEEDED
+        let Some((
+            (last_position, last_bone),
+            (next_to_last_position, next_to_last_bone),
+        )) = current_positions
+            .iter()
+            .rev()
+            .tuple_windows()
+            .next()
+        else {
+            error!("unhandled tip!");
+            continue 'ik_bodies;
+        };
+
+        let relative =
+            last_position - next_to_last_position;
+
+        // set "root" to its proper rotation
+        // let mut transform =
+        //     transforms.get_mut(root_entity).unwrap();
+        let angle = relative.to_angle();
+        let parent = Transform::from_xyz(
+            next_to_last_position.x,
+            next_to_last_position.y,
+            0.,
+        )
+        .with_rotation(Quat::from_axis_angle(
+            Vec3::Z,
+            angle,
+        ));
+
+        let current_node = Transform::from_xyz(
+            last_position.x,
+            last_position.y,
+            0.,
+        )
+        .with_rotation(Quat::from_axis_angle(
+            Vec3::Z,
+            // same as "next_to_last's" rotation
+            (last_position - next_to_last_position)
+                .to_angle(),
+        ));
+        let (scale, rotation, translation) =
+            (parent.compute_affine().inverse()
+                * current_node.compute_affine())
+            .to_scale_rotation_translation();
+
+        let entity = children
+            .iter_descendants(root_entity)
+            .last()
+            .unwrap();
+        let mut transform =
+            transforms.get_mut(entity).unwrap();
+        transform.scale = scale;
+        transform.rotation = rotation;
+        transform.translation = translation;
     }
 }
 
