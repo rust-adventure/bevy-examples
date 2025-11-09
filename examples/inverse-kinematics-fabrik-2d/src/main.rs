@@ -60,6 +60,7 @@ fn startup(
                 .translation
                 .distance(joint_1_position.translation),
         ),
+        Visibility::Inherited,
         children![
             (
                 Mesh2d(meshes.add(Capsule2d::new(
@@ -94,6 +95,7 @@ fn startup(
                         joint_2_position.translation
                     ),
                 ),
+                Visibility::Inherited,
                 children![
                     (
                         Mesh2d(
@@ -297,6 +299,7 @@ fn debug_transforms(
     }
 }
 
+#[derive(Debug, Clone)]
 struct CurrentPosition {
     position: Vec2,
     bone_length: BoneLength,
@@ -387,53 +390,11 @@ fn update(
             SLATE_400,
         );
 
-        // if target isn't reachable, return
-        //
-        // if the `total_length` of the bones is less than
-        // the distance required to reach the mouse, then
-        // we can't make it to the target mouse location
-        let root_translation = global_transforms
-            .get(root_entity)
-            .unwrap()
-            .translation()
-            .xy();
-        if total_length < root_translation.distance(target)
-        {
-            // mouse is out of reach!
-            // orient all bones in straight line to mouse
-            // direction
-            let target_direction =
-                (target - root_translation).normalize();
-
-            // for (a, b) in std::iter::once(root_entity)
-            //     .chain(
-            //         children.iter_descendants(root_entity),
-            //     )
-            //     .tuple_windows()
-            // {
-            //     // get the bone length of the first node
-            //     // and use it to figure out the position
-            //     // entity b should be at.
-            //     // let bone_a = bone_lengths.get(a).unwrap();
-            //     // let bone_vector = mouse_vector * bone_a.0;
-            //     // let mut transform =
-            //     //     transforms.get_mut(b).unwrap();
-            //     // transform.translation.x = bone_vector.x;
-            //     // transform.translation.y = bone_vector.y;
-            //     // transform.rotation = Quat::IDENTITY;
-
-            //     // replicate code from rotation calculations
-            // }
-
-            continue 'ik_bodies;
-        }
-
         // We use this `Vec` to store the calculations
         // we make that mutate the `GlobalPosition`s.
         // After the loop ends, we take this `Vec` and
         // use the values to update the `Transform`
         // components
-
         let mut current_positions: Vec<CurrentPosition> =
             std::iter::once(CurrentPosition {
                 position: end_effector_global_transform
@@ -470,6 +431,55 @@ fn update(
             .collect();
         // put root_entity at beginning
         current_positions.reverse();
+
+        // if target isn't reachable, return
+        //
+        // if the `total_length` of the bones is less than
+        // the distance required to reach the mouse, then
+        // we can't make it to the target mouse location
+        let root_translation = global_transforms
+            .get(root_entity)
+            .unwrap()
+            .translation()
+            .xy();
+        if total_length < root_translation.distance(target)
+        {
+            // mouse is out of reach!
+            // orient all bones in straight line to mouse
+            // direction
+            let target_direction =
+                (target - root_translation).normalize();
+
+            // produce a new current_positions by setting
+            // every bone joint to the edge of the previous
+            // bone in the direction of the target, forming
+            // a straight line.
+            let current_positions: Vec<CurrentPosition> =
+                current_positions
+                    .into_iter()
+                    .scan(None, |state, next| {
+                        let Some(p) = state else {
+                            *state = Some(next);
+                            return state.clone();
+                        };
+
+                        *state = Some(CurrentPosition {
+                            position: p.position
+                                + target_direction
+                                    * p.bone_length.0,
+                            ..next
+                        });
+                        return state.clone();
+                    })
+                    .collect();
+
+            set_transforms(
+                &current_positions,
+                &mut transforms,
+            );
+
+            continue 'ik_bodies;
+        }
 
         // `diff` is "how far off is the end joint from
         // the target?"
@@ -530,68 +540,7 @@ fn update(
             );
         }
 
-        // info!(?current_positions);
-        // At this point we have all of the global positions
-        // and the FABRIK calculation is over.
-        // everything below this point is taking the global
-        // positions and translating them into the
-        // Transform hierarchy so we can apply them to the
-        // actual Transforms
-        let mut parent_global_transform: Option<Transform> =
-            None;
-        let mut it = current_positions.iter().peekable();
-        while let (Some(current), next) =
-            (it.next(), it.peek())
-        {
-            let current_node = Transform::from_xyz(
-                current.position.x,
-                current.position.y,
-                0.,
-            )
-            // if there is no `next` node, we're
-            // dealing with the tail, which does
-            // all the same calculations, but uses
-            // the last joint's rotation value
-            .with_rotation(match next {
-                Some(_) => Quat::from_axis_angle(
-                    Vec3::Z,
-                    (next.unwrap().position
-                        - current.position)
-                        .to_angle(),
-                ),
-                None => {
-                    parent_global_transform
-                        .unwrap()
-                        .rotation
-                }
-            });
-
-            let Some(parent) = parent_global_transform
-            else {
-                let mut transform = transforms
-                    .get_mut(current.entity)
-                    .unwrap();
-                transform.rotation = current_node.rotation;
-                parent_global_transform =
-                    Some(current_node);
-                continue;
-            };
-
-            let (scale, rotation, translation) =
-                (parent.compute_affine().inverse()
-                    * current_node.compute_affine())
-                .to_scale_rotation_translation();
-
-            let mut transform =
-                transforms.get_mut(current.entity).unwrap();
-            transform.scale = scale;
-            transform.rotation = rotation;
-            transform.translation = translation;
-
-            // store the values we calculated for future
-            // processing
-            parent_global_transform = Some(current_node);
-        }
+        set_transforms(&current_positions, &mut transforms);
     }
 }
 
@@ -706,4 +655,72 @@ fn backward_pass(
             - vector.normalize() * previous.bone_length.0;
     }
     Ok(())
+}
+
+fn set_transforms(
+    current_positions: &[CurrentPosition],
+    transforms: &mut Query<&mut Transform>,
+) {
+    // info!(?current_positions);
+    // At this point we have all of the global positions
+    // and the FABRIK calculation is over.
+    // everything below this point is taking the global
+    // positions and translating them into the
+    // Transform hierarchy so we can apply them to the
+    // actual Transforms
+    let mut parent_global_transform: Option<Transform> =
+        None;
+    let mut it = current_positions.iter().peekable();
+    while let (Some(current), next) = (it.next(), it.peek())
+    {
+        let current_node = Transform::from_xyz(
+            current.position.x,
+            current.position.y,
+            0.,
+        )
+        // if there is no `next` node, we're
+        // dealing with the tail, which does
+        // all the same calculations, but uses
+        // the last joint's rotation value
+        .with_rotation(match next {
+            Some(_) => Quat::from_axis_angle(
+                Vec3::Z,
+                (next.unwrap().position - current.position)
+                    .to_angle(),
+            ),
+            None => {
+                parent_global_transform.unwrap().rotation
+            }
+        });
+
+        // if there's no parent, then we're
+        // dealing with the root bone, which
+        // doesn't move so we can set rotation
+        // and parent_global_transform, then
+        // continue
+        let Some(parent) = parent_global_transform else {
+            let mut transform =
+                transforms.get_mut(current.entity).unwrap();
+            transform.rotation = current_node.rotation;
+            parent_global_transform = Some(current_node);
+            continue;
+        };
+
+        // use the "global" Transforms to calculate
+        // the proper rotations using affine inverse
+        let (scale, rotation, translation) =
+            (parent.compute_affine().inverse()
+                * current_node.compute_affine())
+            .to_scale_rotation_translation();
+
+        let mut transform =
+            transforms.get_mut(current.entity).unwrap();
+        transform.scale = scale;
+        transform.rotation = rotation;
+        transform.translation = translation;
+
+        // store the values we calculated for future
+        // processing
+        parent_global_transform = Some(current_node);
+    }
 }
