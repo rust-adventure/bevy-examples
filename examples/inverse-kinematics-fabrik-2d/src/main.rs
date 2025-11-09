@@ -1,3 +1,5 @@
+use std::f32::consts::FRAC_PI_2;
+
 use bevy::{color::palettes::tailwind::*, prelude::*};
 use itertools::Itertools;
 
@@ -16,7 +18,9 @@ fn main() {
 struct DottedGizmos;
 
 #[derive(Debug, Component)]
-struct InverseKinematics;
+struct InverseKinematicEndEffector {
+    affected_bone_count: u32,
+}
 
 #[derive(Debug, Component, Clone)]
 struct BoneLength(f32);
@@ -42,132 +46,244 @@ fn startup(
 
     commands.spawn(Camera2d);
 
-    let root_position = Transform::default();
-    let joint_1_position =
-        Transform::from_xyz(100., 200., 0.);
-    let joint_2_position =
-        Transform::from_xyz(100., 100., 0.);
-
-    commands.spawn((
-        Name::new("IKRoot"),
-        InverseKinematics,
-        root_position,
-        BoneLength(
-            root_position
-                .translation
-                .distance(joint_1_position.translation),
-        ),
-        Mesh2d(
-            meshes.add(Capsule2d::new(
-                5.0,
-                root_position
-                    .translation
-                    .distance(joint_1_position.translation),
-            )),
-        ),
-        MeshMaterial2d(
-            materials.add(Color::hsl(200., 0.95, 0.7)),
-        ),
-        children![(
-            Name::new("Joint1"),
-            joint_1_position,
-            BoneLength(
-                joint_1_position
-                    .translation
-                    .distance(joint_2_position.translation),
-            ),
-            Mesh2d(meshes.add(
-                Capsule2d::new(
-                    5.0,
-                    joint_1_position.translation.distance(
-                        joint_2_position.translation
-                    )
-                )
-            ),),
-            MeshMaterial2d(
-                materials.add(Color::hsl(200., 0.95, 0.7)),
-            ),
-            children![(
-                Name::new("Joint2"),
-                joint_2_position,
-            )]
-        )],
-    ));
-
-    commands.spawn((
-        Name::new("IKRoot"),
-        InverseKinematics,
-        root_position
-            .with_translation(Vec3::new(200., 0., 0.)),
-        BoneLength(
-            root_position
-                .translation
-                .distance(joint_1_position.translation),
-        ),
-        children![
-            // bones
-            (
-                Name::new("Joint1"),
-                joint_1_position,
-                BoneLength(
-                    joint_1_position.translation.distance(
-                        joint_2_position.translation
-                    ),
-                ),
-                children![(
-                    Name::new("Joint2"),
-                    joint_2_position,
-                )]
-            )
-        ],
-    ));
-
     // let root_position = Transform::default();
-    // let joint_position = Transform::from_xyz(30.,
-    // 30., 0.); let joint_2_position =
-    //     Transform::from_xyz(30., 30., 0.);
+    // let joint_1_position =
+    //     Transform::from_xyz(100., 200., 0.);
+    // let joint_2_position =
+    //     Transform::from_xyz(100., 100., 0.);
+
+    // commands.spawn((
+    //     Name::new("IKRoot"),
+    //     root_position,
+    //     BoneLength(
+    //         root_position
+    //             .translation
+    //             .distance(joint_1_position.translation),
+    //     ),
+    //     children![
+    //         (
+    //             Mesh2d(meshes.add(Capsule2d::new(
+    //                 5.0,
+    //                 root_position.translation.distance(
+    //                     joint_1_position.translation
+    //                 ),
+    //             )),),
+    //             MeshMaterial2d(
+    //                 materials
+    //                     .add(Color::hsl(200., 0.95, 0.7)),
+    //             ),
+    //             Transform::from_xyz(
+    //                 root_position.translation.distance(
+    //                     joint_1_position.translation
+    //                 ) / 2.,
+    //                 0.,
+    //                 0.
+    //             )
+    //             .with_rotation(
+    //                 Quat::from_axis_angle(
+    //                     Vec3::Z,
+    //                     FRAC_PI_2
+    //                 )
+    //             )
+    //         ),
+    //         (
+    //             Name::new("Joint1"),
+    //             joint_1_position,
+    //             BoneLength(
+    //                 joint_1_position.translation.distance(
+    //                     joint_2_position.translation
+    //                 ),
+    //             ),
+    //             children![
+    //                 (
+    //                     Mesh2d(
+    //                         meshes.add(Capsule2d::new(
+    //                             5.0,
+    //                             joint_1_position
+    //                                 .translation
+    //                                 .distance(
+    //                                     joint_2_position
+    //                                         .translation
+    //                                 )
+    //                         )),
+    //                     ),
+    //                     MeshMaterial2d(materials.add(
+    //                         Color::hsl(200., 0.95, 0.7)
+    //                     ),),
+    //                     Transform::from_xyz(
+    //                         joint_1_position
+    //                             .translation
+    //                             .distance(
+    //                                 joint_2_position
+    //                                     .translation
+    //                             )
+    //                             / 2.,
+    //                         0.,
+    //                         0.
+    //                     )
+    //                     .with_rotation(
+    //                         Quat::from_axis_angle(
+    //                             Vec3::Z,
+    //                             FRAC_PI_2
+    //                         )
+    //                     )
+    //                 ),
+    //                 (
+    //                     InverseKinematicEndEffector {
+    //                         affected_bone_count: 2
+    //                     },
+    //                     Name::new("Joint2"),
+    //                     joint_2_position,
+    //                 )
+    //             ]
+    //         )
+    //     ],
+    // ));
+
+    // commands.spawn((
+    //     Name::new("IKRoot"),
+    //     root_position
+    //         .with_translation(Vec3::new(200., 0., 0.)),
+    //     BoneLength(
+    //         root_position
+    //             .translation
+    //             .distance(joint_1_position.translation),
+    //     ),
+    //     children![
+    //         // bones
+    //         (
+    //             Name::new("Joint1"),
+    //             joint_1_position,
+    //             BoneLength(
+    //                 joint_1_position.translation.distance(
+    //                     joint_2_position.translation
+    //                 ),
+    //             ),
+    //             children![(
+    //                 InverseKinematicEndEffector {
+    //                     affected_bone_count: 2
+    //                 },
+    //                 Name::new("Joint2"),
+    //                 joint_2_position,
+    //             )]
+    //         )
+    //     ],
+    // ));
+
+    let root_position = Transform::default();
+    let joint_position = Transform::from_xyz(30., 30., 0.);
+    let joint_2_position =
+        Transform::from_xyz(30., 30., 0.);
 
     // ooh wow does rustfmt not like this nesting lol
     // this outer closure is so that rustfmt doesn't
     // touch this flapjack stack of bones. There is
     // no other purpose for it.
     #[rustfmt::skip]
-    let spawn_lots = || {
-    // commands.spawn((
-    //     Name::new("IKRoot"),
-    //     InverseKinematics,
-    //     root_position,
-    //     BoneLength(joint_position.translation.length()),
-    //     children![(
-    //         Name::new("Joint1"),
-    //         joint_position,
-    //         BoneLength(joint_position.translation.length()),
-    //         children![(
-    //             Name::new("Joint2"),
-    //             joint_position,
-    //             BoneLength(joint_position.translation.length()),
-    //             children![(
-    //                 Name::new("Joint3"),
-    //                 joint_position,
-    //                 BoneLength(joint_position.translation.length()),
-    //                 children![(
-    //                     Name::new("Joint4"),
-    //                     joint_position,
-    //                     BoneLength(joint_position.translation.length()),
-    //                     children![(
-    //                         Name::new("Joint5"),
-    //                         joint_position,
-    //                         BoneLength(joint_position.translation.length()),
-    //                         children![(
-    //                             Name::new("Joint6"),
-    //                             joint_2_position,
-    //                         )]
-    //                     )],
-    //                 )],
-    //             )],
-    //         )],
-    //     )],
-    // ));
+    let mut spawn_lots = || {
+    commands.spawn((
+        Name::new("IKRoot"),
+        root_position,
+        BoneLength(joint_position.translation.length()),
+        Visibility::Inherited,
+        children![(
+            Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+            MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+            Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                .with_rotation(
+                    Quat::from_axis_angle(
+                        Vec3::Z,
+                        FRAC_PI_2
+                    )
+                ),
+            ),(
+            Name::new("Joint1"),
+            joint_position,
+            BoneLength(joint_position.translation.length()),
+            Visibility::Inherited,
+            children![(
+                Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                    .with_rotation(
+                        Quat::from_axis_angle(
+                            Vec3::Z,
+                            FRAC_PI_2
+                        )
+                    ),
+                ),(
+                Name::new("Joint2"),
+                joint_position,
+                BoneLength(joint_position.translation.length()),
+                Visibility::Inherited,
+                children![(
+                    Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                    MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                    Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                        .with_rotation(
+                            Quat::from_axis_angle(
+                                Vec3::Z,
+                                FRAC_PI_2
+                            )
+                        ),
+                    ),(
+                    Name::new("Joint3"),
+                    joint_position,
+                    BoneLength(joint_position.translation.length()),
+                    Visibility::Inherited,
+                    children![(
+                        Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                        MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                        Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                            .with_rotation(
+                                Quat::from_axis_angle(
+                                    Vec3::Z,
+                                    FRAC_PI_2
+                                )
+                            ),
+                        ),(
+                        Name::new("Joint4"),
+                        joint_position,
+                        BoneLength(joint_position.translation.length()),
+                        Visibility::Inherited,
+                        children![(
+                            Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                            MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                            Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                                .with_rotation(
+                                    Quat::from_axis_angle(
+                                        Vec3::Z,
+                                        FRAC_PI_2
+                                    )
+                                ),
+                            ),(
+                            Name::new("Joint5"),
+                            joint_position,
+                            BoneLength(joint_position.translation.length()),
+                            Visibility::Inherited,
+                            children![(
+                                Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                                MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                                Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                                    .with_rotation(
+                                        Quat::from_axis_angle(
+                                            Vec3::Z,
+                                            FRAC_PI_2
+                                        )
+                                    ),
+                                ),(
+                                InverseKinematicEndEffector {
+                                    affected_bone_count: 6
+                                },
+                                Name::new("Joint6"),
+                                joint_2_position,
+                            )]
+                        )],
+                    )],
+                )],
+            )],
+        )],
+    ));
     };
     spawn_lots();
 }
@@ -184,12 +300,18 @@ fn debug_transforms(
 const TOLERANCE: f32 = 1.;
 
 fn update(
-    ik_roots: Query<
-        (Entity, &BoneLength),
-        With<InverseKinematics>,
-    >,
-    children: Query<&Children>,
-    bone_lengths: Query<&BoneLength>,
+    ik_end_effectors: Query<(
+        Entity,
+        &InverseKinematicEndEffector,
+        &GlobalTransform,
+    )>,
+    // children: Query<&Children>,
+    parents: Query<&ChildOf>,
+    bone_lengths: Query<(
+        &BoneLength,
+        &GlobalTransform,
+        Entity,
+    )>,
     mut gizmos: Gizmos,
     mut dotted_gizmos: Gizmos<DottedGizmos>,
     mouse_position: Option<Res<MousePosition>>,
@@ -207,9 +329,23 @@ fn update(
     // iterate over all ik bodies in the scene
     // using 'ik_bodies as a label in case we have to
     // abandon a specific ik root's processing
-    'ik_bodies: for (root_entity, root_bone_length) in
-        ik_roots.iter()
+    'ik_bodies: for (
+        end_effector_entity,
+        end_effector,
+        end_effector_global_transform,
+    ) in ik_end_effectors.iter()
     {
+        let Some(root_entity) = parents
+            .iter_ancestors(end_effector_entity)
+            .nth(
+                end_effector.affected_bone_count as usize
+                    - 1,
+            )
+        else {
+            // if no root entity, continue to another body
+            warn!("no root!");
+            continue 'ik_bodies;
+        };
         // dotted_gizmos.arrow_2d(
         //     root_transform.translation.xy(),
         //     mouse_position.0,
@@ -220,14 +356,15 @@ fn update(
         // sum the length of all bones.
         // `iter_descendants` doesn't include the root
         // element, so we add the root bone length
-        let total_length = root_bone_length.0
-            + children
-                .iter_descendants(root_entity)
-                .filter_map(|entity| {
-                    bone_lengths.get(entity).ok()
-                })
-                .map(|bone| bone.0)
-                .sum::<f32>();
+        // If end_effector has length, add it here
+        let total_length = parents
+            .iter_ancestors(end_effector_entity)
+            .take(end_effector.affected_bone_count as usize)
+            .filter_map(|entity| {
+                bone_lengths.get(entity).ok()
+            })
+            .map(|bone| bone.0.0)
+            .sum::<f32>();
 
         // info!(?total_length);
 
@@ -261,25 +398,25 @@ fn update(
                 - root_translation)
                 .normalize();
 
-            for (a, b) in std::iter::once(root_entity)
-                .chain(
-                    children.iter_descendants(root_entity),
-                )
-                .tuple_windows()
-            {
-                // get the bone length of the first node
-                // and use it to figure out the position
-                // entity b should be at.
-                // let bone_a = bone_lengths.get(a).unwrap();
-                // let bone_vector = mouse_vector * bone_a.0;
-                // let mut transform =
-                //     transforms.get_mut(b).unwrap();
-                // transform.translation.x = bone_vector.x;
-                // transform.translation.y = bone_vector.y;
-                // transform.rotation = Quat::IDENTITY;
+            // for (a, b) in std::iter::once(root_entity)
+            //     .chain(
+            //         children.iter_descendants(root_entity),
+            //     )
+            //     .tuple_windows()
+            // {
+            //     // get the bone length of the first node
+            //     // and use it to figure out the position
+            //     // entity b should be at.
+            //     // let bone_a = bone_lengths.get(a).unwrap();
+            //     // let bone_vector = mouse_vector * bone_a.0;
+            //     // let mut transform =
+            //     //     transforms.get_mut(b).unwrap();
+            //     // transform.translation.x = bone_vector.x;
+            //     // transform.translation.y = bone_vector.y;
+            //     // transform.rotation = Quat::IDENTITY;
 
-                // replicate code from rotation calculations
-            }
+            //     // replicate code from rotation calculations
+            // }
 
             continue 'ik_bodies;
         }
@@ -289,32 +426,49 @@ fn update(
         // After the loop ends, we take this `Vec` and
         // use the values to update the `Transform`
         // components
-        let mut current_positions: Vec<_> = std::iter::once((
-            root_translation,
-            root_bone_length,
-        ))
-        .chain(children.iter_descendants(root_entity).map(|entity| (
-            global_transforms.get(entity)
-                .expect("bones should have GlobalTransform components")
-                .translation().xy(),
-            bone_lengths.get(entity).unwrap_or(&BoneLength(0.0))
-        ))).collect();
 
-        // end effector is the last joint without a child
-        let end_effector = children
-            .iter_descendants(root_entity)
-            .last()
-            .and_then(|entity| {
-                global_transforms.get(entity).ok()
-            })
-            .expect("there should be a final bone")
-            .translation()
-            .xy();
+        let mut current_positions: Vec<_> =
+            std::iter::once((
+                end_effector_global_transform
+                    .translation()
+                    .xy(),
+                BoneLength(0.),
+                end_effector_entity,
+            ))
+            .chain(
+                parents
+                    .iter_ancestors(end_effector_entity)
+                    .take(
+                        end_effector.affected_bone_count
+                            as usize,
+                    )
+                    .map(|entity| {
+                        bone_lengths
+                            .get(entity)
+                            .map(
+                                |(bone, global, entity)| {
+                                    (
+                                        global
+                                            .translation()
+                                            .xy(),
+                                        bone.clone(),
+                                        entity,
+                                    )
+                                },
+                            )
+                            .unwrap()
+                    }),
+            )
+            .collect();
+        // put root_entity at beginning
+        current_positions.reverse();
 
         // `diff` is "how far off is the end joint from
         // the target?"
-        let mut diff =
-            end_effector.distance(mouse_position.0);
+        let mut diff = end_effector_global_transform
+            .translation()
+            .xy()
+            .distance(mouse_position.0);
 
         // loop for forward/backward passes
         // keeps track of iteration count because
@@ -335,7 +489,7 @@ fn update(
             //
             // which is an iteration from the end_effector
             // bone, to the root bone
-            if let Some((pos, _)) =
+            if let Some((pos, _, _)) =
                 current_positions.last_mut()
             {
                 pos.x = mouse_position.0.x;
@@ -369,7 +523,7 @@ fn update(
 
             // which is an iteration from the root to
             // the end_effector
-            if let Some((pos, _)) =
+            if let Some((pos, _, _)) =
                 current_positions.first_mut()
             {
                 pos.x = root_translation.x;
@@ -386,8 +540,10 @@ fn update(
             // avoiding indices when possible
             let mut it =
                 current_positions.iter_mut().peekable();
-            while let (Some((p1, p1_bone)), Some((p2, _))) =
-                (it.next(), it.peek_mut())
+            while let (
+                Some((p1, p1_bone, _)),
+                Some((p2, _, _)),
+            ) = (it.next(), it.peek_mut())
             {
                 let vector = *p1 - *p2;
                 *p2 = *p1 - vector.normalize() * p1_bone.0;
@@ -411,7 +567,7 @@ fn update(
             );
         }
 
-        info!(?current_positions);
+        // info!(?current_positions);
 
         // Update Root node rotation
         let relative =
@@ -431,18 +587,11 @@ fn update(
         // positions and converting them to
         // relative measurements suitable
         // for `Transform`
-        let it = current_positions.iter();
         for (
-            (
-                root_entity,
-                (previous_node_global_position, _),
-            ),
-            (entity, (global_position, _)),
-            (last_entity, (last_pos, _)),
-        ) in std::iter::once(root_entity)
-            .chain(children.iter_descendants(root_entity))
-            .zip(it)
-            .tuple_windows()
+            (previous_node_global_position, _, root_entity),
+            (global_position, _, entity),
+            (last_pos, _, last_entity),
+        ) in current_positions.iter().tuple_windows()
         {
             let relative = global_position
                 - previous_node_global_position;
@@ -477,7 +626,7 @@ fn update(
                 .to_scale_rotation_translation();
 
             let mut transform =
-                transforms.get_mut(entity).unwrap();
+                transforms.get_mut(*entity).unwrap();
             transform.scale = scale;
             transform.rotation = rotation;
             transform.translation = translation;
@@ -485,8 +634,8 @@ fn update(
 
         // Duplicate logic: REFACTOR NEEDED
         let Some((
-            (last_position, _),
-            (next_to_last_position, _),
+            (last_position, _, _),
+            (next_to_last_position, _, _),
         )) = current_positions
             .iter()
             .rev()
@@ -530,12 +679,9 @@ fn update(
                 * current_node.compute_affine())
             .to_scale_rotation_translation();
 
-        let entity = children
-            .iter_descendants(root_entity)
-            .last()
+        let mut transform = transforms
+            .get_mut(end_effector_entity)
             .unwrap();
-        let mut transform =
-            transforms.get_mut(entity).unwrap();
         transform.scale = scale;
         transform.rotation = rotation;
         transform.translation = translation;
