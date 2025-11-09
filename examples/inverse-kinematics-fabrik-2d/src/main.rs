@@ -389,7 +389,7 @@ fn update(
             .translation()
             .xy();
         if total_length
-            < (root_translation - mouse_position.0).length()
+            < root_translation.distance(mouse_position.0)
         {
             // mouse is out of reach!
             // orient all bones in straight line to mouse
