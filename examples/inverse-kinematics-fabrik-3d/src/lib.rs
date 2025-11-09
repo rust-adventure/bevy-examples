@@ -52,7 +52,6 @@ pub fn process_inverse_kinematics(
     // "target" so if we don't have one, there is
     // no target
     let Some(target) = mouse_position.map(|resource| resource.0) else {
-        info!("no mouse");
         return;
     };
 
@@ -133,7 +132,6 @@ pub fn process_inverse_kinematics(
         // we can't make it to the target mouse location
         let root_translation = global_transforms.get(root_entity).unwrap().translation();
         if total_length < root_translation.distance(target) {
-            info!("out of range");
             // mouse is out of reach!
             // orient all bones in straight line to mouse
             // direction
@@ -292,9 +290,7 @@ fn set_transforms(current_positions: &[CurrentPosition], transforms: &mut Query<
             // the last joint's rotation value
             .with_rotation(match next {
                 Some(_) => {
-                    let direction = next.unwrap().position - current.position;
-
-                    Quat::from_rotation_arc(Vec3::ZERO, direction)
+                    Quat::from_rotation_arc(Vec3::ZERO, next.unwrap().position - current.position)
                 }
                 None => parent_global_transform.unwrap().rotation,
             });
