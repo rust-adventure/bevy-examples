@@ -38,17 +38,9 @@ const TOLERANCE: f32 = 1.;
 /// The primary system that checks for ik chains that should be processed,
 /// then does some setup before kicking off FABRIK
 pub fn process_inverse_kinematics(
-    ik_end_effectors: Query<(
-        Entity,
-        &InverseKinematicEndEffector,
-        &GlobalTransform,
-    )>,
+    ik_end_effectors: Query<(Entity, &InverseKinematicEndEffector, &GlobalTransform)>,
     parents: Query<&ChildOf>,
-    bone_lengths: Query<(
-        &BoneLength,
-        &GlobalTransform,
-        Entity,
-    )>,
+    bone_lengths: Query<(&BoneLength, &GlobalTransform, Entity)>,
     mut gizmos: Gizmos,
     mut dotted_gizmos: Gizmos<DottedGizmos>,
     mouse_position: Option<Res<MousePosition>>,
@@ -59,9 +51,7 @@ pub fn process_inverse_kinematics(
     // everything the mouse_position is our
     // "target" so if we don't have one, there is
     // no target
-    let Some(target) =
-        mouse_position.map(|resource| resource.0)
-    else {
+    let Some(target) = mouse_position.map(|resource| resource.0) else {
         info!("no mouse");
         return;
     };
@@ -69,18 +59,12 @@ pub fn process_inverse_kinematics(
     // iterate over all ik bodies in the scene
     // using 'ik_bodies as a label in case we have to
     // abandon a specific ik root's processing
-    'ik_bodies: for (
-        end_effector_entity,
-        end_effector,
-        end_effector_global_transform,
-    ) in ik_end_effectors.iter()
+    'ik_bodies: for (end_effector_entity, end_effector, end_effector_global_transform) in
+        ik_end_effectors.iter()
     {
         let Some(root_entity) = parents
             .iter_ancestors(end_effector_entity)
-            .nth(
-                end_effector.affected_bone_count as usize
-                    - 1,
-            )
+            .nth(end_effector.affected_bone_count as usize - 1)
         else {
             // if no root entity, continue to another body
             warn!("no root!");
@@ -101,19 +85,14 @@ pub fn process_inverse_kinematics(
         let total_length = parents
             .iter_ancestors(end_effector_entity)
             .take(end_effector.affected_bone_count as usize)
-            .filter_map(|entity| {
-                bone_lengths.get(entity).ok()
-            })
-            .map(|bone| bone.0.0)
+            .filter_map(|entity| bone_lengths.get(entity).ok())
+            .map(|bone| bone.0 .0)
             .sum::<f32>();
 
         // info!(?total_length);
 
         gizmos.circle(
-            global_transforms
-                .get(root_entity)
-                .unwrap()
-                .translation(),
+            global_transforms.get(root_entity).unwrap().translation(),
             total_length,
             SLATE_400,
         );
@@ -123,38 +102,27 @@ pub fn process_inverse_kinematics(
         // After the loop ends, we take this `Vec` and
         // use the values to update the `Transform`
         // components
-        let mut current_positions: Vec<CurrentPosition> =
-            std::iter::once(CurrentPosition {
-                position: end_effector_global_transform
-                    .translation(),
-                bone_length: BoneLength(0.),
-                entity: end_effector_entity,
-            })
-            .chain(
-                parents
-                    .iter_ancestors(end_effector_entity)
-                    .take(
-                        end_effector.affected_bone_count
-                            as usize,
-                    )
-                    .map(|entity| {
-                        bone_lengths
-                            .get(entity)
-                            .map(
-                                |(bone, global, entity)| {
-                                    CurrentPosition {
-                                        position: global
-                                            .translation(),
-                                        bone_length: bone
-                                            .clone(),
-                                        entity,
-                                    }
-                                },
-                            )
-                            .unwrap()
-                    }),
-            )
-            .collect();
+        let mut current_positions: Vec<CurrentPosition> = std::iter::once(CurrentPosition {
+            position: end_effector_global_transform.translation(),
+            bone_length: BoneLength(0.),
+            entity: end_effector_entity,
+        })
+        .chain(
+            parents
+                .iter_ancestors(end_effector_entity)
+                .take(end_effector.affected_bone_count as usize)
+                .map(|entity| {
+                    bone_lengths
+                        .get(entity)
+                        .map(|(bone, global, entity)| CurrentPosition {
+                            position: global.translation(),
+                            bone_length: bone.clone(),
+                            entity,
+                        })
+                        .unwrap()
+                }),
+        )
+        .collect();
         // put root_entity at beginning
         current_positions.reverse();
 
@@ -163,47 +131,36 @@ pub fn process_inverse_kinematics(
         // if the `total_length` of the bones is less than
         // the distance required to reach the mouse, then
         // we can't make it to the target mouse location
-        let root_translation = global_transforms
-            .get(root_entity)
-            .unwrap()
-            .translation();
-        if total_length < root_translation.distance(target)
-        {
+        let root_translation = global_transforms.get(root_entity).unwrap().translation();
+        if total_length < root_translation.distance(target) {
             info!("out of range");
             // mouse is out of reach!
             // orient all bones in straight line to mouse
             // direction
-            let target_direction =
-                (target - root_translation).normalize();
+            let target_direction = (target - root_translation).normalize();
 
             // produce a new current_positions by setting
             // every bone joint to the edge of the previous
             // bone in the direction of the target, forming
             // a straight line.
-            let current_positions: Vec<CurrentPosition> =
-                current_positions
-                    .into_iter()
-                    .scan(None, |state, next| {
-                        let Some(p) = state else {
-                            *state = Some(next);
-                            return state.clone();
-                        };
-
-                        *state = Some(CurrentPosition {
-                            position: p.position
-                                + target_direction
-                                    * p.bone_length.0,
-                            ..next
-                        });
-
+            let current_positions: Vec<CurrentPosition> = current_positions
+                .into_iter()
+                .scan(None, |state, next| {
+                    let Some(p) = state else {
+                        *state = Some(next);
                         return state.clone();
-                    })
-                    .collect();
+                    };
 
-            set_transforms(
-                &current_positions,
-                &mut transforms,
-            );
+                    *state = Some(CurrentPosition {
+                        position: p.position + target_direction * p.bone_length.0,
+                        ..next
+                    });
+
+                    return state.clone();
+                })
+                .collect();
+
+            set_transforms(&current_positions, &mut transforms);
 
             // continue processing other bodies
             continue 'ik_bodies;
@@ -211,9 +168,7 @@ pub fn process_inverse_kinematics(
 
         // `diff` is "how far off is the end joint from
         // the target?"
-        let mut diff = end_effector_global_transform
-            .translation()
-            .distance(target);
+        let mut diff = end_effector_global_transform.translation().distance(target);
 
         // loop for forward/backward passes
         //
@@ -232,34 +187,20 @@ pub fn process_inverse_kinematics(
             // horribly wrong, but other bodies might still
             // be ok, so we don't panic, but do skip this
             // ik chain
-            if forward_pass(&mut current_positions, &target)
-                .is_err()
-            {
+            if forward_pass(&mut current_positions, &target).is_err() {
                 continue 'ik_bodies;
             };
-            if backward_pass(
-                &mut current_positions,
-                &root_translation,
-            )
-            .is_err()
-            {
+            if backward_pass(&mut current_positions, &root_translation).is_err() {
                 continue 'ik_bodies;
             };
 
             // end_effector_position.distance(target)
-            diff = current_positions
-                .last()
-                .unwrap()
-                .position
-                .distance(target);
+            diff = current_positions.last().unwrap().position.distance(target);
         }
 
         // optional gizmos
-        for (a, b) in
-            current_positions.iter().tuple_windows()
-        {
-            dotted_gizmos
-                .arrow(a.position, b.position, PINK_400);
+        for (a, b) in current_positions.iter().tuple_windows() {
+            dotted_gizmos.arrow(a.position, b.position, PINK_400);
         }
 
         // set the Transform hierarchy for the bones using the current_positions
@@ -276,18 +217,12 @@ pub fn process_inverse_kinematics(
 //
 // forward pass is an iteration from the
 // end_effector bone, to the root bone
-fn forward_pass(
-    current_positions: &mut [CurrentPosition],
-    target: &Vec3,
-) -> Result<(), String> {
-    if let Some(end_effector) = current_positions.last_mut()
-    {
+fn forward_pass(current_positions: &mut [CurrentPosition], target: &Vec3) -> Result<(), String> {
+    if let Some(end_effector) = current_positions.last_mut() {
         end_effector.position.x = target.x;
         end_effector.position.y = target.y;
     } else {
-        return Err(
-            "bones list must have a bone".to_string()
-        );
+        return Err("bones list must have a bone".to_string());
     }
 
     // options here are using `windows_mut` from
@@ -295,14 +230,10 @@ fn forward_pass(
     // or using peekable.
     // We could also use indices, but I prefer
     // avoiding indices when possible
-    let mut it =
-        current_positions.iter_mut().rev().peekable();
-    while let (Some(previous), Some(current)) =
-        (it.next(), it.peek_mut())
-    {
+    let mut it = current_positions.iter_mut().rev().peekable();
+    while let (Some(previous), Some(current)) = (it.next(), it.peek_mut()) {
         let vector = previous.position - current.position;
-        current.position = previous.position
-            - vector.normalize() * current.bone_length.0;
+        current.position = previous.position - vector.normalize() * current.bone_length.0;
     }
 
     Ok(())
@@ -324,9 +255,7 @@ fn backward_pass(
         root.position.x = root_translation.x;
         root.position.y = root_translation.y;
     } else {
-        return Err(
-            "bones list must have a bone".to_string()
-        );
+        return Err("bones list must have a bone".to_string());
     }
 
     // options here are using `windows_mut` from
@@ -335,12 +264,9 @@ fn backward_pass(
     // We could also use indices, but I prefer
     // avoiding indices when possible
     let mut it = current_positions.iter_mut().peekable();
-    while let (Some(previous), Some(current)) =
-        (it.next(), it.peek_mut())
-    {
+    while let (Some(previous), Some(current)) = (it.next(), it.peek_mut()) {
         let vector = previous.position - current.position;
-        current.position = previous.position
-            - vector.normalize() * previous.bone_length.0;
+        current.position = previous.position - vector.normalize() * previous.bone_length.0;
     }
     Ok(())
 }
@@ -348,10 +274,7 @@ fn backward_pass(
 // Take a list of positions and bone lengths,
 // turning that into a Transform hierarchy with
 // the proper rotations, etc.
-fn set_transforms(
-    current_positions: &[CurrentPosition],
-    transforms: &mut Query<&mut Transform>,
-) {
+fn set_transforms(current_positions: &[CurrentPosition], transforms: &mut Query<&mut Transform>) {
     // info!(?current_positions);
     // At this point we have all of the global positions
     // and the FABRIK calculation is over.
@@ -359,34 +282,22 @@ fn set_transforms(
     // positions and translating them into the
     // Transform hierarchy so we can apply them to the
     // actual Transforms
-    let mut parent_global_transform: Option<Transform> =
-        None;
+    let mut parent_global_transform: Option<Transform> = None;
     let mut it = current_positions.iter().peekable();
-    while let (Some(current), next) = (it.next(), it.peek())
-    {
-        let current_node = Transform::from_xyz(
-            current.position.x,
-            current.position.y,
-            0.,
-        )
-        // if there is no `next` node, we're
-        // dealing with the tail, which does
-        // all the same calculations, but uses
-        // the last joint's rotation value
-        .with_rotation(match next {
-            Some(_) => {
-                let direction = next.unwrap().position
-                    - current.position;
+    while let (Some(current), next) = (it.next(), it.peek()) {
+        let current_node = Transform::from_xyz(current.position.x, current.position.y, 0.)
+            // if there is no `next` node, we're
+            // dealing with the tail, which does
+            // all the same calculations, but uses
+            // the last joint's rotation value
+            .with_rotation(match next {
+                Some(_) => {
+                    let direction = next.unwrap().position - current.position;
 
-                Quat::from_rotation_arc(
-                    Vec3::ZERO,
-                    direction,
-                )
-            }
-            None => {
-                parent_global_transform.unwrap().rotation
-            }
-        });
+                    Quat::from_rotation_arc(Vec3::ZERO, direction)
+                }
+                None => parent_global_transform.unwrap().rotation,
+            });
 
         // if there's no parent, then we're
         // dealing with the root bone, which
@@ -394,8 +305,7 @@ fn set_transforms(
         // and parent_global_transform, then
         // continue
         let Some(parent) = parent_global_transform else {
-            let mut transform =
-                transforms.get_mut(current.entity).unwrap();
+            let mut transform = transforms.get_mut(current.entity).unwrap();
             transform.rotation = current_node.rotation;
             parent_global_transform = Some(current_node);
             continue;
@@ -403,13 +313,11 @@ fn set_transforms(
 
         // use the "global" Transforms to calculate
         // the proper rotations using affine inverse
-        let (scale, rotation, translation) =
-            (parent.compute_affine().inverse()
-                * current_node.compute_affine())
-            .to_scale_rotation_translation();
+        let (scale, rotation, translation) = (parent.compute_affine().inverse()
+            * current_node.compute_affine())
+        .to_scale_rotation_translation();
 
-        let mut transform =
-            transforms.get_mut(current.entity).unwrap();
+        let mut transform = transforms.get_mut(current.entity).unwrap();
         transform.scale = scale;
         transform.rotation = rotation;
         transform.translation = translation;
