@@ -45,115 +45,111 @@ fn startup(
 
     commands.spawn(Camera2d);
 
-    let root_position = Transform::default();
-    let joint_1_position = Transform::from_xyz(100., 200., 0.);
-    let joint_2_position = Transform::from_xyz(100., 100., 0.);
-
-    commands.spawn((
-        Name::new("IKRoot"),
-        root_position,
-        BoneLength(
-            root_position
-                .translation
-                .distance(joint_1_position.translation),
-        ),
-        Visibility::Inherited,
-        children![
-            (
-                Mesh2d(
-                    meshes.add(Capsule2d::new(
-                        5.0,
-                        root_position
-                            .translation
-                            .distance(joint_1_position.translation),
-                    )),
-                ),
-                MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7)),),
-                Transform::from_xyz(
-                    root_position
-                        .translation
-                        .distance(joint_1_position.translation)
-                        / 2.,
-                    0.,
-                    0.
-                )
-                .with_rotation(Quat::from_axis_angle(Vec3::Z, FRAC_PI_2))
-            ),
-            (
-                Name::new("Joint1"),
-                joint_1_position,
-                BoneLength(
-                    joint_1_position
-                        .translation
-                        .distance(joint_2_position.translation),
-                ),
-                Visibility::Inherited,
-                children![
-                    (
-                        Mesh2d(
-                            meshes.add(Capsule2d::new(
-                                5.0,
-                                joint_1_position
-                                    .translation
-                                    .distance(joint_2_position.translation)
-                            )),
-                        ),
-                        MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7)),),
-                        Transform::from_xyz(
-                            joint_1_position
-                                .translation
-                                .distance(joint_2_position.translation)
-                                / 2.,
-                            0.,
-                            0.
-                        )
-                        .with_rotation(Quat::from_axis_angle(Vec3::Z, FRAC_PI_2))
-                    ),
-                    (
-                        InverseKinematicEndEffector {
-                            affected_bone_count: 2
-                        },
-                        Name::new("Joint2"),
-                        joint_2_position,
-                    )
-                ]
-            )
-        ],
-    ));
-
-    commands.spawn((
-        Name::new("IKRoot"),
-        root_position.with_translation(Vec3::new(200., 0., 0.)),
-        BoneLength(
-            root_position
-                .translation
-                .distance(joint_1_position.translation),
-        ),
-        children![
-            // bones
-            (
-                Name::new("Joint1"),
-                joint_1_position,
-                BoneLength(
-                    joint_1_position
-                        .translation
-                        .distance(joint_2_position.translation),
-                ),
-                children![(
-                    InverseKinematicEndEffector {
-                        affected_bone_count: 2
-                    },
-                    Name::new("Joint2"),
-                    joint_2_position,
-                )]
-            )
-        ],
-    ));
-
     // let root_position = Transform::default();
-    // let joint_position = Transform::from_xyz(30., 30., 0.);
-    // let joint_2_position =
-    //     Transform::from_xyz(30., 30., 0.);
+    // let joint_1_position = Transform::from_xyz(100., 200., 0.);
+    // let joint_2_position = Transform::from_xyz(100., 100., 0.);
+
+    // commands.spawn((
+    //     Name::new("IKRoot"),
+    //     root_position,
+    //     BoneLength(
+    //         root_position
+    //             .translation
+    //             .distance(joint_1_position.translation),
+    //     ),
+    //     Visibility::Inherited,
+    //     children![
+    //         (
+    //             Mesh2d(
+    //                 meshes.add(Capsule2d::new(
+    //                     5.0,
+    //                     root_position
+    //                         .translation
+    //                         .distance(joint_1_position.translation),
+    //                 )),
+    //             ),
+    //             MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7)),),
+    //             Transform::from_xyz(
+    //                 root_position
+    //                     .translation
+    //                     .distance(joint_1_position.translation)
+    //                     / 2.,
+    //                 0.,
+    //                 0.
+    //             )
+    //             .with_rotation(Quat::from_axis_angle(Vec3::Z, FRAC_PI_2))
+    //         ),
+    //         (
+    //             Name::new("Joint1"),
+    //             joint_1_position,
+    //             BoneLength(
+    //                 joint_1_position
+    //                     .translation
+    //                     .distance(joint_2_position.translation),
+    //             ),
+    //             Visibility::Inherited,
+    //             children![
+    //                 (
+    //                     Mesh2d(
+    //                         meshes.add(Capsule2d::new(
+    //                             5.0,
+    //                             joint_1_position
+    //                                 .translation
+    //                                 .distance(joint_2_position.translation)
+    //                         )),
+    //                     ),
+    //                     MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7)),),
+    //                     Transform::from_xyz(
+    //                         joint_1_position
+    //                             .translation
+    //                             .distance(joint_2_position.translation)
+    //                             / 2.,
+    //                         0.,
+    //                         0.
+    //                     )
+    //                     .with_rotation(Quat::from_axis_angle(Vec3::Z, FRAC_PI_2))
+    //                 ),
+    //                 (
+    //                     Name::new("Joint2"),
+    //                     InverseKinematicEndEffector {
+    //                         affected_bone_count: 2
+    //                     },
+    //                     joint_2_position,
+    //                 )
+    //             ]
+    //         )
+    //     ],
+    // ));
+
+    // commands.spawn((
+    //     Name::new("IKRoot"),
+    //     root_position.with_translation(Vec3::new(200., 0., 0.)),
+    //     BoneLength(
+    //         root_position
+    //             .translation
+    //             .distance(joint_1_position.translation),
+    //     ),
+    //     children![(
+    //         Name::new("Joint1"),
+    //         joint_1_position,
+    //         BoneLength(
+    //             joint_1_position
+    //                 .translation
+    //                 .distance(joint_2_position.translation),
+    //         ),
+    //         children![(
+    //             Name::new("Joint2"),
+    //             InverseKinematicEndEffector {
+    //                 affected_bone_count: 2
+    //             },
+    //             joint_2_position,
+    //         )]
+    //     )],
+    // ));
+
+    let root_position = Transform::default();
+    let joint_position = Transform::from_xyz(30., 30., 0.);
+    let joint_2_position = Transform::from_xyz(30., 30., 0.);
 
     // ooh wow does rustfmt not like this nesting lol
     // this outer closure is so that rustfmt doesn't
@@ -161,109 +157,109 @@ fn startup(
     // no other purpose for it.
     #[rustfmt::skip]
     let mut spawn_lots = || {
-    // commands.spawn((
-    //     Name::new("IKRoot"),
-    //     root_position,
-    //     BoneLength(joint_position.translation.length()),
-    //     Visibility::Inherited,
-    //     children![(
-    //         Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
-    //         MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
-    //         Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
-    //             .with_rotation(
-    //                 Quat::from_axis_angle(
-    //                     Vec3::Z,
-    //                     FRAC_PI_2
-    //                 )
-    //             ),
-    //         ),(
-    //         Name::new("Joint1"),
-    //         joint_position,
-    //         BoneLength(joint_position.translation.length()),
-    //         Visibility::Inherited,
-    //         children![(
-    //             Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
-    //             MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
-    //             Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
-    //                 .with_rotation(
-    //                     Quat::from_axis_angle(
-    //                         Vec3::Z,
-    //                         FRAC_PI_2
-    //                     )
-    //                 ),
-    //             ),(
-    //             Name::new("Joint2"),
-    //             joint_position,
-    //             BoneLength(joint_position.translation.length()),
-    //             Visibility::Inherited,
-    //             children![(
-    //                 Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
-    //                 MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
-    //                 Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
-    //                     .with_rotation(
-    //                         Quat::from_axis_angle(
-    //                             Vec3::Z,
-    //                             FRAC_PI_2
-    //                         )
-    //                     ),
-    //                 ),(
-    //                 Name::new("Joint3"),
-    //                 joint_position,
-    //                 BoneLength(joint_position.translation.length()),
-    //                 Visibility::Inherited,
-    //                 children![(
-    //                     Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
-    //                     MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
-    //                     Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
-    //                         .with_rotation(
-    //                             Quat::from_axis_angle(
-    //                                 Vec3::Z,
-    //                                 FRAC_PI_2
-    //                             )
-    //                         ),
-    //                     ),(
-    //                     Name::new("Joint4"),
-    //                     joint_position,
-    //                     BoneLength(joint_position.translation.length()),
-    //                     Visibility::Inherited,
-    //                     children![(
-    //                         Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
-    //                         MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
-    //                         Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
-    //                             .with_rotation(
-    //                                 Quat::from_axis_angle(
-    //                                     Vec3::Z,
-    //                                     FRAC_PI_2
-    //                                 )
-    //                             ),
-    //                         ),(
-    //                         Name::new("Joint5"),
-    //                         joint_position,
-    //                         BoneLength(joint_position.translation.length()),
-    //                         Visibility::Inherited,
-    //                         children![(
-    //                             Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
-    //                             MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
-    //                             Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
-    //                                 .with_rotation(
-    //                                     Quat::from_axis_angle(
-    //                                         Vec3::Z,
-    //                                         FRAC_PI_2
-    //                                     )
-    //                                 ),
-    //                             ),(
-    //                             InverseKinematicEndEffector {
-    //                                 affected_bone_count: 6
-    //                             },
-    //                             Name::new("Joint6"),
-    //                             joint_2_position,
-    //                         )]
-    //                     )],
-    //                 )],
-    //             )],
-    //         )],
-    //     )],
-    // ));
+    commands.spawn((
+        Name::new("IKRoot"),
+        root_position,
+        BoneLength(joint_position.translation.length()),
+        Visibility::Inherited,
+        children![(
+            Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+            MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+            Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                .with_rotation(
+                    Quat::from_axis_angle(
+                        Vec3::Z,
+                        FRAC_PI_2
+                    )
+                ),
+            ),(
+            Name::new("Joint1"),
+            joint_position,
+            BoneLength(joint_position.translation.length()),
+            Visibility::Inherited,
+            children![(
+                Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                    .with_rotation(
+                        Quat::from_axis_angle(
+                            Vec3::Z,
+                            FRAC_PI_2
+                        )
+                    ),
+                ),(
+                Name::new("Joint2"),
+                joint_position,
+                BoneLength(joint_position.translation.length()),
+                Visibility::Inherited,
+                children![(
+                    Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                    MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                    Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                        .with_rotation(
+                            Quat::from_axis_angle(
+                                Vec3::Z,
+                                FRAC_PI_2
+                            )
+                        ),
+                    ),(
+                    Name::new("Joint3"),
+                    joint_position,
+                    BoneLength(joint_position.translation.length()),
+                    Visibility::Inherited,
+                    children![(
+                        Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                        MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                        Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                            .with_rotation(
+                                Quat::from_axis_angle(
+                                    Vec3::Z,
+                                    FRAC_PI_2
+                                )
+                            ),
+                        ),(
+                        Name::new("Joint4"),
+                        joint_position,
+                        BoneLength(joint_position.translation.length()),
+                        Visibility::Inherited,
+                        children![(
+                            Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                            MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                            Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                                .with_rotation(
+                                    Quat::from_axis_angle(
+                                        Vec3::Z,
+                                        FRAC_PI_2
+                                    )
+                                ),
+                            ),(
+                            Name::new("Joint5"),
+                            joint_position,
+                            BoneLength(joint_position.translation.length()),
+                            Visibility::Inherited,
+                            children![(
+                                Mesh2d(meshes.add(Capsule2d::new(5.0,joint_position.translation.length()))),
+                                MeshMaterial2d(materials.add(Color::hsl(200., 0.95, 0.7))),
+                                Transform::from_xyz(joint_position.translation.length() / 2., 0., 0.)
+                                    .with_rotation(
+                                        Quat::from_axis_angle(
+                                            Vec3::Z,
+                                            FRAC_PI_2
+                                        )
+                                    ),
+                                ),(
+                                InverseKinematicEndEffector {
+                                    affected_bone_count: 6
+                                },
+                                Name::new("Joint6"),
+                                joint_2_position,
+                            )]
+                        )],
+                    )],
+                )],
+            )],
+        )],
+    ));
     };
     spawn_lots();
 }
@@ -274,6 +270,9 @@ fn debug_transforms(query: Query<&GlobalTransform>, mut gizmos: Gizmos) {
     }
 }
 
+// This is a useful struct for keeping some data we need
+// It represents the "current position" of one joint,
+// which can have a 0 or longer bone length.
 #[derive(Debug, Clone)]
 struct CurrentPosition {
     position: Vec2,
@@ -281,11 +280,12 @@ struct CurrentPosition {
     entity: Entity,
 }
 
+// How close does the end_effector need to be to the target for
+// it to be "a success" which means we can stop
 const TOLERANCE: f32 = 1.;
 
 fn process_inverse_kinematics(
     ik_end_effectors: Query<(Entity, &InverseKinematicEndEffector, &GlobalTransform)>,
-    // children: Query<&Children>,
     parents: Query<&ChildOf>,
     bone_lengths: Query<(&BoneLength, &GlobalTransform, Entity)>,
     mut gizmos: Gizmos,
@@ -439,18 +439,14 @@ fn process_inverse_kinematics(
         let mut iterations = 0;
         while diff > TOLERANCE && iterations < 10 {
             iterations += 1;
-            let Ok(_) = forward_pass(&mut current_positions, &target) else {
-                // if a pass returns an error, something is
-                // horribly wrong, but other bodies might still
-                // be ok, so we don't panic, but do skip this
-                // ik chain
+            // if a pass returns an error, something is
+            // horribly wrong, but other bodies might still
+            // be ok, so we don't panic, but do skip this
+            // ik chain
+            if forward_pass(&mut current_positions, &target).is_err() {
                 continue 'ik_bodies;
             };
-            let Ok(_) = backward_pass(&mut current_positions, &root_translation) else {
-                // if a pass returns an error, something is
-                // horribly wrong, but other bodies might still
-                // be ok, so we don't panic, but do skip this
-                // ik chain
+            if backward_pass(&mut current_positions, &root_translation).is_err() {
                 continue 'ik_bodies;
             };
 
@@ -458,10 +454,13 @@ fn process_inverse_kinematics(
             diff = current_positions.last().unwrap().position.distance(target);
         }
 
+        // optional gizmos
         for (a, b) in current_positions.iter().tuple_windows() {
             dotted_gizmos.arrow_2d(a.position, b.position, PINK_400.with_alpha(0.4));
         }
 
+        // set the Transform hierarchy for the bones using the current_positions
+        // as source data
         set_transforms(&current_positions, &mut transforms);
     }
 }
@@ -506,8 +505,8 @@ fn observe_mouse(
 // #                                       #
 // #########################################
 //
-// which is an iteration from the end_effector
-// bone, to the root bone
+// forward pass is an iteration from the
+// end_effector bone, to the root bone
 fn forward_pass(current_positions: &mut [CurrentPosition], target: &Vec2) -> Result<(), String> {
     if let Some(end_effector) = current_positions.last_mut() {
         end_effector.position.x = target.x;
@@ -535,8 +534,8 @@ fn forward_pass(current_positions: &mut [CurrentPosition], target: &Vec2) -> Res
 /// # Paper calls this the "Backward Pass"  #
 /// #                                       #
 /// #########################################
-
-/// which is an iteration from the root to
+///
+/// backward pass is an iteration from the root to
 /// the end_effector
 fn backward_pass(
     current_positions: &mut [CurrentPosition],
