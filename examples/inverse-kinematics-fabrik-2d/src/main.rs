@@ -297,6 +297,12 @@ fn debug_transforms(
     }
 }
 
+struct CurrentPosition {
+    position: Vec2,
+    bone_length: BoneLength,
+    entity: Entity,
+}
+
 const TOLERANCE: f32 = 1.;
 
 fn update(
@@ -322,7 +328,9 @@ fn update(
     // everything the mouse_position is our
     // "target" so if we don't have one, there is
     // no target
-    let Some(mouse_position) = mouse_position else {
+    let Some(target) =
+        mouse_position.map(|resource| resource.0)
+    else {
         return;
     };
 
@@ -356,7 +364,8 @@ fn update(
         // sum the length of all bones.
         // `iter_descendants` doesn't include the root
         // element, so we add the root bone length
-        // If end_effector has length, add it here
+        // if end_effector has length for some reason:
+        // add it here
         let total_length = parents
             .iter_ancestors(end_effector_entity)
             .take(end_effector.affected_bone_count as usize)
@@ -388,15 +397,13 @@ fn update(
             .unwrap()
             .translation()
             .xy();
-        if total_length
-            < root_translation.distance(mouse_position.0)
+        if total_length < root_translation.distance(target)
         {
             // mouse is out of reach!
             // orient all bones in straight line to mouse
             // direction
-            let mouse_vector = (mouse_position.0
-                - root_translation)
-                .normalize();
+            let target_direction =
+                (target - root_translation).normalize();
 
             // for (a, b) in std::iter::once(root_entity)
             //     .chain(
@@ -427,14 +434,14 @@ fn update(
         // use the values to update the `Transform`
         // components
 
-        let mut current_positions: Vec<_> =
-            std::iter::once((
-                end_effector_global_transform
+        let mut current_positions: Vec<CurrentPosition> =
+            std::iter::once(CurrentPosition {
+                position: end_effector_global_transform
                     .translation()
                     .xy(),
-                BoneLength(0.),
-                end_effector_entity,
-            ))
+                bone_length: BoneLength(0.),
+                entity: end_effector_entity,
+            })
             .chain(
                 parents
                     .iter_ancestors(end_effector_entity)
@@ -447,13 +454,14 @@ fn update(
                             .get(entity)
                             .map(
                                 |(bone, global, entity)| {
-                                    (
-                                        global
+                                    CurrentPosition {
+                                        position: global
                                             .translation()
                                             .xy(),
-                                        bone.clone(),
+                                        bone_length: bone
+                                            .clone(),
                                         entity,
-                                    )
+                                    }
                                 },
                             )
                             .unwrap()
@@ -468,7 +476,7 @@ fn update(
         let mut diff = end_effector_global_transform
             .translation()
             .xy()
-            .distance(mouse_position.0);
+            .distance(target);
 
         // loop for forward/backward passes
         // keeps track of iteration count because
@@ -480,129 +488,76 @@ fn update(
         let mut iterations = 0;
         while diff > TOLERANCE && iterations < 10 {
             iterations += 1;
-
-            // #########################################
-            // #                                       #
-            // #  Paper calls this the "Forward Pass"  #
-            // #                                       #
-            // #########################################
-            //
-            // which is an iteration from the end_effector
-            // bone, to the root bone
-            if let Some((pos, _, _)) =
-                current_positions.last_mut()
-            {
-                pos.x = mouse_position.0.x;
-                pos.y = mouse_position.0.y;
-            } else {
-                error!("bones list to have a bone");
+            let Ok(_) = forward_pass(
+                &mut current_positions,
+                &target,
+            ) else {
+                // if a pass returns an error, something is
+                // horribly wrong, but other bodies might still
+                // be ok, so we don't panic, but do skip this
+                // ik chain
                 continue 'ik_bodies;
-            }
-
-            // options here are using `windows_mut` from
-            // `lending_iterator` https://docs.rs/lending-iterator/latest/lending_iterator/#windows_mut
-            // or using peekable.
-            // We could also use indices, but I prefer
-            // avoiding indices when possible
-            let mut it = current_positions
-                .iter_mut()
-                .rev()
-                .peekable();
-            while let (Some(p2), Some(p1)) =
-                (it.next(), it.peek_mut())
-            {
-                let vector = p2.0 - p1.0;
-                p1.0 = p2.0 - vector.normalize() * p1.1.0;
-            }
-
-            // #########################################
-            // #                                       #
-            // # Paper calls this the "Backward Pass"  #
-            // #                                       #
-            // #########################################
-
-            // which is an iteration from the root to
-            // the end_effector
-            if let Some((pos, _, _)) =
-                current_positions.first_mut()
-            {
-                pos.x = root_translation.x;
-                pos.y = root_translation.y;
-            } else {
-                error!("bones list to have a bone");
+            };
+            let Ok(_) = backward_pass(
+                &mut current_positions,
+                &root_translation,
+            ) else {
+                // if a pass returns an error, something is
+                // horribly wrong, but other bodies might still
+                // be ok, so we don't panic, but do skip this
+                // ik chain
                 continue 'ik_bodies;
-            }
+            };
 
-            // options here are using `windows_mut` from
-            // `lending_iterator` https://docs.rs/lending-iterator/latest/lending_iterator/#windows_mut
-            // or using peekable.
-            // We could also use indices, but I prefer
-            // avoiding indices when possible
-            let mut it =
-                current_positions.iter_mut().peekable();
-            while let (
-                Some((p1, p1_bone, _)),
-                Some((p2, _, _)),
-            ) = (it.next(), it.peek_mut())
-            {
-                let vector = *p1 - *p2;
-                *p2 = *p1 - vector.normalize() * p1_bone.0;
-            }
-
-            // set diff and loop again
+            // end_effector_position.distance(target)
             diff = current_positions
                 .last()
                 .unwrap()
-                .0
-                .distance(mouse_position.0);
+                .position
+                .distance(target);
         }
 
         for (a, b) in
             current_positions.iter().tuple_windows()
         {
             dotted_gizmos.arrow_2d(
-                a.0,
-                b.0,
+                a.position,
+                b.position,
                 PINK_400.with_alpha(0.4),
             );
         }
 
         // info!(?current_positions);
 
-        // Update Root node rotation
-        let relative =
-            current_positions[1].0 - current_positions[0].0;
-
-        // set "root" to its proper rotation
-        // let mut transform =
-        //     transforms.get_mut(root_entity).unwrap();
-        let angle = relative.to_angle();
-        let current_rotation =
-            Quat::from_axis_angle(Vec3::Z, angle);
-        let mut transform =
-            transforms.get_mut(root_entity).unwrap();
-        transform.rotation = current_rotation;
+        {
+            // Update Root node rotation using the angle
+            // calculated from the relative vector from
+            // the root node to the next position
+            let relative = current_positions[1].position
+                - current_positions[0].position;
+            let current_rotation = Quat::from_axis_angle(
+                Vec3::Z,
+                relative.to_angle(),
+            );
+            let mut transform =
+                transforms.get_mut(root_entity).unwrap();
+            transform.rotation = current_rotation;
+        }
 
         // Update all `Transform`s by taking global
         // positions and converting them to
         // relative measurements suitable
         // for `Transform`
-        for (
-            (previous_node_global_position, _, root_entity),
-            (global_position, _, entity),
-            (last_pos, _, last_entity),
-        ) in current_positions.iter().tuple_windows()
+        for (previous, current, last) in
+            current_positions.iter().tuple_windows()
         {
-            let relative = global_position
-                - previous_node_global_position;
+            let relative =
+                current.position - previous.position;
 
-            // set "root" to its proper rotation
-            // let mut transform =
-            //     transforms.get_mut(root_entity).unwrap();
             let angle = relative.to_angle();
             let parent = Transform::from_xyz(
-                previous_node_global_position.x,
-                previous_node_global_position.y,
+                previous.position.x,
+                previous.position.y,
                 0.,
             )
             .with_rotation(
@@ -610,14 +565,15 @@ fn update(
             );
 
             let current_node = Transform::from_xyz(
-                global_position.x,
-                global_position.y,
+                current.position.x,
+                current.position.y,
                 0.,
             )
             .with_rotation(
                 Quat::from_axis_angle(
                     Vec3::Z,
-                    (last_pos - global_position).to_angle(),
+                    (last.position - current.position)
+                        .to_angle(),
                 ),
             );
             let (scale, rotation, translation) =
@@ -626,17 +582,14 @@ fn update(
                 .to_scale_rotation_translation();
 
             let mut transform =
-                transforms.get_mut(*entity).unwrap();
+                transforms.get_mut(current.entity).unwrap();
             transform.scale = scale;
             transform.rotation = rotation;
             transform.translation = translation;
         }
 
         // Duplicate logic: REFACTOR NEEDED
-        let Some((
-            (last_position, _, _),
-            (next_to_last_position, _, _),
-        )) = current_positions
+        let Some((last, next_to_last)) = current_positions
             .iter()
             .rev()
             .tuple_windows()
@@ -647,15 +600,15 @@ fn update(
         };
 
         let relative =
-            last_position - next_to_last_position;
+            last.position - next_to_last.position;
 
         // set "root" to its proper rotation
         // let mut transform =
         //     transforms.get_mut(root_entity).unwrap();
         let angle = relative.to_angle();
         let parent = Transform::from_xyz(
-            next_to_last_position.x,
-            next_to_last_position.y,
+            next_to_last.position.x,
+            next_to_last.position.y,
             0.,
         )
         .with_rotation(Quat::from_axis_angle(
@@ -664,14 +617,14 @@ fn update(
         ));
 
         let current_node = Transform::from_xyz(
-            last_position.x,
-            last_position.y,
+            last.position.x,
+            last.position.y,
             0.,
         )
         .with_rotation(Quat::from_axis_angle(
             Vec3::Z,
             // same as "next_to_last's" rotation
-            (last_position - next_to_last_position)
+            (last.position - next_to_last.position)
                 .to_angle(),
         ));
         let (scale, rotation, translation) =
@@ -722,4 +675,81 @@ fn observe_mouse(
         commands
             .insert_resource(MousePosition(world_position));
     }
+}
+
+// #########################################
+// #                                       #
+// #  Paper calls this the "Forward Pass"  #
+// #                                       #
+// #########################################
+//
+// which is an iteration from the end_effector
+// bone, to the root bone
+fn forward_pass(
+    current_positions: &mut [CurrentPosition],
+    target: &Vec2,
+) -> Result<(), String> {
+    if let Some(end_effector) = current_positions.last_mut()
+    {
+        end_effector.position.x = target.x;
+        end_effector.position.y = target.y;
+    } else {
+        return Err(
+            "bones list must have a bone".to_string()
+        );
+    }
+
+    // options here are using `windows_mut` from
+    // `lending_iterator` https://docs.rs/lending-iterator/latest/lending_iterator/#windows_mut
+    // or using peekable.
+    // We could also use indices, but I prefer
+    // avoiding indices when possible
+    let mut it =
+        current_positions.iter_mut().rev().peekable();
+    while let (Some(previous), Some(current)) =
+        (it.next(), it.peek_mut())
+    {
+        let vector = previous.position - current.position;
+        current.position = previous.position
+            - vector.normalize() * current.bone_length.0;
+    }
+
+    Ok(())
+}
+
+/// #########################################
+/// #                                       #
+/// # Paper calls this the "Backward Pass"  #
+/// #                                       #
+/// #########################################
+
+/// which is an iteration from the root to
+/// the end_effector
+fn backward_pass(
+    current_positions: &mut [CurrentPosition],
+    root_translation: &Vec2,
+) -> Result<(), String> {
+    if let Some(root) = current_positions.first_mut() {
+        root.position.x = root_translation.x;
+        root.position.y = root_translation.y;
+    } else {
+        return Err(
+            "bones list must have a bone".to_string()
+        );
+    }
+
+    // options here are using `windows_mut` from
+    // `lending_iterator` https://docs.rs/lending-iterator/latest/lending_iterator/#windows_mut
+    // or using peekable.
+    // We could also use indices, but I prefer
+    // avoiding indices when possible
+    let mut it = current_positions.iter_mut().peekable();
+    while let (Some(previous), Some(current)) =
+        (it.next(), it.peek_mut())
+    {
+        let vector = previous.position - current.position;
+        current.position = previous.position
+            - vector.normalize() * previous.bone_length.0;
+    }
+    Ok(())
 }
