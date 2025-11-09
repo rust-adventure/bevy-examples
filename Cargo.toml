@@ -18,6 +18,7 @@ members = [
   "examples/visibility-2d-mesh",
   "examples/landscape-compute-intro",
   "examples/inverse-kinematics-fabrik-2d",
+  "examples/inverse-kinematics-fabrik-3d",
 ]
 # "examples/spacecraft-noiseland",
 # rotating-column depends on bevy_tweening
