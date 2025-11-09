@@ -2,26 +2,20 @@ use std::f32::consts::FRAC_PI_2;
 
 use bevy::{color::palettes::tailwind::*, prelude::*};
 use inverse_kinematics_fabrik_3d::{
-    BoneLength, DottedGizmos, InverseKinematicEndEffector,
-    MousePosition, process_inverse_kinematics,
+    process_inverse_kinematics, BoneLength, DottedGizmos, InverseKinematicEndEffector,
+    MousePosition,
 };
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(SKY_950.into()))
-        .insert_resource(MousePosition(Vec3::new(
-            1., 2., -1.,
-        )))
+        .insert_resource(MousePosition(Vec3::new(1., 2., -1.)))
         .init_gizmo_group::<DottedGizmos>()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, startup)
         .add_systems(
             Update,
-            (
-                update_target,
-                debug_transforms,
-                process_inverse_kinematics,
-            ),
+            (update_target, debug_transforms, process_inverse_kinematics),
         )
         .run();
 }
@@ -35,8 +29,7 @@ fn startup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let (config, _) =
-        config_store.config_mut::<DottedGizmos>();
+    let (config, _) = config_store.config_mut::<DottedGizmos>();
     config.line.style = GizmoLineStyle::Dashed {
         gap_scale: 5.,
         line_scale: 10.,
@@ -53,24 +46,19 @@ fn startup(
     // camera
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(-2.5, 4.5, 19.0)
-            .looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(-2.5, 4.5, 19.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
     // circular base
     commands.spawn((
         Mesh3d(meshes.add(Circle::new(4.0))),
         MeshMaterial3d(materials.add(Color::WHITE)),
-        Transform::from_rotation(Quat::from_rotation_x(
-            -std::f32::consts::FRAC_PI_2,
-        )),
+        Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2)),
     ));
 
     // spawn a sphere target in.
     commands.spawn((
         Target,
-        Mesh3d(
-            meshes.add(Sphere::default().mesh().uv(32, 18)),
-        ),
+        Mesh3d(meshes.add(Sphere::default().mesh().uv(32, 18))),
         MeshMaterial3d(materials.add(Color::WHITE)),
         Transform::from_xyz(0.0, 0.5, 0.0),
     ));
@@ -214,10 +202,7 @@ fn startup(
     spawn_lots();
 }
 
-fn debug_transforms(
-    query: Query<&GlobalTransform>,
-    mut gizmos: Gizmos,
-) {
+fn debug_transforms(query: Query<&GlobalTransform>, mut gizmos: Gizmos) {
     for transform in &query {
         gizmos.axes(*transform, 1.);
     }
