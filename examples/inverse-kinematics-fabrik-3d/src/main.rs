@@ -215,6 +215,8 @@ fn update_target(
 ) {
     position.0.x = time.elapsed_secs().sin() * 3.;
     position.0.y = time.elapsed_secs().cos() * 3. + 3.;
+    position.0.z = time.elapsed_secs().cos() * 2. + 1.;
+
     for mut sphere in &mut query {
         sphere.translation.x = position.0.x;
         sphere.translation.y = position.0.y;
