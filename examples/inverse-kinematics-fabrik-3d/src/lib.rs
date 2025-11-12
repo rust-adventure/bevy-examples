@@ -33,7 +33,7 @@ struct CurrentPosition {
 
 /// How close does the end_effector need to be to the target for
 /// it to be "a success" which means we can stop
-const TOLERANCE: f32 = 1.;
+const TOLERANCE: f32 = 0.01;
 
 /// The primary system that checks for ik chains that should be processed,
 /// then does some setup before kicking off FABRIK
@@ -289,9 +289,10 @@ fn set_transforms(current_positions: &[CurrentPosition], transforms: &mut Query<
             // all the same calculations, but uses
             // the last joint's rotation value
             .with_rotation(match next {
-                Some(_) => {
-                    Quat::from_rotation_arc(Vec3::ZERO, next.unwrap().position - current.position)
-                }
+                Some(_) => Quat::from_rotation_arc(
+                    Vec3::new(0., 0., 1.),
+                    next.unwrap().position - current.position,
+                ),
                 None => parent_global_transform.unwrap().rotation,
             });
 
