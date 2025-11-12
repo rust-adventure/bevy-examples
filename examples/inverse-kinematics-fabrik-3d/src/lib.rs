@@ -283,18 +283,19 @@ fn set_transforms(current_positions: &[CurrentPosition], transforms: &mut Query<
     let mut parent_global_transform: Option<Transform> = None;
     let mut it = current_positions.iter().peekable();
     while let (Some(current), next) = (it.next(), it.peek()) {
-        let current_node = Transform::from_xyz(current.position.x, current.position.y, 0.)
-            // if there is no `next` node, we're
-            // dealing with the tail, which does
-            // all the same calculations, but uses
-            // the last joint's rotation value
-            .with_rotation(match next {
-                Some(_) => Quat::from_rotation_arc(
-                    Vec3::new(0., 0., 1.),
-                    next.unwrap().position - current.position,
-                ),
-                None => parent_global_transform.unwrap().rotation,
-            });
+        let current_node =
+            Transform::from_xyz(current.position.x, current.position.y, current.position.z)
+                // if there is no `next` node, we're
+                // dealing with the tail, which does
+                // all the same calculations, but uses
+                // the last joint's rotation value
+                .with_rotation(match next {
+                    Some(_) => Quat::from_rotation_arc(
+                        Vec3::new(0., 0., 1.),
+                        next.unwrap().position - current.position,
+                    ),
+                    None => parent_global_transform.unwrap().rotation,
+                });
 
         // if there's no parent, then we're
         // dealing with the root bone, which
