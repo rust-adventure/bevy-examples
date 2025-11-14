@@ -1,18 +1,47 @@
 use bevy::{color::palettes::tailwind::*, prelude::*};
 use itertools::Itertools;
 
-/// MousePosition is just a helper. It could be any target.
-#[derive(Resource)]
-pub struct MousePosition(pub Vec3);
+pub struct FabrikPlugin;
+impl Plugin for FabrikPlugin {
+    fn build(&self, app: &mut App) {
+        app.init_gizmo_group::<DottedGizmos>()
+            .add_systems(Startup, config_gizmos)
+            .add_systems(
+                PostUpdate,
+                process_inverse_kinematics.after(TransformSystems::Propagate),
+            );
+    }
+}
 
 // We can create our own gizmo config group!
 #[derive(Default, Reflect, GizmoConfigGroup)]
 pub struct DottedGizmos;
 
-/// We use this to
+fn config_gizmos(mut config_store: ResMut<GizmoConfigStore>) {
+    let (config, _) = config_store.config_mut::<DottedGizmos>();
+    config.line.style = GizmoLineStyle::Dashed {
+        gap_scale: 5.,
+        line_scale: 10.,
+    };
+}
+
+/// A tip of the IK chain.
+///
+/// Iterate from this entity up the ancestor chain to
+/// find the root IK entity.
 #[derive(Debug, Component)]
 pub struct InverseKinematicEndEffector {
+    /// How many bones are involved in the IK chain?
+    ///
+    /// This is "how many links between joints" there are
     pub affected_bone_count: u32,
+    /// How close does the end_effector need to be to the target for
+    /// it to be "a success" which means we can stop
+    ///
+    /// A good 2d tolerance is 1.0 in the default camera view
+    pub tolerance: f32,
+    /// The place this end effector "wants to be"
+    pub target: Vec3,
 }
 
 /// a bone_length. This is explicit, but could
@@ -31,10 +60,6 @@ struct CurrentPosition {
     entity: Entity,
 }
 
-/// How close does the end_effector need to be to the target for
-/// it to be "a success" which means we can stop
-const TOLERANCE: f32 = 0.01;
-
 /// The primary system that checks for ik chains that should be processed,
 /// then does some setup before kicking off FABRIK
 pub fn process_inverse_kinematics(
@@ -43,18 +68,9 @@ pub fn process_inverse_kinematics(
     bone_lengths: Query<(&BoneLength, &GlobalTransform, Entity)>,
     mut gizmos: Gizmos,
     mut dotted_gizmos: Gizmos<DottedGizmos>,
-    mouse_position: Option<Res<MousePosition>>,
     mut transforms: Query<&mut Transform>,
     global_transforms: Query<&GlobalTransform>,
 ) {
-    // if there's no mouse_position, just skip
-    // everything the mouse_position is our
-    // "target" so if we don't have one, there is
-    // no target
-    let Some(target) = mouse_position.map(|resource| resource.0) else {
-        return;
-    };
-
     // iterate over all ik bodies in the scene
     // using 'ik_bodies as a label in case we have to
     // abandon a specific ik root's processing
@@ -131,11 +147,11 @@ pub fn process_inverse_kinematics(
         // the distance required to reach the mouse, then
         // we can't make it to the target mouse location
         let root_translation = global_transforms.get(root_entity).unwrap().translation();
-        if total_length < root_translation.distance(target) {
+        if total_length < root_translation.distance(end_effector.target) {
             // mouse is out of reach!
             // orient all bones in straight line to mouse
             // direction
-            let target_direction = (target - root_translation).normalize();
+            let target_direction = (end_effector.target - root_translation).normalize();
 
             // produce a new current_positions by setting
             // every bone joint to the edge of the previous
@@ -166,7 +182,9 @@ pub fn process_inverse_kinematics(
 
         // `diff` is "how far off is the end joint from
         // the target?"
-        let mut diff = end_effector_global_transform.translation().distance(target);
+        let mut diff = end_effector_global_transform
+            .translation()
+            .distance(end_effector.target);
 
         // loop for forward/backward passes
         //
@@ -179,21 +197,26 @@ pub fn process_inverse_kinematics(
         // 10 iterations is an entirely arbitrary number
         // of maximum iterations.
         let mut iterations = 0;
-        while diff > TOLERANCE && iterations < 10 {
+        while diff > end_effector.tolerance && iterations < 10 {
             iterations += 1;
             // if a pass returns an error, something is
             // horribly wrong, but other bodies might still
             // be ok, so we don't panic, but do skip this
             // ik chain
-            if forward_pass(&mut current_positions, &target).is_err() {
+            if forward_pass(&mut current_positions, &end_effector.target).is_err() {
                 continue 'ik_bodies;
             };
+            // constraint
             if backward_pass(&mut current_positions, &root_translation).is_err() {
                 continue 'ik_bodies;
             };
 
             // end_effector_position.distance(target)
-            diff = current_positions.last().unwrap().position.distance(target);
+            diff = current_positions
+                .last()
+                .unwrap()
+                .position
+                .distance(end_effector.target);
         }
 
         // optional gizmos
@@ -217,8 +240,7 @@ pub fn process_inverse_kinematics(
 // end_effector bone, to the root bone
 fn forward_pass(current_positions: &mut [CurrentPosition], target: &Vec3) -> Result<(), String> {
     if let Some(end_effector) = current_positions.last_mut() {
-        end_effector.position.x = target.x;
-        end_effector.position.y = target.y;
+        end_effector.position = *target;
     } else {
         return Err("bones list must have a bone".to_string());
     }
@@ -250,8 +272,7 @@ fn backward_pass(
     root_translation: &Vec3,
 ) -> Result<(), String> {
     if let Some(root) = current_positions.first_mut() {
-        root.position.x = root_translation.x;
-        root.position.y = root_translation.y;
+        root.position = *root_translation;
     } else {
         return Err("bones list must have a bone".to_string());
     }
@@ -290,10 +311,10 @@ fn set_transforms(current_positions: &[CurrentPosition], transforms: &mut Query<
                 // all the same calculations, but uses
                 // the last joint's rotation value
                 .with_rotation(match next {
-                    Some(_) => Quat::from_rotation_arc(
-                        Vec3::new(0., 0., 1.),
-                        next.unwrap().position - current.position,
-                    ),
+                    Some(_) => {
+                        let angle = next.unwrap().position - current.position;
+                        Quat::from_rotation_arc(Vec3::Z, angle.normalize())
+                    }
                     None => parent_global_transform.unwrap().rotation,
                 });
 
