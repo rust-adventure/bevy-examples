@@ -1,5 +1,3 @@
-use std::f32::consts::FRAC_PI_2;
-
 use bevy::{color::palettes::tailwind::*, prelude::*};
 use inverse_kinematics_fabrik_3d::{
     BoneLength, DottedGizmos, FabrikPlugin, InverseKinematicEndEffector,
