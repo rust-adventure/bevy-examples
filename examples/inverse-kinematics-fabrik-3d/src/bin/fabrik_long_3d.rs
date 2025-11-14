@@ -1,7 +1,5 @@
 use bevy::{color::palettes::tailwind::*, prelude::*};
-use inverse_kinematics_fabrik_3d::{
-    BoneLength, DottedGizmos, FabrikPlugin, InverseKinematicEndEffector,
-};
+use inverse_kinematics_fabrik_3d::{BoneLength, FabrikPlugin, InverseKinematicEndEffector};
 
 fn main() {
     App::new()
@@ -177,7 +175,7 @@ fn startup(
 
 fn debug_transforms(query: Query<&GlobalTransform>, mut gizmos: Gizmos) {
     for transform in &query {
-        // gizmos.axes(*transform, 1.);
+        gizmos.axes(*transform, 1.);
     }
 }
 
