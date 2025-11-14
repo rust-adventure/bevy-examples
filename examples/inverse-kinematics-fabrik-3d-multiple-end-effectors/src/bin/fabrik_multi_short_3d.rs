@@ -1,6 +1,6 @@
 use bevy::{color::palettes::tailwind::*, prelude::*};
-use inverse_kinematics_fabrik_3d::{
-    BoneLength, DottedGizmos, FabrikPlugin, InverseKinematicEndEffector,
+use inverse_kinematics_fabrik_3d_multiple_end_effectors::{
+    DottedGizmos, FabrikPlugin, InverseKinematicEndEffector,
 };
 
 fn main() {
@@ -57,77 +57,46 @@ fn startup(
     ));
 
     let root_position = Transform::default();
-    let joint_1_position = Transform::from_xyz(3., 5., 0.);
-    let joint_2_position = Transform::from_xyz(3., 2., 0.);
+    let joint_1_position = Transform::from_xyz(0., 0., 3.);
+    let joint_2_position = Transform::from_xyz(0., 0., 2.);
 
-    let sphere = meshes.add(Sphere::new(0.2).mesh().uv(32, 18));
+    let sphere_size = 0.2;
+    let sphere = meshes.add(Sphere::new(sphere_size).mesh().uv(32, 18));
+    // this is 2x the size of the sphere because we take a bit off both ends
+    // of the "bone" meshes
+    let sphere_gap = 2. * sphere_size;
 
     let joint_material = MeshMaterial3d(materials.add(Color::hsl(100., 0.95, 0.7)));
 
     commands.spawn((
         Name::new("IKRoot"),
         root_position,
-        BoneLength(
-            root_position
-                .translation
-                .distance(joint_1_position.translation),
-        ),
         Mesh3d(sphere.clone()),
         joint_material.clone(),
         children![
             (
-                Mesh3d(
-                    meshes.add(Cuboid::new(
-                        0.2,
-                        0.2,
-                        root_position
-                            .translation
-                            .distance(joint_1_position.translation)
-                            - 0.4,
-                    ))
-                ),
+                Mesh3d(meshes.add(Cuboid::new(
+                    0.2,
+                    0.2,
+                    joint_1_position.translation.length() - sphere_gap,
+                ))),
                 MeshMaterial3d(materials.add(Color::hsl(300., 0.95, 0.7))),
-                Transform::from_xyz(
-                    0.,
-                    0.,
-                    root_position
-                        .translation
-                        .distance(joint_1_position.translation)
-                        / 2.
-                        + 0.2,
-                )
+                Transform::from_xyz(0., 0., joint_1_position.translation.length() / 2.,)
             ),
             (
                 Name::new("Joint1"),
                 joint_1_position,
-                BoneLength(
-                    joint_1_position
-                        .translation
-                        .distance(joint_2_position.translation),
-                ),
                 Mesh3d(sphere.clone()),
                 joint_material.clone(),
                 children![
                     (
-                        Mesh3d(
-                            meshes.add(Cuboid::new(
-                                0.2,
-                                0.2,
-                                joint_1_position
-                                    .translation
-                                    .distance(joint_2_position.translation)
-                                    - 0.4,
-                            )),
-                        ),
+                        Mesh3d(meshes.add(Cuboid::new(
+                            0.2,
+                            0.2,
+                            joint_2_position.translation.length() - sphere_gap,
+                        )),),
                         MeshMaterial3d(materials.add(Color::hsl(360., 0.95, 0.7))),
-                        Transform::from_xyz(
-                            0.,
-                            0.,
-                            joint_1_position
-                                .translation
-                                .distance(joint_2_position.translation)
-                                / 2.,
-                        )
+                        Transform::from_xyz(0., 0., joint_2_position.translation.length() / 2.)
                     ),
                     (
                         InverseKinematicEndEffector {
