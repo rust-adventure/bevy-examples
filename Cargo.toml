@@ -19,6 +19,7 @@ members = [
   "examples/landscape-compute-intro",
   "examples/inverse-kinematics-fabrik-2d",
   "examples/inverse-kinematics-fabrik-3d",
+  "examples/inverse-kinematics-fabrik-3d-multiple-end-effectors",
 ]
 # "examples/spacecraft-noiseland",
 # rotating-column depends on bevy_tweening
