@@ -1,5 +1,6 @@
 use bevy::platform::collections::HashSet;
 use bevy::{color::palettes::tailwind::*, platform::collections::HashMap, prelude::*};
+use itertools::Itertools;
 use petgraph::{
     prelude::DiGraphMap,
     visit::{Dfs, DfsPostOrder, Walker},
@@ -146,6 +147,10 @@ pub fn process_inverse_kinematics(
         })
         .collect();
 
+    for (entity, position) in positions.iter() {
+        gizmos.sphere(*position, 0.2, RED_400);
+    }
+
     // iterate graphs
     for root in roots.iter() {
         let original_root_position = *positions.get(root).unwrap();
@@ -289,6 +294,16 @@ pub fn process_inverse_kinematics(
                 );
         }
 
+        for (entity, position) in positions.iter() {
+            gizmos.sphere(*position, 0.2, GREEN_400);
+        }
+        for (a, b) in positions
+            .iter()
+            .sorted_by(|a, b| b.0.cmp(a.0))
+            .tuple_windows()
+        {
+            dotted_gizmos.arrow(*a.1, *b.1, PINK_400);
+        }
         // set the Transform hierarchy for the bones using the current_positions
         // as source data
         // set_transforms(&current_positions, &mut transforms);
@@ -305,6 +320,7 @@ pub fn process_inverse_kinematics(
                 .edges_directed(node, petgraph::Direction::Incoming)
                 .next()
             else {
+                info!(?node, "root");
                 // if there isn't a parent node,
                 // rotate in direction of next child
                 let mut it = all_ik_graphs.neighbors(node);
@@ -315,15 +331,11 @@ pub fn process_inverse_kinematics(
                     panic!("we don't handle the case where a root node has more than one child")
                 }
 
-                let new_transform = Transform::from_translation(*positions.get(&child).unwrap())
-                    // if there is no `next` node, we're
-                    // dealing with the tail, which does
-                    // all the same calculations, but uses
-                    // the last joint's rotation value
-                    .with_rotation({
-                        let angle = positions.get(&child).unwrap() - positions.get(&node).unwrap();
-                        Quat::from_rotation_arc(Vec3::Z, angle.normalize())
-                    });
+                let new_transform = child_transform_from_positions(
+                    *positions.get(&node).unwrap(),
+                    *positions.get(&child).unwrap(),
+                );
+
                 // if there's no parent, then we're
                 // dealing with the root bone, which
                 // doesn't move so we can set rotation
@@ -342,6 +354,7 @@ pub fn process_inverse_kinematics(
             // info!(?node, ?num_children, "set_transform");
             let transform_to_insert = match num_children {
                 1 => {
+                    info!(?node, "1");
                     // rotate in direction of next child
                     let mut it = all_ik_graphs.neighbors(node);
                     let child = it
@@ -349,52 +362,39 @@ pub fn process_inverse_kinematics(
                         // technically would panic if one node were passed in, but that's
                         // an exceedingly weird configuration of EndEffector::affected_bone_count == 0.
                         .expect("we already confirmed this node has a child.");
-                    let new_transform =
-                        Transform::from_translation(*positions.get(&child).unwrap())
-                            // if there is no `next` node, we're
-                            // dealing with the tail, which does
-                            // all the same calculations, but uses
-                            // the last joint's rotation value
-                            .with_rotation({
-                                let angle =
-                                    positions.get(&child).unwrap() - positions.get(&node).unwrap();
-                                Quat::from_rotation_arc(Vec3::Z, angle.normalize())
-                            });
+
+                    let new_transform = child_transform_from_positions(
+                        *positions.get(&node).unwrap(),
+                        *positions.get(&child).unwrap(),
+                    );
+
                     new_global_transforms.insert(node, new_transform);
 
                     new_transform
                 }
                 0 => {
-                    let new_transform =
-                        Transform::from_translation(*positions.get(&incoming.1).unwrap())
-                            // if there is no `next` node, we're
-                            // dealing with the tail, which does
-                            // all the same calculations, but uses
-                            // the last joint's rotation value
-                            .with_rotation(
-                                new_global_transforms.get(&incoming.0).unwrap().rotation,
-                            );
-                    new_global_transforms.insert(incoming.1, new_transform);
+                    info!(?node, "0");
+                    // if there is no `child` node, we're
+                    // dealing with the tail, which does
+                    // all the same calculations, but uses
+                    // the parent joint's rotation value
+                    let new_transform = Transform::from_translation(*positions.get(&node).unwrap())
+                        .with_rotation(new_global_transforms.get(&incoming.0).unwrap().rotation);
+                    new_global_transforms.insert(node, new_transform);
                     new_transform
                 }
-                // more than 1 child means we are at a sub-base;
-                // for now, rotate sub-bases according to their parent
-                // similar to how we handle end nodes.
-                // This means we don't handle a root with an immediate
-                // split well... but I'm not really sure what the
-                // rotation should be if there's a root node with say:
-                // an 8 way immediate split.
-                _ => {
-                    let new_transform =
-                        Transform::from_translation(*positions.get(&incoming.1).unwrap())
-                            // if there is no `next` node, we're
-                            // dealing with the tail, which does
-                            // all the same calculations, but uses
-                            // the last joint's rotation value
-                            .with_rotation(
-                                new_global_transforms.get(&incoming.0).unwrap().rotation,
-                            );
-                    new_global_transforms.insert(incoming.1, new_transform);
+                n => {
+                    // more than 1 child means we are at a sub-base;
+                    // for now, rotate sub-bases according to their parent
+                    // similar to how we handle end nodes.
+                    // This means we don't handle a root with an immediate
+                    // split well... but I'm not really sure what the
+                    // rotation should be if there's a root node with say:
+                    // an 8 way immediate split.
+                    info!(?node, "{n}");
+                    let new_transform = Transform::from_translation(*positions.get(&node).unwrap())
+                        .with_rotation(new_global_transforms.get(&incoming.0).unwrap().rotation);
+                    new_global_transforms.insert(node, new_transform);
 
                     new_transform
                 }
@@ -414,4 +414,11 @@ pub fn process_inverse_kinematics(
             transform.translation = translation;
         }
     }
+}
+
+fn child_transform_from_positions(current: Vec3, next: Vec3) -> Transform {
+    Transform::from_translation(current).with_rotation({
+        let angle = next - current;
+        Quat::from_rotation_arc(Vec3::Z, angle.normalize())
+    })
 }
