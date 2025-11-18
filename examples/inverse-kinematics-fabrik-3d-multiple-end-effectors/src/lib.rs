@@ -147,10 +147,6 @@ pub fn process_inverse_kinematics(
         })
         .collect();
 
-    for (entity, position) in positions.iter() {
-        gizmos.sphere(*position, 0.2, RED_400);
-    }
-
     // iterate graphs
     for root in roots.iter() {
         let original_root_position = *positions.get(root).unwrap();
@@ -247,11 +243,10 @@ pub fn process_inverse_kinematics(
             for node in Dfs::new(&*all_ik_graphs, *root).iter(&*all_ik_graphs) {
                 // "neighbors" in a directed graph where edges
                 // are pointed towards children is the same as "children".
-                // let num_children = fabrik_graph.neighbors(node).count();
-                // info!(?node, ?num_children, "Dfs");
-                let mut it = all_ik_graphs.edges_directed(node, petgraph::Direction::Incoming);
-                let incoming = it.next();
-                match incoming {
+                match all_ik_graphs
+                    .edges_directed(node, petgraph::Direction::Incoming)
+                    .next()
+                {
                     None => {
                         // This is the root node of the IK graph!
                         let target = original_root_position;
@@ -264,7 +259,6 @@ pub fn process_inverse_kinematics(
                         let previous_node_position = positions.get(&incoming_edge.0).unwrap();
                         let current_node_position = positions.get(&incoming_edge.1).unwrap();
 
-                        // let child_pos = positions.get(&child).unwrap();
                         let bone_length = all_ik_graphs
                             .edge_weight(incoming_edge.0, incoming_edge.1)
                             .unwrap();
@@ -294,33 +288,33 @@ pub fn process_inverse_kinematics(
                 );
         }
 
-        for (entity, position) in positions.iter() {
-            gizmos.sphere(*position, 0.2, GREEN_400);
+        // gizmos for calculated node positions
+        // for (entity, position) in positions.iter() {
+        //     gizmos.sphere(*position, 0.2, GREEN_400);
+        // }
+        for (start, end, _distance) in all_ik_graphs.all_edges() {
+            gizmos.arrow(
+                *positions.get(&start).unwrap(),
+                *positions.get(&end).unwrap(),
+                GREEN_400,
+            );
         }
-        for (a, b) in positions
-            .iter()
-            .sorted_by(|a, b| b.0.cmp(a.0))
-            .tuple_windows()
-        {
-            dotted_gizmos.arrow(*a.1, *b.1, PINK_400);
-        }
-        // set the Transform hierarchy for the bones using the current_positions
-        // as source data
-        // set_transforms(&current_positions, &mut transforms);
+
+        // set the Transform hierarchy for the bones using the calculated
+        // `positions` as source data
         //
         // Also build up a temporary cache of "global transforms" so that
         // we can access them while iterating
         // These Transforms represent the entities as if they were
         // lone entities, not part of any hierarchy.
         let mut new_global_transforms = HashMap::<Entity, Transform>::new();
-        // info!(?positions);
+
         for node in Dfs::new(&*all_ik_graphs, *root).iter(&*all_ik_graphs) {
             // Check to see if there's a "parent" node
             let Some(incoming) = all_ik_graphs
                 .edges_directed(node, petgraph::Direction::Incoming)
                 .next()
             else {
-                info!(?node, "root");
                 // if there isn't a parent node,
                 // rotate in direction of next child
                 let mut it = all_ik_graphs.neighbors(node);
@@ -350,17 +344,12 @@ pub fn process_inverse_kinematics(
 
             // "neighbors" in a directed graph where edges
             // are pointed towards children is the same as "children".
-            let num_children = all_ik_graphs.neighbors(node).count();
-            // info!(?node, ?num_children, "set_transform");
-            let transform_to_insert = match num_children {
+            let transform_to_insert = match all_ik_graphs.neighbors(node).count() {
                 1 => {
-                    info!(?node, "1");
                     // rotate in direction of next child
-                    let mut it = all_ik_graphs.neighbors(node);
-                    let child = it
+                    let child = all_ik_graphs
+                        .neighbors(node)
                         .next()
-                        // technically would panic if one node were passed in, but that's
-                        // an exceedingly weird configuration of EndEffector::affected_bone_count == 0.
                         .expect("we already confirmed this node has a child.");
 
                     let new_transform = current_transform_with_rotation(
@@ -373,7 +362,6 @@ pub fn process_inverse_kinematics(
                     new_transform
                 }
                 0 => {
-                    info!(?node, "0");
                     // if there is no `child` node, we're
                     // dealing with the tail, which does
                     // all the same calculations, but uses
@@ -386,15 +374,16 @@ pub fn process_inverse_kinematics(
                     new_global_transforms.insert(incoming.1, new_transform);
                     new_transform
                 }
-                n => {
-                    // more than 1 child means we are at a sub-base;
+                _ => {
+                    // more than 1 child means we are at a sub-base; (since we haven't handled "loops" here)
+                    //
                     // for now, rotate sub-bases according to their parent
                     // similar to how we handle end nodes.
+                    //
                     // This means we don't handle a root with an immediate
                     // split well... but I'm not really sure what the
                     // rotation should be if there's a root node with say:
                     // an 8 way immediate split.
-                    info!(?node, "{n}");
                     let new_transform =
                         Transform::from_translation(*positions.get(&incoming.1).unwrap())
                             .with_rotation(
@@ -406,7 +395,6 @@ pub fn process_inverse_kinematics(
                 }
             };
 
-            // info!(?new_global_transforms, ?incoming);
             // use the "global" Transforms to calculate
             // the proper rotations using affine inverse
             let parent = new_global_transforms.get(&incoming.0).unwrap();
