@@ -18,9 +18,6 @@ impl Plugin for FabrikPlugin {
     }
 }
 
-#[derive(Component)]
-pub struct IkRoot;
-
 // We can create our own gizmo config group!
 #[derive(Default, Reflect, GizmoConfigGroup)]
 pub struct DottedGizmos;
@@ -128,10 +125,10 @@ pub fn process_inverse_kinematics(
         }
     }
     // print dot for viz
-    println!(
-        "{:?}",
-        petgraph::dot::Dot::with_config(&*all_ik_graphs, &[])
-    );
+    // println!(
+    //     "{:?}",
+    //     petgraph::dot::Dot::with_config(&*all_ik_graphs, &[])
+    // );
 
     // build `positions` for everything
     let mut positions: HashMap<Entity, Vec3> = all_ik_graphs
@@ -187,7 +184,7 @@ pub fn process_inverse_kinematics(
         // 10 iterations is an entirely arbitrary number
         // of maximum iterations.
         let mut iterations = 0;
-        while !all_end_effectors_are_at_targets && iterations < 10 {
+        while !all_end_effectors_are_at_targets && iterations < 3 {
             iterations += 1;
 
             // This is the Forward Pass, done as a graph traversal!
