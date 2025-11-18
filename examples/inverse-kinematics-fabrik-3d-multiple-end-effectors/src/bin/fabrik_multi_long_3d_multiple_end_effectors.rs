@@ -4,7 +4,7 @@ use bevy::{
     prelude::*,
 };
 use inverse_kinematics_fabrik_3d_multiple_end_effectors::{
-    FabrikPlugin, IkRoot, InverseKinematicEndEffector,
+    FabrikPlugin, InverseKinematicEndEffector,
 };
 
 // logging with the example name was getting a bit long, so this
@@ -112,7 +112,6 @@ fn startup(
 
     commands.spawn((
         Name::new("IKRoot"),
-        IkRoot,
         root_position,
         Mesh3d(sphere.clone()),
         joint_material.clone(),
