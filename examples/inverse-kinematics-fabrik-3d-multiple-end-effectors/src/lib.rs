@@ -331,7 +331,7 @@ pub fn process_inverse_kinematics(
                     panic!("we don't handle the case where a root node has more than one child")
                 }
 
-                let new_transform = child_transform_from_positions(
+                let new_transform = current_transform_with_rotation(
                     *positions.get(&node).unwrap(),
                     *positions.get(&child).unwrap(),
                 );
@@ -363,7 +363,7 @@ pub fn process_inverse_kinematics(
                         // an exceedingly weird configuration of EndEffector::affected_bone_count == 0.
                         .expect("we already confirmed this node has a child.");
 
-                    let new_transform = child_transform_from_positions(
+                    let new_transform = current_transform_with_rotation(
                         *positions.get(&node).unwrap(),
                         *positions.get(&child).unwrap(),
                     );
@@ -378,9 +378,12 @@ pub fn process_inverse_kinematics(
                     // dealing with the tail, which does
                     // all the same calculations, but uses
                     // the parent joint's rotation value
-                    let new_transform = Transform::from_translation(*positions.get(&node).unwrap())
-                        .with_rotation(new_global_transforms.get(&incoming.0).unwrap().rotation);
-                    new_global_transforms.insert(node, new_transform);
+                    let new_transform =
+                        Transform::from_translation(*positions.get(&incoming.1).unwrap())
+                            .with_rotation(
+                                new_global_transforms.get(&incoming.0).unwrap().rotation,
+                            );
+                    new_global_transforms.insert(incoming.1, new_transform);
                     new_transform
                 }
                 n => {
@@ -392,9 +395,12 @@ pub fn process_inverse_kinematics(
                     // rotation should be if there's a root node with say:
                     // an 8 way immediate split.
                     info!(?node, "{n}");
-                    let new_transform = Transform::from_translation(*positions.get(&node).unwrap())
-                        .with_rotation(new_global_transforms.get(&incoming.0).unwrap().rotation);
-                    new_global_transforms.insert(node, new_transform);
+                    let new_transform =
+                        Transform::from_translation(*positions.get(&incoming.1).unwrap())
+                            .with_rotation(
+                                new_global_transforms.get(&incoming.0).unwrap().rotation,
+                            );
+                    new_global_transforms.insert(incoming.1, new_transform);
 
                     new_transform
                 }
@@ -416,7 +422,10 @@ pub fn process_inverse_kinematics(
     }
 }
 
-fn child_transform_from_positions(current: Vec3, next: Vec3) -> Transform {
+/// Takes the "current" position and the "next" position and
+/// return a `Transform` that is location at `current` and rotated
+/// to point `Vec3::Z` towards `next`.
+fn current_transform_with_rotation(current: Vec3, next: Vec3) -> Transform {
     Transform::from_translation(current).with_rotation({
         let angle = next - current;
         Quat::from_rotation_arc(Vec3::Z, angle.normalize())
