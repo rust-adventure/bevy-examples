@@ -154,15 +154,15 @@ fn startup(
                                 Mesh3d(sphere.clone()),
                                 joint_material.clone(),
                                 children![
-                                    // (
-                                    //     Mesh3d(cuboid.clone()),
-                                    //     bone_material.clone(),
-                                    //     Transform::from_xyz(
-                                    //         0.,
-                                    //         0.,
-                                    //         joint_position.translation.length() / 2.,
-                                    //     ) // .with_rotation(Quat::from_axis_angle(Vec3::Z, FRAC_PI_2))
-                                    // ),
+                                    (
+                                        Mesh3d(cuboid.clone()),
+                                        bone_material.clone(),
+                                        Transform::from_xyz(
+                                            0.,
+                                            0.,
+                                            joint_position.translation.length() / 2.,
+                                        ) // .with_rotation(Quat::from_axis_angle(Vec3::Z, FRAC_PI_2))
+                                    ),
                                     (
                                         Name::new("Joint4"),
                                         joint_position,
