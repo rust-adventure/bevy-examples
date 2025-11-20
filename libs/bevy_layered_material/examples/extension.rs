@@ -7,8 +7,10 @@ use bevy::{
     render::render_resource::*,
     shader::ShaderRef,
 };
+use bevy_color::palettes::tailwind::*;
 use bevy_image::ImageLoaderSettings;
 use bevy_layered_materials::{LayeredMaterial, LayeredMaterialsPlugin};
+use bevy_light::light_consts::lux;
 use bevy_math::Affine2;
 
 /// This example uses a shader source file from the assets subdirectory
@@ -16,6 +18,7 @@ const SHADER_ASSET_PATH: &str = "extension.wgsl";
 
 fn main() {
     App::new()
+        .insert_resource(ClearColor(SKY_800.into()))
         .add_plugins((DefaultPlugins, LayeredMaterialsPlugin))
         .add_plugins(MaterialPlugin::<
             ExtendedMaterial<LayeredMaterial, MyExtension>,
@@ -88,7 +91,11 @@ fn setup(
 
     // light
     commands.spawn((
-        DirectionalLight::default(),
+        DirectionalLight {
+            illuminance: lux::AMBIENT_DAYLIGHT,
+            shadows_enabled: true,
+            ..default()
+        },
         Transform::from_xyz(1.0, 1.0, 1.0).looking_at(Vec3::ZERO, Vec3::Y),
         Rotate,
     ));
