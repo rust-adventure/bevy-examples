@@ -48,6 +48,7 @@ fn setup(
     ));
     // cube
     let mut cube = Cuboid::new(2.0, 2.0, 2.0).mesh().build();
+    // tangents are required for normals to affect lighting!
     cube.generate_tangents().unwrap();
     commands.spawn((
         Mesh3d(meshes.add(cube)),

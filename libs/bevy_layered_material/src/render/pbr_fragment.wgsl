@@ -79,6 +79,7 @@ fn pbr_input_from_vertex_output(
 fn pbr_input_from_standard_material(
     in: VertexOutput,
     is_front: bool,
+    layer_index: u32
 ) -> pbr_types::PbrInput {
 #ifdef MESHLET_MESH_MATERIAL_PASS
     let slot = in.material_bind_group_slot;
@@ -212,7 +213,7 @@ pbr_input.material.uv_transform = uv_transform;
                 uv,
 #endif
                 // TODO: bevy_layered_materials index
-                pbr_bindings::material.layer_index,
+                layer_index,
 #ifdef MESHLET_MESH_MATERIAL_PASS
                 bias.ddx_uv,
                 bias.ddy_uv,
@@ -705,7 +706,7 @@ pbr_input.material.uv_transform = uv_transform;
                 uv,
 #endif
                 // TODO: bevy_layered_materials index
-                pbr_bindings::material.layer_index,
+                layer_index,
 #ifdef MESHLET_MESH_MATERIAL_PASS
                 bias.ddx_uv,
                 bias.ddy_uv,
