@@ -3,6 +3,7 @@
     pbr_functions::alpha_discard,
     pbr_types::PbrInput
 }
+#import bevy_pbr::mesh_view_bindings::globals;
 
 #ifdef PREPASS_PIPELINE
 #import bevy_pbr::{
@@ -38,10 +39,14 @@ fn fragment(
 ) -> FragmentOutput {
     // generate a PbrInput struct from the StandardMaterial bindings
     var pbr_input: PbrInput;
-    if in.uv.x > 0.5 {
-      pbr_input = pbr_input_from_standard_material(in, is_front, 0);
+    let value = (sin(globals.time) + 1) / 2;
+    var pbr_input1 = pbr_input_from_standard_material(in, is_front, 0);
+    var pbr_input2 = pbr_input_from_standard_material(in, is_front, 1);
+    if value > in.uv.x {
+        pbr_input = pbr_input1;
     } else {
-      pbr_input = pbr_input_from_standard_material(in, is_front, 1);
+        pbr_input = pbr_input2;
+        pbr_input.N = pbr_input1.N;
     }
 
     // we can optionally modify the input before lighting and alpha_discard is applied
