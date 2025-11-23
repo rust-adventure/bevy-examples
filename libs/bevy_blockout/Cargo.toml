@@ -7,7 +7,7 @@ homepage = "https://github.com/rust-adventure/bevy-examples/tree/main/libs/bevy_
 keywords = ["bevy", "wgpu"]
 license = "MIT"
 name = "bevy_blockout"
-version = "0.3.0"
+version = "0.3.1"
 exclude = ["/screenshots", "/assets", "/examples"]
 
 
