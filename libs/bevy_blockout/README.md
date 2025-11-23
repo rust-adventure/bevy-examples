@@ -24,3 +24,7 @@ commands.spawn((
     })),
 ));
 ```
+
+## TODO
+
+- [ ] Smaller squares could combine better on angled surfaces

@@ -1,3 +1,5 @@
+use std::f32::consts::FRAC_PI_6;
+
 use bevy::{
     camera::Exposure,
     color::palettes::tailwind::*,
@@ -84,6 +86,23 @@ fn setup(
             ))),
         ),
         Transform::from_xyz(4.0, 0.5, 0.0),
+        MeshMaterial3d(materials.add(ExtendedMaterial {
+            base: StandardMaterial {
+                base_color: SKY_400.into(),
+                ..default()
+            },
+            extension: BlockoutMaterialExt::default(),
+        })),
+    ));
+
+    commands.spawn((
+        Mesh3d(meshes.add(Extrusion::new(
+            RegularPolygon::new(2., 6),
+            4.,
+        ))),
+        Transform::from_xyz(-1.0, 0., 0.0).with_rotation(
+            Quat::from_axis_angle(Vec3::Z, FRAC_PI_6),
+        ),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: SKY_400.into(),
