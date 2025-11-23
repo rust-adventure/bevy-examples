@@ -57,6 +57,7 @@ fn setup(
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: BLUE_50.into(),
+                perceptual_roughness: 1.,
                 reflectance: 0.,
                 ..default()
             },
@@ -73,6 +74,8 @@ fn setup(
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: SKY_400.into(),
+                perceptual_roughness: 1.,
+                reflectance: 0.,
                 ..default()
             },
             extension: BlockoutMaterialExt::default(),
@@ -88,7 +91,9 @@ fn setup(
         Transform::from_xyz(4.0, 0.5, 0.0),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
-                base_color: SKY_400.into(),
+                base_color: LIME_400.into(),
+                perceptual_roughness: 1.,
+                reflectance: 0.,
                 ..default()
             },
             extension: BlockoutMaterialExt::default(),
@@ -105,7 +110,9 @@ fn setup(
         ),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
-                base_color: SKY_400.into(),
+                base_color: RED_400.into(),
+                perceptual_roughness: 1.,
+                reflectance: 0.,
                 ..default()
             },
             extension: BlockoutMaterialExt::default(),

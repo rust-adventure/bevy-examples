@@ -36,12 +36,28 @@ fn fragment(
     // generate a PbrInput struct from the StandardMaterial bindings
     var pbr_input = pbr_input_from_standard_material(in, is_front);
 
+    // compute checkerboard for 1m and 0.1m squares
+    var computed_checkers = (checkerboard(in, 0.1) + checkerboard(in, 1.)) / 2.;
+
+    // pick the color to use based on how close it is
+    // to the Y normal
+    var color = extension.color.xyz;
+    if abs(in.world_normal.y) < 0.99 {
+        color = pbr_input.material.base_color.xyz;
+    }
+
+    // convert to oklab, adjust lightness via checkers, convert back
+    var floor_wall_split = oklab_from_linear(color);
+    floor_wall_split.x = (floor_wall_split.x + computed_checkers.x * 0.2) - 0.2;
+
+
     pbr_input.material.base_color = mix(
         vec4(blockout(in)),
         extension.line_color,
-        // mix the y world normal between the desaturated color and the "core" side color.
-        // multiply it by the checkerboards, which overlap and darken their respective boxes
-        mix(vec4(in.world_normal.y), pbr_input.material.base_color, extension.color) * vec4(checkerboard(in, 0.1) + checkerboard(in, 1.), 1.)
+        vec4(
+            linear_from_oklab(floor_wall_split),
+            1.
+        )
     );
 
     //pbr_input.material.base_color = mix(vec4(in.world_normal.y), pbr_input.material.base_color, extension.color) * vec4(checkerboard(in, 1.) + checkerboard(in, 5.), 1.);
@@ -81,9 +97,9 @@ fn checkerboard(mesh: VertexOutput, size: f32) -> vec3f {
 
     // get the f32 value for each axis,
     // lock the lower end to a min of 0.3 so we don't get black grid positions
-    let x = max(0.3, checker(mesh.world_position.zy, size));
-    let y = max(0.3, checker(mesh.world_position.xz, size));
-    let z = max(0.3, checker(mesh.world_position.xy, size));
+    let x = max(0.1, checker(mesh.world_position.zy, size));
+    let y = max(0.1, checker(mesh.world_position.xz, size));
+    let z = max(0.1, checker(mesh.world_position.xy, size));
 
     // blend the albedos per-axis based on the normal direction
     let normal = abs(mesh.world_normal);
