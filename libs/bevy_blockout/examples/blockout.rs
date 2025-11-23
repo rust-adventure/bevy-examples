@@ -47,7 +47,7 @@ fn setup(
             meshes.add(Mesh::from(
                 Plane3d::default()
                     .mesh()
-                    .size(300., 300.)
+                    .size(20., 20.)
                     .subdivisions(10),
             )),
         ),
@@ -65,9 +65,9 @@ fn setup(
     // sphere
     commands.spawn((
         Mesh3d(
-            meshes.add(Sphere::new(6.).mesh().uv(32, 18)),
+            meshes.add(Sphere::new(2.).mesh().uv(32, 18)),
         ),
-        Transform::from_xyz(0.0, 14., 0.0),
+        Transform::from_xyz(0.0, 4., 0.0),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: SKY_400.into(),
@@ -78,10 +78,12 @@ fn setup(
     ));
 
     commands.spawn((
-        Mesh3d(meshes.add(Cuboid::from_size(Vec3::new(
-            10., 4., 20.,
-        )))),
-        Transform::from_xyz(10.0, 2., 0.0),
+        Mesh3d(
+            meshes.add(Cuboid::from_size(Vec3::new(
+                2., 1., 4.,
+            ))),
+        ),
+        Transform::from_xyz(4.0, 0.5, 0.0),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: SKY_400.into(),
@@ -128,7 +130,7 @@ fn setup(
             ..default()
         },
         Hdr,
-        Transform::from_xyz(-50.2, 20., 50.0)
+        Transform::from_xyz(-10.2, 5., 10.0)
             .looking_at(Vec3::Y * 0.1, Vec3::Y),
         // This is the component that enables atmospheric scattering for a camera
         Atmosphere::EARTH,

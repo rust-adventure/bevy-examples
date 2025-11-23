@@ -120,7 +120,9 @@ pub struct BlockoutMaterialExt {
     #[uniform(100)]
     pub color: LinearRgba,
     #[uniform(100)]
+    // currently unused
     pub cell_multiplier: Vec2,
+    // size of the lines
     #[uniform(100)]
     pub line_size: Vec2,
 }
@@ -130,8 +132,8 @@ impl Default for BlockoutMaterialExt {
         Self {
             line_color: Color::WHITE.into(), /* SLATE_50.into(), */
             color: SLATE_400.into(),
-            cell_multiplier: Vec2::splat(10.),
-            line_size: Vec2::splat(0.1),
+            cell_multiplier: Vec2::splat(1.),
+            line_size: Vec2::splat(0.0),
         }
     }
 }
