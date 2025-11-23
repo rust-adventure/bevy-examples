@@ -133,7 +133,7 @@ impl Default for BlockoutMaterialExt {
             line_color: Color::WHITE.into(), /* SLATE_50.into(), */
             color: SLATE_400.into(),
             cell_multiplier: Vec2::splat(1.),
-            line_size: Vec2::splat(0.0),
+            line_size: Vec2::splat(0.01),
         }
     }
 }

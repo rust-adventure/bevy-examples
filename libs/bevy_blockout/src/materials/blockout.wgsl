@@ -60,10 +60,6 @@ fn fragment(
         )
     );
 
-    //pbr_input.material.base_color = mix(vec4(in.world_normal.y), pbr_input.material.base_color, extension.color) * vec4(checkerboard(in, 1.) + checkerboard(in, 5.), 1.);
-    // pbr_input.material.base_color = vec4(checkerboard(in, 0.1) * checkerboard(in, 1.), 1.);
-    //pbr_input.material.base_color = vec4(vec3(blockout(in)), 1.);
-
     // alpha discard
     pbr_input.material.base_color = alpha_discard(pbr_input.material, pbr_input.material.base_color);
 
