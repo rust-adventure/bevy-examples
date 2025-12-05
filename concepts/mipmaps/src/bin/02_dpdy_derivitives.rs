@@ -8,17 +8,11 @@ use bevy::{
     },
     shader::ShaderRef,
 };
-use image::{
-    DynamicImage, ImageBuffer, imageops::FilterType,
-};
+use image::{DynamicImage, ImageBuffer};
 
 fn main() -> AppExit {
     App::new()
         .insert_resource(ClearColor(SLATE_950.into()))
-        // .insert_resource(AmbientLight {
-        //     brightness: 1_000.,
-        //     ..default()
-        // })
         .add_plugins((
             DefaultPlugins,
             MaterialPlugin::<DpDyMaterial>::default(),
@@ -100,12 +94,9 @@ fn rotate(
 }
 
 fn build_mips(
-    mut commands: Commands,
     manual_mips: Res<ManualMips>,
     mut assets: ResMut<Assets<Image>>,
     mut processed: Local<bool>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     if *processed {
         info_once!("processed");
@@ -154,37 +145,8 @@ fn build_mips(
 
     x2048.texture_descriptor.mip_level_count = 5;
     x2048.data = Some(new_image);
-
-    // commands.spawn((
-    //     Mesh3d(
-    //         meshes.add(Plane3d::new(
-    //             Vec3::Y,
-    //             Vec2::splat(10.),
-    //         )),
-    //     ),
-    //     MeshMaterial3d(materials.
-    // add(StandardMaterial {
-    //         base_color_texture: Some(
-    //             manual_mips.x2048.clone(),
-    //         ),
-    //         unlit: true,
-    //         ..default()
-    //     })),
-    //     Transform::from_xyz(0.0, 0.0, 0.0),
-    // ));
-    // commands.spawn((
-    //     Mesh3d(meshes.add(Cuboid::new(5., 5.,
-    // 5.))),     MeshMaterial3d(materials.
-    // add(StandardMaterial {
-    //         base_color_texture: Some(
-    //             manual_mips.x2048.clone(),
-    //         ),
-    //         unlit: true,
-    //         ..default()
-    //     })),
-    //     Transform::from_xyz(0.0, 0.0, 0.0),
-    // ));
 }
+
 fn build_mip(image: &Image) -> Option<DynamicImage> {
     info!(
         has_data = image.data.is_some(),
@@ -207,16 +169,9 @@ fn build_mip(image: &Image) -> Option<DynamicImage> {
     Some(dynamic_image)
 }
 
-// This struct defines the data that will be
-// passed to your shader
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct DpDyMaterial {}
 
-/// The Material trait is very configurable, but
-/// comes with sensible defaults for all methods.
-/// You only need to implement functions for
-/// features that need non-default behavior. See
-/// the Material api docs for details!
 impl Material for DpDyMaterial {
     fn fragment_shader() -> ShaderRef {
         "dpdy_material.wgsl".into()

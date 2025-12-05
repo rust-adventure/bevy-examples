@@ -40,6 +40,7 @@ fn startup(
         x2048: asset_server.load("2048.png"),
     };
 
+    // a plane
     commands.spawn((
         Mesh3d(
             meshes.add(Plane3d::new(
@@ -58,6 +59,20 @@ fn startup(
         Transform::from_xyz(0.0, 0.0, 0.0),
     ));
 
+    // a cube
+    // commands.spawn((
+    //     Mesh3d(meshes.add(Cuboid::new(5., 5.,
+    // 5.))),     MeshMaterial3d(materials.
+    // add(StandardMaterial {
+    //         base_color_texture: Some(
+    //             manual_mips.x2048.clone(),
+    //         ),
+    //         unlit: true,
+    //         ..default()
+    //     })),
+    //     Transform::from_xyz(0.0, 0.0, 0.0),
+    // ));
+
     commands.insert_resource(manual_mips);
 }
 
@@ -70,12 +85,9 @@ fn rotate(
 }
 
 fn build_mips(
-    mut commands: Commands,
     manual_mips: Res<ManualMips>,
     mut assets: ResMut<Assets<Image>>,
     mut processed: Local<bool>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     if *processed {
         info_once!("processed");
@@ -124,37 +136,8 @@ fn build_mips(
 
     x2048.texture_descriptor.mip_level_count = 5;
     x2048.data = Some(new_image);
-
-    // commands.spawn((
-    //     Mesh3d(
-    //         meshes.add(Plane3d::new(
-    //             Vec3::Y,
-    //             Vec2::splat(10.),
-    //         )),
-    //     ),
-    //     MeshMaterial3d(materials.
-    // add(StandardMaterial {
-    //         base_color_texture: Some(
-    //             manual_mips.x2048.clone(),
-    //         ),
-    //         unlit: true,
-    //         ..default()
-    //     })),
-    //     Transform::from_xyz(0.0, 0.0, 0.0),
-    // ));
-    // commands.spawn((
-    //     Mesh3d(meshes.add(Cuboid::new(5., 5.,
-    // 5.))),     MeshMaterial3d(materials.
-    // add(StandardMaterial {
-    //         base_color_texture: Some(
-    //             manual_mips.x2048.clone(),
-    //         ),
-    //         unlit: true,
-    //         ..default()
-    //     })),
-    //     Transform::from_xyz(0.0, 0.0, 0.0),
-    // ));
 }
+
 fn build_mip(image: &Image) -> Option<DynamicImage> {
     info!(
         has_data = image.data.is_some(),

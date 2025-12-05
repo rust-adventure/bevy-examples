@@ -2539,13 +2539,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "error_handling"
-version = "0.1.0"
-dependencies = [
- "bevy",
-]
-
-[[package]]
 name = "euclid"
 version = "0.22.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"

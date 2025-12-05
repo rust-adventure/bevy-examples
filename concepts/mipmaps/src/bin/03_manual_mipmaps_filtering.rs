@@ -73,12 +73,9 @@ fn rotate(
 }
 
 fn build_mips(
-    mut commands: Commands,
     manual_mips: Res<ManualMips>,
     mut assets: ResMut<Assets<Image>>,
     mut processed: Local<bool>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     if *processed {
         info_once!("processed");
@@ -128,37 +125,9 @@ fn build_mips(
     x2048.texture_descriptor.mip_level_count = 5;
     x2048.data = Some(new_image);
     let sampler = x2048.sampler.get_or_init_descriptor();
-    sampler.mipmap_filter = ImageFilterMode::Nearest;
 
-    // commands.spawn((
-    //     Mesh3d(
-    //         meshes.add(Plane3d::new(
-    //             Vec3::Y,
-    //             Vec2::splat(10.),
-    //         )),
-    //     ),
-    //     MeshMaterial3d(materials.
-    // add(StandardMaterial {
-    //         base_color_texture: Some(
-    //             manual_mips.x2048.clone(),
-    //         ),
-    //         unlit: true,
-    //         ..default()
-    //     })),
-    //     Transform::from_xyz(0.0, 0.0, 0.0),
-    // ));
-    // commands.spawn((
-    //     Mesh3d(meshes.add(Cuboid::new(5., 5.,
-    // 5.))),     MeshMaterial3d(materials.
-    // add(StandardMaterial {
-    //         base_color_texture: Some(
-    //             manual_mips.x2048.clone(),
-    //         ),
-    //         unlit: true,
-    //         ..default()
-    //     })),
-    //     Transform::from_xyz(0.0, 0.0, 0.0),
-    // ));
+    // mipmap_filter!
+    sampler.mipmap_filter = ImageFilterMode::Nearest;
 }
 fn build_mip(image: &Image) -> Option<DynamicImage> {
     info!(
