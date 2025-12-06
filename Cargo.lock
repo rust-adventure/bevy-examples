@@ -3272,6 +3272,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "inverse-kinematics-fabrik-2d"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "itertools 0.14.0",
+]
+
+[[package]]
+name = "inverse-kinematics-fabrik-3d"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "itertools 0.14.0",
+]
+
+[[package]]
+name = "inverse-kinematics-fabrik-3d-multiple-end-effectors"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "itertools 0.14.0",
+ "petgraph",
+]
+
+[[package]]
 name = "io-kit-sys"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
