@@ -19,6 +19,8 @@ members = [
   "examples/inverse-kinematics-fabrik-2d",
   "examples/inverse-kinematics-fabrik-3d",
   "examples/inverse-kinematics-fabrik-3d-multiple-end-effectors",
+  "examples/inverse-kinematics-fabrik-3d-constraints",
+  "examples/ik_cone_projection",
 ]
 # "examples/spacecraft-noiseland",
 # rotating-column depends on bevy_tweening

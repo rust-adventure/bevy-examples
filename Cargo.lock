@@ -3044,6 +3044,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ik_cone_projection"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "itertools 0.14.0",
+]
+
+[[package]]
 name = "image"
 version = "0.25.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3155,6 +3163,15 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "itertools 0.14.0",
+]
+
+[[package]]
+name = "inverse-kinematics-fabrik-3d-constraints"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "itertools 0.14.0",
+ "petgraph",
 ]
 
 [[package]]
