@@ -8,6 +8,8 @@ use bevy::{
 };
 use itertools::Itertools;
 
+const CIRCLE_GIZMO_RESOLUTION: u32 = 100;
+
 fn main() {
     App::new()
         .init_gizmo_group::<Gizmos3d>()
@@ -41,6 +43,7 @@ fn startup(
     config.render_layers = RenderLayers::layer(0);
     config.line = GizmoLineConfig {
         width: 10.,
+        // perspective: true,
         ..default()
     };
 
@@ -227,144 +230,109 @@ fn update(
             },
             YELLOW_400.with_alpha(0.2),
         )
-        .resolution(20);
+        .resolution(40);
 
-    // TEMP
-    // a
-    let og_normal = o.normalize();
-    // b
-    let new_normal = Vec3::Z;
-
-    // //2
-    let v = og_normal.cross(new_normal);
-    // let s = ?;
-    // let c = og_normal.dot(new_normal);
-    let angle = og_normal.angle_between(new_normal);
-    let mat = Mat3::from_axis_angle(v, angle);
-    let translation = o - positions[1];
-    dbg!(translation);
-
-    let projected_endpoint_from_origin = positions[1] - o;
-
-    let new_t_pos = mat
-        * (positions[0] - projected_endpoint_from_origin);
-    // original target position
-    gizmos_3d.circle(
-        Isometry3d::from_translation(new_t_pos),
-        0.1,
-        PINK_400,
-    );
-    gizmos_2d.circle_2d(
-        Isometry2d::from_translation(new_t_pos.xy()),
-        0.1,
-        RED_400,
-    );
-    let new_pos = (new_t_pos.xy()).normalize() * qj;
-    gizmos_2d.circle_2d(
-        Isometry2d::from_translation(new_pos),
-        0.1,
-        GREEN_400,
-    );
-
-    gizmos_2d.arrow_2d(new_t_pos.xy(), new_pos, GREEN_400);
-
-    // let new_space_vec = ;
-
-    gizmos_3d.circle(Isometry3d::default(), 0.05, SKY_400);
-
-    let position_before_bone_length = mat.inverse()
-        * new_pos.extend(0.)
-        + projected_endpoint_from_origin;
-
-    gizmos_3d.circle(
-        Isometry3d::from_translation(
-            position_before_bone_length,
-        ),
-        0.1,
-        GREEN_400,
-    );
-
-    gizmos_3d.arrow(
-        positions[0],
-        position_before_bone_length,
-        GREEN_400,
-    );
-    // END TEMP
-
-    // 2d
+    gizmos_3d
+        .circle(
+            Isometry3d {
+                rotation: Quat::from_rotation_arc(
+                    Vec3::NEG_Z,
+                    (-o).normalize(),
+                ),
+                translation: (positions[1] - o).into(),
+                ..default()
+            },
+            qj,
+            Color::WHITE,
+        )
+        .resolution(CIRCLE_GIZMO_RESOLUTION);
 
     // the cone slice location, which is the origin
-    gizmos_2d.circle_2d(
-        Isometry2d::default(),
-        qj,
-        SLATE_50,
-    );
+    gizmos_2d
+        .circle_2d(Isometry2d::default(), 0.01, BLUE_400)
+        .resolution(CIRCLE_GIZMO_RESOLUTION);
+    gizmos_2d
+        .circle_2d(Isometry2d::default(), qj, SLATE_50)
+        .resolution(CIRCLE_GIZMO_RESOLUTION);
 
-    // // 3.8: Check whether the target is within the conic section or not
-    let t_position = positions[0] - (positions[1] - o);
-    // gizmos_3d.line(positions[0], t_position, RED_400);
-    // translate t_position to 0,0
+    // goal is to build the rotation matrix the rotates
+    // `projection_target_plane_normal` onto `bevy_xy_plane_normal`,
+    // which can then be applied to the target points
+    let projection_target_plane_normal = o.normalize();
+    let bevy_xy_plane_normal = Vec3::Z;
 
-    // original target position
-    gizmos_2d.circle_2d(
-        Isometry2d::from_translation(t_position.xy()),
-        0.1,
-        RED_400,
-    );
+    // rotation axis
+    let axis = projection_target_plane_normal
+        .cross(bevy_xy_plane_normal);
+    // rotation angle
+    let angle = projection_target_plane_normal
+        .angle_between(bevy_xy_plane_normal);
+    // rotation matrix
+    let mat = Mat3::from_axis_angle(axis, angle);
+    // the global position of the vector projection
+    let projected_endpoint_from_origin = positions[1] - o;
+    // the target position, rotated and translated to exist
+    // on Bevy's 2d, xy, plane with o as the origin
+    let target_position_on_2d_plane = mat
+        * (positions[0] - projected_endpoint_from_origin);
 
-    let is_inside_circle = t_position.length() < qj;
-    if !is_inside_circle {
-        info!("move point");
-
-        //
-        let new_pos = (t_position.xy()).normalize() * qj;
-        gizmos_2d.circle_2d(
-            Isometry2d::from_translation(new_pos),
-            0.1,
-            GREEN_400,
-        );
-
-        gizmos_2d.arrow_2d(
-            t_position.xy(),
-            new_pos,
-            GREEN_400,
-        );
-
-        let position_before_bone_length =
-            new_pos.extend(0.) + (positions[1] - o);
-
-        gizmos_3d.circle(
-            Isometry3d::from_translation(
-                position_before_bone_length,
+    // 2d target position, before mapping to cone slice
+    gizmos_2d
+        .circle_2d(
+            Isometry2d::from_translation(
+                target_position_on_2d_plane.xy(),
             ),
             0.1,
+            RED_400,
+        )
+        .resolution(CIRCLE_GIZMO_RESOLUTION);
+
+    // // 3.8: Check whether the target is within the conic section or not
+    if target_position_on_2d_plane.xy().length() > qj {
+        // The target position, moved to exist on the cone slice
+        let new_target_position_2d =
+            (target_position_on_2d_plane.xy()).normalize()
+                * qj;
+        gizmos_2d
+            .circle_2d(
+                Isometry2d::from_translation(
+                    new_target_position_2d,
+                ),
+                0.1,
+                GREEN_400,
+            )
+            .resolution(CIRCLE_GIZMO_RESOLUTION);
+
+        // the vector the target took to move to the circle
+        gizmos_2d.arrow_2d(
+            target_position_on_2d_plane.xy(),
+            new_target_position_2d,
             GREEN_400,
         );
 
+        // new_3d_position of target, generated by inverting
+        // the rotation and translation we applied before
+        let position_before_bone_length = mat.inverse()
+            * new_target_position_2d.extend(0.)
+            + projected_endpoint_from_origin;
+
+        // joint position before applying the bone_length
+        gizmos_3d
+            .circle(
+                Isometry3d::from_translation(
+                    position_before_bone_length,
+                ),
+                0.1,
+                GREEN_400,
+            )
+            .resolution(CIRCLE_GIZMO_RESOLUTION);
+
+        // movement of the target joint, in 3d.
+        // Represents the same movement as the 2d green vector
         gizmos_3d.arrow(
             positions[0],
             position_before_bone_length,
             GREEN_400,
-        );
-
-        gizmos_3d.line(
-            positions[1],
-            position_before_bone_length,
-            INDIGO_400,
-        );
-
-        // extra gizmo to show the cone slice
-        // position_before_bone_length;
-        // let d = (positions[1] - o).normalize();
-        gizmos_3d.line(
-            position_before_bone_length,
-            position_before_bone_length
-                - 2. * (position_before_bone_length
-                    - (positions[1] - o))
-                    .normalize()
-                    * qj,
-            // position_before_bone_length.normalize() * qj,
-            SLATE_50,
         );
 
         // extend bone_length vector to show final position
@@ -377,13 +345,15 @@ fn update(
             INDIGO_400,
         );
 
-        gizmos_3d.circle(
-            Isometry3d::from_translation(
-                positions[1] + direction * bone_length,
-            ),
-            0.1,
-            INDIGO_400,
-        );
+        gizmos_3d
+            .circle(
+                Isometry3d::from_translation(
+                    positions[1] + direction * bone_length,
+                ),
+                0.1,
+                INDIGO_400,
+            )
+            .resolution(CIRCLE_GIZMO_RESOLUTION);
     }
 }
 
