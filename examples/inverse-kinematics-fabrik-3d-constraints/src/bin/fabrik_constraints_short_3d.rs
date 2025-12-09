@@ -1,6 +1,8 @@
+use std::f32::consts::FRAC_PI_8;
+
 use bevy::{color::palettes::tailwind::*, prelude::*};
 use inverse_kinematics_fabrik_3d_constraints::{
-    Constraint, DottedGizmos, FabrikPlugin, InverseKinematicEndEffector,
+    DottedGizmos, FabrikPlugin, InverseKinematicEndEffector, JointConstraint,
 };
 
 fn main() {
@@ -92,17 +94,17 @@ fn startup(
                 joint_1_position,
                 Mesh3d(sphere.clone()),
                 joint_material.clone(),
-                Constraint,
+                JointConstraint::Angle(FRAC_PI_8),
                 children![
-                    // (
-                    //     Mesh3d(meshes.add(Cuboid::new(
-                    //         0.2,
-                    //         0.2,
-                    //         joint_2_position.translation.length() - sphere_gap,
-                    //     )),),
-                    //     MeshMaterial3d(materials.add(Color::hsl(360., 0.95, 0.7))),
-                    //     Transform::from_xyz(0., 0., joint_2_position.translation.length() / 2.)
-                    // ),
+                    (
+                        Mesh3d(meshes.add(Cuboid::new(
+                            0.2,
+                            0.2,
+                            joint_2_position.translation.length() - sphere_gap,
+                        )),),
+                        MeshMaterial3d(materials.add(Color::hsl(360., 0.95, 0.7))),
+                        Transform::from_xyz(0., 0., joint_2_position.translation.length() / 2.)
+                    ),
                     (
                         InverseKinematicEndEffector {
                             affected_bone_count: 2,

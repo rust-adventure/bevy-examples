@@ -1,5 +1,9 @@
+use std::f32::consts::FRAC_PI_8;
+
 use bevy::{color::palettes::tailwind::*, prelude::*};
-use inverse_kinematics_fabrik_3d_constraints::{FabrikPlugin, InverseKinematicEndEffector};
+use inverse_kinematics_fabrik_3d_constraints::{
+    FabrikPlugin, InverseKinematicEndEffector, JointConstraint,
+};
 
 fn main() {
     App::new()
@@ -108,6 +112,7 @@ fn startup(
                                 joint_position,
                                 Mesh3d(sphere.clone()),
                                 joint_material.clone(),
+                                JointConstraint::Angle(FRAC_PI_8),
                                 children![
                                     (
                                         Mesh3d(cuboid.clone()),
