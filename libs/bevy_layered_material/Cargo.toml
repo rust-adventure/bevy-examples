@@ -2,7 +2,8 @@
 name = "bevy_layered_materials"
 version = "0.1.0"
 edition = "2024"
-
+description = "A StandardMaterial-compatible Material that accepts multiple textures in 2d texture array form"
+license = "MIT"
 exclude = ["assets/*.ktx2"]
 
 [features]
