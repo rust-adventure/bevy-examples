@@ -3,6 +3,7 @@ name = "bevy_layered_materials"
 version = "0.1.0"
 edition = "2024"
 
+exclude = ["assets/*.ktx2"]
 
 [features]
 webgl = ["bevy_light/webgl"]
