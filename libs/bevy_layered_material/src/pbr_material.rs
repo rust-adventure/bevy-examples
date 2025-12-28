@@ -5,7 +5,7 @@ use bevy_math::{Affine2, Affine3, Mat2, Mat3, Vec2, Vec3, Vec4};
 use bevy_mesh::MeshVertexBufferLayoutRef;
 use bevy_pbr::{
     deferred::DEFAULT_PBR_DEFERRED_LIGHTING_PASS_ID, Material, MaterialPipeline,
-    MaterialPipelineKey, OpaqueRendererMethod, ParallaxMappingMethod, *,
+    MaterialPipelineKey, OpaqueRendererMethod, ParallaxMappingMethod,
 };
 use bevy_reflect::{std_traits::ReflectDefault, Reflect};
 use bevy_render::{
