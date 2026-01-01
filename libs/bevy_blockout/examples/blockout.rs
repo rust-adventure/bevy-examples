@@ -4,10 +4,8 @@ use bevy::{
     camera::Exposure,
     color::palettes::tailwind::*,
     core_pipeline::tonemapping::Tonemapping,
-    light::light_consts::lux,
-    pbr::{
-        Atmosphere, AtmosphereSettings, ExtendedMaterial,
-    },
+    light::{AtmosphereEnvironmentMapLight, light_consts::lux},
+    pbr::{AtmosphereSettings, EarthlikeAtmosphere, ExtendedMaterial},
     post_process::bloom::Bloom,
     prelude::*,
     render::view::Hdr,
@@ -16,14 +14,9 @@ use bevy_blockout::{BlockoutMaterialExt, BlockoutPlugin};
 
 fn main() {
     App::new()
-        .insert_resource(AmbientLight {
-            brightness: 4000.,
-            ..default()
-        })
         .add_plugins((DefaultPlugins, BlockoutPlugin))
         .add_systems(Startup, setup)
         .add_systems(Update, rotate_camera)
-        // .add_systems(Update, dynamic_scene)
         .run();
 }
 
@@ -33,26 +26,14 @@ struct MainCamera;
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<
-        Assets<
-            ExtendedMaterial<
-                StandardMaterial,
-                BlockoutMaterialExt,
-            >,
-        >,
-    >,
-    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, BlockoutMaterialExt>>>,
+    earth_atmosphere: Res<EarthlikeAtmosphere>,
 ) {
     // floor
     commands.spawn((
-        Mesh3d(
-            meshes.add(Mesh::from(
-                Plane3d::default()
-                    .mesh()
-                    .size(20., 20.)
-                    .subdivisions(10),
-            )),
-        ),
+        Mesh3d(meshes.add(Mesh::from(
+            Plane3d::default().mesh().size(50., 50.).subdivisions(10),
+        ))),
         Transform::from_xyz(0.0, 0.0, 0.0),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
@@ -67,9 +48,7 @@ fn setup(
 
     // sphere
     commands.spawn((
-        Mesh3d(
-            meshes.add(Sphere::new(2.).mesh().uv(32, 18)),
-        ),
+        Mesh3d(meshes.add(Sphere::new(2.).mesh().uv(32, 18))),
         Transform::from_xyz(0.0, 4., 0.0),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
@@ -83,11 +62,7 @@ fn setup(
     ));
 
     commands.spawn((
-        Mesh3d(
-            meshes.add(Cuboid::from_size(Vec3::new(
-                2., 1., 4.,
-            ))),
-        ),
+        Mesh3d(meshes.add(Cuboid::from_size(Vec3::new(2., 1., 4.)))),
         Transform::from_xyz(4.0, 0.5, 0.0),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
@@ -101,13 +76,8 @@ fn setup(
     ));
 
     commands.spawn((
-        Mesh3d(meshes.add(Extrusion::new(
-            RegularPolygon::new(2., 6),
-            4.,
-        ))),
-        Transform::from_xyz(-1.0, 0., 0.0).with_rotation(
-            Quat::from_axis_angle(Vec3::Z, FRAC_PI_6),
-        ),
+        Mesh3d(meshes.add(Extrusion::new(RegularPolygon::new(2., 6), 4.))),
+        Transform::from_xyz(-1.0, 0., 0.0).with_rotation(Quat::from_axis_angle(Vec3::Z, FRAC_PI_6)),
         MeshMaterial3d(materials.add(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: RED_400.into(),
@@ -119,71 +89,41 @@ fn setup(
         })),
     ));
 
-    // commands.spawn((
-    //     Mesh3d(meshes.
-    // add(Cuboid::from_size(Vec3::new(
-    //         10., 4., 20.,
-    //     )))),
-    //     Transform::from_xyz(10.0, 1., 0.0),
-    //     MeshMaterial3d(materials.
-    // add(ExtendedMaterial {         base:
-    // StandardMaterial {             base_color:
-    // SKY_400.into(),             ..default()
-    //         },
-    //         extension:
-    // BlockoutMaterialExt::default(),     })),
-    // ));
-    // commands.spawn((
-    //     Mesh3d(meshes.
-    // add(Cuboid::from_size(Vec3::new(
-    //         10., 4., 20.,
-    //     )))),
-    //     Transform::from_xyz(10.0, 1., 0.0),
-    //     MeshMaterial3d(materials.
-    // add(ExtendedMaterial {         base:
-    // StandardMaterial {             base_color:
-    // SKY_400.into(),             ..default()
-    //         },
-    //         extension:
-    // BlockoutMaterialExt::default(),     })),
-    // ));
+    commands.spawn((
+        Mesh3d(meshes.add(Cuboid::from_size(Vec3::new(10., 3., 14.)))),
+        Transform::from_xyz(-15.0, 1., 0.0),
+        MeshMaterial3d(materials.add(ExtendedMaterial {
+            base: StandardMaterial {
+                base_color: SKY_400.into(),
+                ..default()
+            },
+            extension: BlockoutMaterialExt::default(),
+        })),
+    ));
+    commands.spawn((
+        Mesh3d(meshes.add(Cuboid::from_size(Vec3::new(5., 4., 7.)))),
+        Transform::from_xyz(-12.5, 2., -10.5),
+        MeshMaterial3d(materials.add(ExtendedMaterial {
+            base: StandardMaterial {
+                base_color: SKY_400.into(),
+                ..default()
+            },
+            extension: BlockoutMaterialExt::default(),
+        })),
+    ));
     // camera
     commands.spawn((
         MainCamera,
         Camera3d::default(),
-        // HDR is required for atmospheric scattering to be properly applied to the scene
-        Camera {
-            ..default()
-        },
+        Camera::default(),
         Hdr,
-        Transform::from_xyz(-10.2, 5., 10.0)
-            .looking_at(Vec3::Y * 0.1, Vec3::Y),
-        // This is the component that enables atmospheric scattering for a camera
-        Atmosphere::EARTH,
-        // The scene is in units of 10km, so we need to scale up the
-        // aerial view lut distance and set the scene scale accordingly.
-        // Most usages of this feature will not need to adjust this.
-        AtmosphereSettings {
-            // aerial_view_lut_max_distance: 3.2e5,
-            // scene_units_to_m: 1e+1,
-            ..default()
-        },
-        // The directional light illuminance  used in this scene
-        // (the one recommended for use with this feature) is
-        // quite bright, so raising the exposure compensation helps
-        // bring the scene to a nicer brightness range.
+        Transform::from_xyz(-10.2, 5., 10.0).looking_at(Vec3::Y * 0.1, Vec3::Y),
+        earth_atmosphere.get(),
+        AtmosphereSettings::default(),
         Exposure::SUNLIGHT,
-        // Tonemapper chosen just because it looked good with the scene, any
-        // tonemapper would be fine :)
         Tonemapping::AcesFitted,
-        // Bloom gives the sun a much more natural look.
         Bloom::NATURAL,
-        EnvironmentMapLight {
-            diffuse_map: asset_server.load("environment_maps/pisa_diffuse_rgb9e5_zstd.ktx2"),
-            specular_map: asset_server.load("environment_maps/pisa_specular_rgb9e5_zstd.ktx2"),
-            intensity: 20000.0,
-            ..default()
-        }
+        AtmosphereEnvironmentMapLight::default(),
     ));
 
     // Sun
@@ -212,29 +152,10 @@ fn setup(
     ));
 }
 
-fn rotate_camera(
-    mut cam_transform: Single<
-        &mut Transform,
-        With<MainCamera>,
-    >,
-    time: Res<Time>,
-) {
+fn rotate_camera(mut cam_transform: Single<&mut Transform, With<MainCamera>>, time: Res<Time>) {
     cam_transform.rotate_around(
         Vec3::ZERO,
-        Quat::from_axis_angle(
-            Vec3::Y,
-            45f32.to_radians() * time.delta_secs(),
-        ),
+        Quat::from_axis_angle(Vec3::Y, 45f32.to_radians() * time.delta_secs()),
     );
     cam_transform.look_at(Vec3::ZERO, Vec3::Y);
 }
-
-// fn dynamic_scene(
-//     mut suns: Query<&mut Transform,
-// With<DirectionalLight>>,     time: Res<Time>,
-// ) {
-//     suns.iter_mut().for_each(|mut tf| {
-//         tf.rotate_x(-time.delta_secs() * PI /
-// 10.0);         dbg!(tf);
-//     });
-// }

@@ -1,5 +1,5 @@
 use bevy::{
-    camera::visibility::RenderLayers,
+    camera::{RenderTarget, visibility::RenderLayers},
     color::palettes::tailwind::*,
     image::ImageLoaderSettings,
     light::DirectionalLightTexture,
@@ -54,6 +54,7 @@ fn setup(
         512,
         512,
         TextureFormat::bevy_default(),
+        Some(TextureFormat::bevy_default()),
     );
     // the image we'll use
     let image_handle = images.add(image);
@@ -149,10 +150,10 @@ fn setup(
     commands.spawn((
         Camera2d::default(),
         Camera {
-            target: image_handle.clone().into(),
             clear_color: Color::WHITE.into(),
             ..default()
         },
+        RenderTarget::Image(image_handle.clone().into()),
         Transform::from_translation(Vec3::new(
             0.0, 0.0, 0.0,
         ))

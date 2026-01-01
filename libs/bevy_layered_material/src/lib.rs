@@ -33,6 +33,7 @@ impl Plugin for LayeredMaterialsPlugin {
         // load_shader_library!(app, "render/parallax_mapping.wgsl");
         // load_shader_library!(app, "render/view_transformations.wgsl");
 
+        load_shader_library!(app, "decal/clustered.wgsl");
         app.add_plugins(MaterialPlugin::<LayeredMaterial>::default());
     }
 }

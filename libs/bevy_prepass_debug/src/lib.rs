@@ -40,14 +40,7 @@ impl Plugin for PrepassDebugPlugin {
             // >::default(),))
             .add_plugins(MaterialPlugin::<
                 PrepassOutputMaterial,
-            > {
-                // This material only needs to read the
-                // prepass textures, but the
-                // meshes using it should not contribute to
-                // the prepass render, so we can disable it.
-                prepass_enabled: false,
-                ..default()
-            })
+            >::default())
             .add_systems(Startup, setup_prepass_debug)
             .add_systems(Update, toggle_prepass_view);
     }

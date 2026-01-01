@@ -1,21 +1,21 @@
 [workspace]
 members = [
   # "examples/*",
-  "examples/candy-cane",
-  "examples/cube-wave",
-  "examples/dissolve-sphere-standard-material-extensions",
-  "examples/fresnel-effect",
-  # "examples/shield-spheres",
-  # "examples/shield-with-depth",
-  "examples/ui-button-shader",
-  "examples/raymarch-sphere",
+  # "examples/candy-cane",
+  # "examples/cube-wave",
+  # "examples/dissolve-sphere-standard-material-extensions",
+  # "examples/fresnel-effect",
+  # # "examples/shield-spheres",
+  # # "examples/shield-with-depth",
+  # "examples/ui-button-shader",
+  # "examples/raymarch-sphere",
   "libs/*",
-  "examples/two-uvs",
-  "examples/edge-detection-custom-phase",
-  "concepts/*",
+  # "examples/two-uvs",
+  # "examples/edge-detection-custom-phase",
+  # "concepts/*",
   "examples/dappled-lighting",
   "examples/cube-sphere",
-  "examples/visibility-2d-mesh",
+  # "examples/visibility-2d-mesh",
 ]
 # "examples/spacecraft-noiseland",
 # rotating-column depends on bevy_tweening
@@ -23,7 +23,7 @@ members = [
 # "examples/rotating-column",
 exclude = []
 license = "MIT OR Apache-2.0"
-resolver = "2"
+resolver = "3"
 
 [workspace.lints.clippy]
 type_complexity = "allow"
@@ -38,13 +38,9 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.17.0", features = ["jpeg", "file_watcher"] }
+bevy = { version = "0.18.0-rc.2", features = ["jpeg", "file_watcher"] }
+bevy_skein = "0.5.0-rc.1"
 # bevy-inspector-egui = "0.31.0"
-# bevy_asset_loader = "0.22.0"
-# bevy_asset_loader = "0.23.0-rc.3"
-# bevy_tweening = "0.11.0"
-# bevy_panorbit_camera = "0.19"
-# bevy_basic_camera = { path = "./libs/bevy_basic_camera" }
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
 itertools = "0.14"
