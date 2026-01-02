@@ -76,7 +76,7 @@ fn setup(
 
     commands.spawn((
         Node {
-            width: Val::Percent(100.),
+            width: percent(100.),
             justify_content: JustifyContent::Center,
             ..default()
         },

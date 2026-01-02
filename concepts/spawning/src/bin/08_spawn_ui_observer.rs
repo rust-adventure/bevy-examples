@@ -1,7 +1,4 @@
-use bevy::{
-    color::palettes::tailwind::*, prelude::*,
-    ui_widgets::observe,
-};
+use bevy::{color::palettes::tailwind::*, prelude::*, ui_widgets::observe};
 
 fn main() {
     App::new()
@@ -14,8 +11,8 @@ fn main() {
 fn setup(mut commands: Commands) {
     commands.spawn((
         Node {
-            width: Val::Percent(100.),
-            height: Val::Percent(100.),
+            width: percent(100.),
+            height: percent(100.),
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             flex_direction: FlexDirection::Column,
@@ -56,9 +53,6 @@ fn button<T: Into<String>>(text: T) -> impl Bundle {
             width: Val::Px(200.),
             ..default()
         },
-        children![(
-            Text::new(text),
-            TextColor(SLATE_50.into())
-        )],
+        children![(Text::new(text), TextColor(SLATE_50.into()))],
     )
 }
