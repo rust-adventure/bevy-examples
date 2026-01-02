@@ -65,7 +65,7 @@ fn setup(
                 parent.spawn((
                     Node {
                         aspect_ratio: Some(1.),
-                        width: Val::Percent(100.),
+                        width: percent(100.),
                         height: Val::Auto,
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
@@ -80,8 +80,8 @@ fn setup(
                         }),),
                         Node {
                             aspect_ratio: Some(1.),
-                            width: Val::Percent(100.),
-                            height: Val::Percent(100.),
+                            width: percent(100.),
+                            height: percent(100.),
                             ..default()
                         },
                     )],
@@ -95,7 +95,7 @@ fn setup(
             bottom: px(0.),
             aspect_ratio: Some(1.),
             margin: px(50.).all(),
-            width: Val::Percent(50.),
+            width: percent(50.),
             height: Val::Auto,
             align_items: AlignItems::Center,
             justify_content: JustifyContent::Center,
@@ -110,8 +110,8 @@ fn setup(
             },)),
             Node {
                 aspect_ratio: Some(1.),
-                width: Val::Percent(100.),
-                height: Val::Percent(100.),
+                width: percent(100.),
+                height: percent(100.),
                 ..default()
             },
         )],

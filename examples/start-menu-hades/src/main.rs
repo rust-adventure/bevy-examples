@@ -239,7 +239,7 @@ fn spawn_camera(
         MaterialNodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
-                width: Val::Percent(100.),
+                width: percent(100.),
                 height: px(125.),
                 align_self: AlignSelf::Center,
                 ..default()
@@ -592,8 +592,8 @@ fn expect(
         MaterialNodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
-                width: Val::Percent(100.),
-                height: Val::Percent(100.),
+                width: percent(100.),
+                height: percent(100.),
                 ..default()
             },
             material: smoke_ui_materials.add(
@@ -654,13 +654,13 @@ fn expect(
     commands
         .spawn((NodeBundle {
             style: Style {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
+                width: percent(100.0),
+                height: percent(100.0),
                 padding: UiRect {
-                    left: Val::Percent(10.),
-                    right: Val::Percent(0.),
-                    top: Val::Percent(0.),
-                    bottom: Val::Percent(0.),
+                    left: percent(10.),
+                    right: percent(0.),
+                    top: percent(0.),
+                    bottom: percent(0.),
                 },
                 right: px(-100.),
                 bottom: px(-200.),
@@ -683,7 +683,7 @@ fn expect(
                 },
                 ImageBundle {
                     style: Style {
-                        height: Val::Percent(100.),
+                        height: percent(100.),
                         width: Val::Auto,
                         ..default()
                     },
@@ -741,8 +741,8 @@ fn expect(
     commands
         .spawn((NodeBundle {
             style: Style {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
+                width: percent(100.0),
+                height: percent(100.0),
                 ..default()
             },
             background_color: Color::NONE.into(),
@@ -759,8 +759,8 @@ fn expect(
                 },
                 ImageBundle {
                     style: Style {
-                        height: Val::Percent(100.),
-                        width: Val::Percent(100.),
+                        height: percent(100.),
+                        width: percent(100.),
                         ..default()
                     },
                     image: texture_assets
@@ -789,13 +789,13 @@ fn expect(
     commands
         .spawn(NodeBundle {
             style: Style {
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
+                width: percent(100.0),
+                height: percent(100.0),
                 padding: UiRect {
-                    left: Val::Percent(10.),
-                    right: Val::Percent(70.),
-                    top: Val::Percent(20.),
-                    bottom: Val::Percent(10.),
+                    left: percent(10.),
+                    right: percent(70.),
+                    top: percent(20.),
+                    bottom: percent(10.),
                 },
                 align_items: AlignItems::FlexStart,
                 justify_content: JustifyContent::Center,
@@ -809,7 +809,7 @@ fn expect(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            width: Val::Percent(100.),
+                            width: percent(100.),
                             justify_content:
                                 JustifyContent::FlexStart,
                             align_items: AlignItems::Center,
@@ -864,7 +864,7 @@ fn expect(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            width: Val::Percent(100.),
+                            width: percent(100.),
                             justify_content:
                                 JustifyContent::FlexStart,
                             align_items: AlignItems::Center,
@@ -917,7 +917,7 @@ fn expect(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            width: Val::Percent(100.),
+                            width: percent(100.),
                             justify_content:
                                 JustifyContent::FlexStart,
                             align_items: AlignItems::Center,
@@ -972,12 +972,12 @@ fn expect(
     commands
         .spawn(NodeBundle {
             style: Style {
-                width: Val::Percent(100.0),
+                width: percent(100.0),
                 padding: UiRect {
-                    left: Val::Percent(10.),
-                    right: Val::Percent(0.),
-                    top: Val::Percent(0.),
-                    bottom: Val::Percent(10.),
+                    left: percent(10.),
+                    right: percent(0.),
+                    top: percent(0.),
+                    bottom: percent(10.),
                 },
                 align_self: AlignSelf::End,
                 align_items: AlignItems::End,
@@ -991,7 +991,7 @@ fn expect(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            // width: Val::Percent(100.),
+                            // width: percent(100.),
                             flex_direction:
                                 FlexDirection::Column,
                             justify_content:
@@ -1040,7 +1040,7 @@ fn expect(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            // width: Val::Percent(100.),
+                            // width: percent(100.),
                             flex_direction:
                                 FlexDirection::Column,
                             justify_content:
@@ -1082,7 +1082,7 @@ fn expect(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            // width: Val::Percent(100.),
+                            // width: percent(100.),
                             flex_direction:
                                 FlexDirection::Column,
                             justify_content:
@@ -1124,7 +1124,7 @@ fn expect(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            // width: Val::Percent(100.),
+                            // width: percent(100.),
                             flex_direction:
                                 FlexDirection::Column,
                             justify_content:
@@ -1167,12 +1167,12 @@ fn expect(
     commands
         .spawn(NodeBundle {
             style: Style {
-                width: Val::Percent(100.0),
+                width: percent(100.0),
                 padding: UiRect {
-                    left: Val::Percent(0.),
+                    left: percent(0.),
                     right: px(30.),
                     top: px(30.),
-                    bottom: Val::Percent(0.),
+                    bottom: percent(0.),
                 },
                 align_self: AlignSelf::Start,
                 justify_content: JustifyContent::FlexEnd,
