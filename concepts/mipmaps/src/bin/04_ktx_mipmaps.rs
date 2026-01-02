@@ -1,6 +1,8 @@
 use bevy::{
     color::palettes::tailwind::*,
-    image::ImageLoaderSettings, math::Affine2, prelude::*,
+    image::{ImageAddressMode, ImageLoaderSettings},
+    math::Affine2,
+    prelude::*,
 };
 
 fn main() -> AppExit {
@@ -20,74 +22,51 @@ fn startup(
 ) {
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0., 0., 15.)
-            .looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(0., 0., 15.).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.spawn((
-        Mesh3d(meshes.add(Plane3d::new(
-            Vec3::Y,
-            Vec2::new(30., 90.),
-        ))),
-        MeshMaterial3d(materials.add(
-            StandardMaterial {
-                base_color_texture:
-                    Some(
-                        asset_server.load_with_settings(
-                            "floor_graph_base_color.png",
-                            |settings: &mut ImageLoaderSettings| {
-                                let  descriptor = settings.sampler.get_or_init_descriptor();
-                                descriptor.address_mode_u = bevy::image::ImageAddressMode::Repeat;
-                                descriptor.address_mode_v = bevy::image::ImageAddressMode::Repeat;
-                                descriptor.address_mode_w = bevy::image::ImageAddressMode::Repeat;
-
-                            }
-                        ),
-                    ),
-                unlit: true,
-                cull_mode: None,
-                uv_transform: Affine2::from_scale(Vec2::new(30., 90.)),
-                ..default()
-            },
-        )),
-        Transform::from_xyz(-30.1, 0.0, 0.0)
-            .with_rotation(Quat::from_rotation_x(0.1)),
+        Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(30., 90.)))),
+        MeshMaterial3d(materials.add(StandardMaterial {
+            base_color_texture: Some(asset_server.load_with_settings(
+                "floor_graph_base_color.png",
+                |settings: &mut ImageLoaderSettings| {
+                    settings
+                        .sampler
+                        .get_or_init_descriptor()
+                        .set_address_mode(ImageAddressMode::Repeat);
+                },
+            )),
+            unlit: true,
+            cull_mode: None,
+            uv_transform: Affine2::from_scale(Vec2::new(30., 90.)),
+            ..default()
+        })),
+        Transform::from_xyz(-30.1, 0.0, 0.0).with_rotation(Quat::from_rotation_x(0.1)),
     ));
 
     commands.spawn((
-        Mesh3d(meshes.add(Plane3d::new(
-            Vec3::Y,
-            Vec2::new(30., 90.),
-        ))),
-        MeshMaterial3d(materials.add(
-            StandardMaterial {
-                base_color_texture:
-                    Some(
-                        asset_server.load_with_settings(
-                            "floor_graph_base_color_uncompressed.ktx2",
-                            |settings: &mut ImageLoaderSettings| {
-                                let descriptor = settings.sampler.get_or_init_descriptor();
-                                descriptor.address_mode_u = bevy::image::ImageAddressMode::Repeat;
-                                descriptor.address_mode_v = bevy::image::ImageAddressMode::Repeat;
-                                descriptor.address_mode_w = bevy::image::ImageAddressMode::Repeat;
-
-                            }
-                        ),
-                    ),
-                unlit: true,
-                cull_mode: None,
-                uv_transform: Affine2::from_scale(Vec2::new(30., 90.)),
-                ..default()
-            },
-        )),
-        Transform::from_xyz(30.1, 0.0, 0.0)
-            .with_rotation(Quat::from_rotation_x(0.1)),
+        Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(30., 90.)))),
+        MeshMaterial3d(materials.add(StandardMaterial {
+            base_color_texture: Some(asset_server.load_with_settings(
+                "floor_graph_base_color_uncompressed.ktx2",
+                |settings: &mut ImageLoaderSettings| {
+                    settings
+                        .sampler
+                        .get_or_init_descriptor()
+                        .set_address_mode(ImageAddressMode::Repeat);
+                },
+            )),
+            unlit: true,
+            cull_mode: None,
+            uv_transform: Affine2::from_scale(Vec2::new(30., 90.)),
+            ..default()
+        })),
+        Transform::from_xyz(30.1, 0.0, 0.0).with_rotation(Quat::from_rotation_x(0.1)),
     ));
 }
 
-fn rotate(
-    mut transforms: Query<&mut Transform, With<Mesh3d>>,
-) {
+fn rotate(mut transforms: Query<&mut Transform, With<Mesh3d>>) {
     for mut transform in &mut transforms {
         // transform.rotate_x(0.01);
     }
