@@ -16,20 +16,15 @@ use bevy::{
     render::{
         RenderApp, RenderStartup,
         extract_component::{
-            ComponentUniforms, DynamicUniformIndex,
-            ExtractComponent, ExtractComponentPlugin,
+            ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin,
             UniformComponentPlugin,
         },
         render_asset::RenderAssets,
         render_graph::{
-            NodeRunError, RenderGraphContext,
-            RenderGraphExt, RenderLabel, ViewNode,
-            ViewNodeRunner,
+            NodeRunError, RenderGraphContext, RenderGraphExt, RenderLabel, ViewNode, ViewNodeRunner,
         },
         render_resource::{
-            binding_types::{
-                sampler, texture_2d, uniform_buffer,
-            },
+            binding_types::{sampler, texture_2d, uniform_buffer},
             *,
         },
         renderer::{RenderContext, RenderDevice},
@@ -62,18 +57,13 @@ impl Plugin for PostProcessPlugin {
         ));
 
         // We need to get the render app from the main app
-        let Some(render_app) =
-            app.get_sub_app_mut(RenderApp)
-        else {
+        let Some(render_app) = app.get_sub_app_mut(RenderApp) else {
             return;
         };
 
         // RenderStartup runs once on startup after all plugins are built
         // It is useful to initialize data that will only live in the RenderApp
-        render_app.add_systems(
-            RenderStartup,
-            init_post_process_pipeline,
-        );
+        render_app.add_systems(RenderStartup, init_post_process_pipeline);
 
         render_app
             // Bevy's renderer uses a render graph which is a collection of nodes in a directed acyclic graph.
@@ -108,9 +98,7 @@ impl Plugin for PostProcessPlugin {
     }
 }
 
-#[derive(
-    Debug, Hash, PartialEq, Eq, Clone, RenderLabel,
-)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, RenderLabel)]
 struct PostProcessLabel;
 
 // The post process node used for the render graph
@@ -144,39 +132,29 @@ impl ViewNode for PostProcessNode {
         &self,
         _graph: &mut RenderGraphContext,
         render_context: &mut RenderContext,
-        (
-            view_target,
-            _post_process_settings,
-            visibility_handle,
-            settings_index,
-        ): QueryItem<Self::ViewQuery>,
+        (view_target, _post_process_settings, visibility_handle, settings_index): QueryItem<
+            Self::ViewQuery,
+        >,
         world: &World,
     ) -> Result<(), NodeRunError> {
         // Get the pipeline resource that contains the global data we need
         // to create the render pipeline
-        let post_process_pipeline =
-            world.resource::<PostProcessPipeline>();
+        let post_process_pipeline = world.resource::<PostProcessPipeline>();
 
         // The pipeline cache is a cache of all previously created pipelines.
         // It is required to avoid creating a new pipeline each frame,
         // which is expensive due to shader compilation.
-        let pipeline_cache =
-            world.resource::<PipelineCache>();
+        let pipeline_cache = world.resource::<PipelineCache>();
 
         // Get the pipeline from the cache
-        let Some(pipeline) = pipeline_cache
-            .get_render_pipeline(
-                post_process_pipeline.pipeline_id,
-            )
+        let Some(pipeline) = pipeline_cache.get_render_pipeline(post_process_pipeline.pipeline_id)
         else {
             return Ok(());
         };
 
         // Get the settings uniform binding
         let settings_uniforms = world.resource::<ComponentUniforms<PostProcessSettings>>();
-        let Some(settings_binding) =
-            settings_uniforms.uniforms().binding()
-        else {
+        let Some(settings_binding) = settings_uniforms.uniforms().binding() else {
             return Ok(());
         };
 
@@ -202,46 +180,37 @@ impl ViewNode for PostProcessNode {
         // The reason it doesn't work is because each post_process_write will alternate the source/destination.
         // The only way to have the correct source/destination for the bind_group
         // is to make sure you get it during the node execution.
-        let bind_group = render_context
-            .render_device()
-            .create_bind_group(
-                "post_process_bind_group",
-                &post_process_pipeline.layout,
-                // It's important for this to match the BindGroupLayout defined in the PostProcessPipeline
-                &BindGroupEntries::sequential((
-                    // Make sure to use the source view
-                    post_process.source,
-                    // Use the sampler created for the pipeline
-                    &post_process_pipeline.sampler,
-                    // Set the settings binding
-                    settings_binding.clone(),
-                    visibility_texture
-                        .texture_view
-                        .into_binding(),
-                    &visibility_texture.sampler,
-                )),
-            );
+        let bind_group = render_context.render_device().create_bind_group(
+            "post_process_bind_group",
+            &pipeline_cache.get_bind_group_layout(&post_process_pipeline.layout),
+            // It's important for this to match the BindGroupLayout defined in the PostProcessPipeline
+            &BindGroupEntries::sequential((
+                // Make sure to use the source view
+                post_process.source,
+                // Use the sampler created for the pipeline
+                &post_process_pipeline.sampler,
+                // Set the settings binding
+                settings_binding.clone(),
+                visibility_texture.texture_view.into_binding(),
+                &visibility_texture.sampler,
+            )),
+        );
 
         // Begin the render pass
-        let mut render_pass = render_context
-            .begin_tracked_render_pass(
-                RenderPassDescriptor {
-                    label: Some("post_process_pass"),
-                    color_attachments: &[Some(
-                        RenderPassColorAttachment {
-                            // We need to specify the post process destination view here
-                            // to make sure we write to the appropriate texture.
-                            view: post_process.destination,
-                            depth_slice: None,
-                            resolve_target: None,
-                            ops: Operations::default(),
-                        },
-                    )],
-                    depth_stencil_attachment: None,
-                    timestamp_writes: None,
-                    occlusion_query_set: None,
-                },
-            );
+        let mut render_pass = render_context.begin_tracked_render_pass(RenderPassDescriptor {
+            label: Some("post_process_pass"),
+            color_attachments: &[Some(RenderPassColorAttachment {
+                // We need to specify the post process destination view here
+                // to make sure we write to the appropriate texture.
+                view: post_process.destination,
+                depth_slice: None,
+                resolve_target: None,
+                ops: Operations::default(),
+            })],
+            depth_stencil_attachment: None,
+            timestamp_writes: None,
+            occlusion_query_set: None,
+        });
 
         // This is mostly just wgpu boilerplate for drawing a fullscreen triangle,
         // using the pipeline/bind_group created above
@@ -249,11 +218,7 @@ impl ViewNode for PostProcessNode {
         // By passing in the index of the post process settings on this view, we ensure
         // that in the event that multiple settings were sent to the GPU (as would be the
         // case with multiple cameras), we use the correct one.
-        render_pass.set_bind_group(
-            0,
-            &bind_group,
-            &[settings_index.index()],
-        );
+        render_pass.set_bind_group(0, &bind_group, &[settings_index.index()]);
         render_pass.draw(0..3, 0..1);
 
         Ok(())
@@ -263,7 +228,7 @@ impl ViewNode for PostProcessNode {
 // This contains global data used by the render pipeline. This will be created once on startup.
 #[derive(Resource)]
 struct PostProcessPipeline {
-    layout: BindGroupLayout,
+    layout: BindGroupLayoutDescriptor,
     sampler: Sampler,
     pipeline_id: CachedRenderPipelineId,
 }
@@ -276,32 +241,27 @@ fn init_post_process_pipeline(
     pipeline_cache: Res<PipelineCache>,
 ) {
     // We need to define the bind group layout used for our pipeline
-    let layout = render_device.create_bind_group_layout(
+    let layout = BindGroupLayoutDescriptor::new(
         "post_process_bind_group_layout",
         &BindGroupLayoutEntries::sequential(
             // The layout entries will only be visible in the fragment stage
             ShaderStages::FRAGMENT,
             (
                 // The screen texture
-                texture_2d(TextureSampleType::Float {
-                    filterable: true,
-                }),
+                texture_2d(TextureSampleType::Float { filterable: true }),
                 // The sampler that will be used to sample the screen texture
                 sampler(SamplerBindingType::Filtering),
                 // The settings uniform that will control the effect
                 uniform_buffer::<PostProcessSettings>(true),
                 // The screen texture
-                texture_2d(TextureSampleType::Float {
-                    filterable: true,
-                }),
+                texture_2d(TextureSampleType::Float { filterable: true }),
                 // The sampler that will be used to sample the visibility texture
                 sampler(SamplerBindingType::Filtering),
             ),
         ),
     );
     // We can create the sampler here since it won't change at runtime and doesn't depend on the view
-    let sampler = render_device
-        .create_sampler(&SamplerDescriptor::default());
+    let sampler = render_device.create_sampler(&SamplerDescriptor::default());
 
     // Get the shader handle
     let shader = asset_server.load(SHADER_ASSET_PATH);
@@ -334,9 +294,7 @@ fn init_post_process_pipeline(
 }
 
 // This is the component that will get passed to the shader
-#[derive(
-    Component, Default, Clone, ExtractComponent, ShaderType,
-)]
+#[derive(Component, Default, Clone, ExtractComponent, ShaderType)]
 pub struct PostProcessSettings {
     pub width: u32,
     pub height: u32,
