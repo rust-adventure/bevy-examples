@@ -684,7 +684,7 @@ fn expect(
                 ImageBundle {
                     style: Style {
                         height: percent(100.),
-                        width: Val::Auto,
+                        width: auto,
                         ..default()
                     },
                     image: texture_assets

@@ -66,7 +66,7 @@ fn setup(
                     Node {
                         aspect_ratio: Some(1.),
                         width: percent(100.),
-                        height: Val::Auto,
+                        height: auto(),
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
                         ..default()
@@ -96,7 +96,7 @@ fn setup(
             aspect_ratio: Some(1.),
             margin: px(50.).all(),
             width: percent(50.),
-            height: Val::Auto,
+            height: auto(),
             align_items: AlignItems::Center,
             justify_content: JustifyContent::Center,
             ..default()
