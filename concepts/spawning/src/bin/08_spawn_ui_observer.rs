@@ -16,7 +16,7 @@ fn setup(mut commands: Commands) {
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             flex_direction: FlexDirection::Column,
-            row_gap: Val::Px(10.),
+            row_gap: px(10.),
             ..default()
         },
         children![
@@ -49,8 +49,8 @@ fn button<T: Into<String>>(text: T) -> impl Bundle {
         Button,
         BackgroundColor(SKY_700.into()),
         Node {
-            padding: UiRect::all(Val::Px(5.)),
-            width: Val::Px(200.),
+            padding: px(5.).all(),
+            width: px(200.),
             ..default()
         },
         children![(Text::new(text), TextColor(SLATE_50.into()))],

@@ -1,7 +1,4 @@
-use bevy::{
-    color::palettes::tailwind::*, ecs::spawn::SpawnIter,
-    prelude::*, ui_widgets::observe,
-};
+use bevy::{color::palettes::tailwind::*, ecs::spawn::SpawnIter, prelude::*, ui_widgets::observe};
 
 fn main() {
     App::new()
@@ -19,7 +16,7 @@ fn setup(mut commands: Commands) {
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             flex_direction: FlexDirection::Column,
-            row_gap: Val::Px(10.),
+            row_gap: px(10.),
             ..default()
         },
         children![
@@ -43,23 +40,18 @@ fn setup(mut commands: Commands) {
             ),
             (
                 Node {
-                    width: Val::Px(200.),
-                    justify_content:
-                        JustifyContent::SpaceBetween,
+                    width: px(200.),
+                    justify_content: JustifyContent::SpaceBetween,
                     ..default()
                 },
-                Children::spawn(SpawnIter(
-                    (0..9).into_iter().map(|index| {
-                        (
-                            Text::new(index.to_string()),
-                            observe(
-                              move |_: On<Pointer<Click>>| {
-                                    info!("{index}");
-                                },
-                            ),
-                        )
-                    }),
-                )),
+                Children::spawn(SpawnIter((0..9).into_iter().map(|index| {
+                    (
+                        Text::new(index.to_string()),
+                        observe(move |_: On<Pointer<Click>>| {
+                            info!("{index}");
+                        }),
+                    )
+                }),)),
             ),
         ],
     ));
@@ -72,13 +64,10 @@ fn button<T: Into<String>>(text: T) -> impl Bundle {
         Button,
         BackgroundColor(SKY_700.into()),
         Node {
-            padding: UiRect::all(Val::Px(5.)),
-            width: Val::Px(200.),
+            padding: px(5.).all(),
+            width: px(200.),
             ..default()
         },
-        children![(
-            Text::new(text),
-            TextColor(SLATE_50.into())
-        )],
+        children![(Text::new(text), TextColor(SLATE_50.into()))],
     )
 }

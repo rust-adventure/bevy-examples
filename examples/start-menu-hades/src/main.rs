@@ -240,7 +240,7 @@ fn spawn_camera(
             style: Style {
                 position_type: PositionType::Absolute,
                 width: Val::Percent(100.),
-                height: Val::Px(125.),
+                height: px(125.),
                 align_self: AlignSelf::Center,
                 ..default()
             },
@@ -645,8 +645,8 @@ fn expect(
         EaseFunction::QuadraticIn,
         std::time::Duration::from_millis(250),
         UiPositionLens {
-            start: UiRect::left(Val::Px(-100.)),
-            end: UiRect::left(Val::Px(0.)),
+            start: UiRect::left(px(-100.)),
+            end: UiRect::left(px(0.)),
         },
     )
     .with_repeat_count(RepeatCount::Finite(1));
@@ -662,8 +662,8 @@ fn expect(
                     top: Val::Percent(0.),
                     bottom: Val::Percent(0.),
                 },
-                right: Val::Px(-100.),
-                bottom: Val::Px(-200.),
+                right: px(-100.),
+                bottom: px(-200.),
                 align_items: AlignItems::FlexEnd,
                 justify_content: JustifyContent::Center,
                 flex_direction: FlexDirection::Column,
@@ -723,16 +723,16 @@ fn expect(
         std::time::Duration::from_millis(100),
         UiPositionLens {
             start: UiRect {
-                left: Val::Px(0.),
-                right: Val::Px(0.),
-                top: Val::Px(0.),
-                bottom: Val::Px(0.),
+                left: px(0.),
+                right: px(0.),
+                top: px(0.),
+                bottom: px(0.),
             },
             end: UiRect {
-                left: Val::Px(-1000.),
-                right: Val::Px(0.),
-                top: Val::Px(-300.),
-                bottom: Val::Px(0.),
+                left: px(-1000.),
+                right: px(0.),
+                top: px(-300.),
+                bottom: px(0.),
             },
         },
     )
@@ -814,10 +814,10 @@ fn expect(
                                 JustifyContent::FlexStart,
                             align_items: AlignItems::Center,
                             padding: UiRect {
-                                left: Val::Px(35.),
-                                right: Val::Px(10.),
-                                top: Val::Px(20.),
-                                bottom: Val::Px(20.),
+                                left: px(35.),
+                                right: px(10.),
+                                top: px(20.),
+                                bottom: px(20.),
                             },
                             ..default()
                         },
@@ -836,7 +836,7 @@ fn expect(
                         style: Style {
                             position_type:
                                 PositionType::Absolute,
-                            left: Val::Px(-75.),
+                            left: px(-75.),
                             ..default()
                         },
                         image: texture_assets
@@ -869,10 +869,10 @@ fn expect(
                                 JustifyContent::FlexStart,
                             align_items: AlignItems::Center,
                             padding: UiRect {
-                                left: Val::Px(35.),
-                                right: Val::Px(10.),
-                                top: Val::Px(20.),
-                                bottom: Val::Px(20.),
+                                left: px(35.),
+                                right: px(10.),
+                                top: px(20.),
+                                bottom: px(20.),
                             },
                             ..default()
                         },
@@ -891,7 +891,7 @@ fn expect(
                         style: Style {
                             position_type:
                                 PositionType::Absolute,
-                            left: Val::Px(-75.),
+                            left: px(-75.),
                             ..default()
                         },
                         image: texture_assets
@@ -922,10 +922,10 @@ fn expect(
                                 JustifyContent::FlexStart,
                             align_items: AlignItems::Center,
                             padding: UiRect {
-                                left: Val::Px(35.),
-                                right: Val::Px(10.),
-                                top: Val::Px(20.),
-                                bottom: Val::Px(20.),
+                                left: px(35.),
+                                right: px(10.),
+                                top: px(20.),
+                                bottom: px(20.),
                             },
                             ..default()
                         },
@@ -944,7 +944,7 @@ fn expect(
                         style: Style {
                             position_type:
                                 PositionType::Absolute,
-                            left: Val::Px(-75.),
+                            left: px(-75.),
                             ..default()
                         },
                         image: texture_assets
@@ -981,7 +981,7 @@ fn expect(
                 },
                 align_self: AlignSelf::End,
                 align_items: AlignItems::End,
-                column_gap: Val::Px(50.),
+                column_gap: px(50.),
                 ..default()
             },
             ..default()
@@ -1008,7 +1008,7 @@ fn expect(
                 .with_children(|parent| {
                     parent.spawn(ImageBundle {
                         style: Style {
-                            height: Val::Px(125.),
+                            height: px(125.),
                             ..default()
                         },
                         image: texture_assets
@@ -1057,7 +1057,7 @@ fn expect(
                 .with_children(|parent| {
                     parent.spawn(ImageBundle {
                         style: Style {
-                            height: Val::Px(125.),
+                            height: px(125.),
                             ..default()
                         },
                         image: texture_assets
@@ -1099,7 +1099,7 @@ fn expect(
                 .with_children(|parent| {
                     parent.spawn(ImageBundle {
                         style: Style {
-                            height: Val::Px(125.),
+                            height: px(125.),
                             ..default()
                         },
                         image: texture_assets
@@ -1141,7 +1141,7 @@ fn expect(
                 .with_children(|parent| {
                     parent.spawn(ImageBundle {
                         style: Style {
-                            height: Val::Px(125.),
+                            height: px(125.),
                             ..default()
                         },
                         image: texture_assets
@@ -1170,14 +1170,14 @@ fn expect(
                 width: Val::Percent(100.0),
                 padding: UiRect {
                     left: Val::Percent(0.),
-                    right: Val::Px(30.),
-                    top: Val::Px(30.),
+                    right: px(30.),
+                    top: px(30.),
                     bottom: Val::Percent(0.),
                 },
                 align_self: AlignSelf::Start,
                 justify_content: JustifyContent::FlexEnd,
                 // align_items: AlignItems::End,
-                // column_gap: Val::Px(50.),/
+                // column_gap: px(50.),/
                 ..default()
             },
             ..default()

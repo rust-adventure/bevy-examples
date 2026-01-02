@@ -440,8 +440,8 @@ fn setup(
         },
         Node {
             position_type: PositionType::Absolute,
-            top: Val::Px(10.0),
-            left: Val::Px(10.0),
+            top: px(10.0),
+            left: px(10.0),
             ..default()
         },
     ));
@@ -455,8 +455,8 @@ fn setup(
         },
         Node {
             position_type: PositionType::Absolute,
-            bottom: Val::Px(10.0),
-            left: Val::Px(10.0),
+            bottom: px(10.0),
+            left: px(10.0),
             ..default()
         },
         ExampleName,

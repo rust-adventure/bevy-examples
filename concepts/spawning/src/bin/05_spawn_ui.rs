@@ -16,7 +16,7 @@ fn setup(mut commands: Commands) {
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             flex_direction: FlexDirection::Column,
-            row_gap: Val::Px(10.),
+            row_gap: px(10.),
             ..default()
         },
         children![
@@ -24,40 +24,31 @@ fn setup(mut commands: Commands) {
                 Button,
                 BackgroundColor(SKY_700.into()),
                 Node {
-                    padding: UiRect::all(Val::Px(5.)),
-                    width: Val::Px(200.),
+                    padding: px(5.).all(),
+                    width: px(200.),
                     ..default()
                 },
-                children![(
-                    Text::new("New Game"),
-                    TextColor(SLATE_50.into())
-                )]
+                children![(Text::new("New Game"), TextColor(SLATE_50.into()))]
             ),
             (
                 Button,
                 BackgroundColor(SKY_700.into()),
                 Node {
-                    padding: UiRect::all(Val::Px(5.)),
-                    width: Val::Px(200.),
+                    padding: px(5.).all(),
+                    width: px(200.),
                     ..default()
                 },
-                children![(
-                    Text::new("Options"),
-                    TextColor(SLATE_50.into())
-                )]
+                children![(Text::new("Options"), TextColor(SLATE_50.into()))]
             ),
             (
                 Button,
                 BackgroundColor(SKY_700.into()),
                 Node {
-                    padding: UiRect::all(Val::Px(5.)),
-                    width: Val::Px(200.),
+                    padding: px(5.).all(),
+                    width: px(200.),
                     ..default()
                 },
-                children![(
-                    Text::new("Quit"),
-                    TextColor(SLATE_50.into())
-                )]
+                children![(Text::new("Quit"), TextColor(SLATE_50.into()))]
             )
         ],
     ));
