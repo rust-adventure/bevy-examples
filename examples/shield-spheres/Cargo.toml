@@ -1,6 +1,6 @@
 
 [dependencies]
-itertools = "0.13.0"
+itertools = "0.14.0"
 bevy_asset_loader.workspace = true
 [dependencies.bevy]
 workspace = true

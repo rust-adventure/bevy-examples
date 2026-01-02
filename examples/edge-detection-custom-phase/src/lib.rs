@@ -8,76 +8,55 @@ use bevy::{
         system::{SystemParamItem, lifetimeless::SRes},
     },
     math::FloatOrd,
-    mesh::{
-        MeshVertexAttribute, MeshVertexBufferLayoutRef,
-    },
+    mesh::{MeshVertexAttribute, MeshVertexBufferLayoutRef},
     pbr::{
-        DrawMesh, MeshInputUniform, MeshPipeline,
-        MeshPipelineKey, MeshPipelineViewLayoutKey,
-        MeshUniform, RenderMeshInstances, SetMeshBindGroup,
-        SetMeshViewBindGroup, SetMeshViewEmptyBindGroup,
+        DrawMesh, MeshInputUniform, MeshPipeline, MeshPipelineKey, MeshPipelineViewLayoutKey,
+        MeshUniform, RenderMeshInstances, SetMeshBindGroup, SetMeshViewBindGroup,
+        SetMeshViewEmptyBindGroup,
     },
     platform::collections::{HashMap, HashSet},
     prelude::*,
     render::{
-        Extract, Render, RenderApp, RenderDebugFlags,
-        RenderSystems,
+        Extract, Render, RenderApp, RenderDebugFlags, RenderSystems,
         batching::{
             GetBatchData, GetFullBatchData,
             gpu_preprocessing::{
-                IndirectParametersCpuMetadata,
-                UntypedPhaseIndirectParametersBuffers,
+                IndirectParametersCpuMetadata, UntypedPhaseIndirectParametersBuffers,
                 batch_and_prepare_sorted_render_phase,
             },
         },
         camera::ExtractedCamera,
         diagnostic::RecordDiagnostics,
         extract_component::{
-            ComponentUniforms, DynamicUniformIndex,
-            ExtractComponent, ExtractComponentPlugin,
+            ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin,
             UniformComponentPlugin,
         },
         mesh::{RenderMesh, allocator::MeshAllocator},
         render_asset::RenderAssets,
         render_graph::{
-            NodeRunError, RenderGraphContext,
-            RenderGraphExt, RenderLabel, ViewNode,
-            ViewNodeRunner,
+            NodeRunError, RenderGraphContext, RenderGraphExt, RenderLabel, ViewNode, ViewNodeRunner,
         },
         render_phase::{
-            AddRenderCommand,
-            CachedRenderPipelinePhaseItem, DrawFunctionId,
-            DrawFunctions, PhaseItem, PhaseItemExtraIndex,
-            RenderCommand, RenderCommandResult,
-            SetItemPipeline, SortedPhaseItem,
-            SortedRenderPhasePlugin, TrackedRenderPass,
-            ViewSortedRenderPhases, sort_phase_system,
+            AddRenderCommand, CachedRenderPipelinePhaseItem, DrawFunctionId, DrawFunctions,
+            PhaseItem, PhaseItemExtraIndex, RenderCommand, RenderCommandResult, SetItemPipeline,
+            SortedPhaseItem, SortedRenderPhasePlugin, TrackedRenderPass, ViewSortedRenderPhases,
+            sort_phase_system,
         },
         render_resource::{
-            BindGroup, BindGroupEntries, BindGroupLayout,
-            BindGroupLayoutEntries, BindingType,
-            BufferBindingType, CachedRenderPipelineId,
-            ColorTargetState, ColorWrites,
-            CommandEncoderDescriptor, CompareFunction,
-            DepthStencilState, Extent3d, Face,
-            FragmentState, FrontFace, MultisampleState,
-            PipelineCache, PolygonMode, PrimitiveState,
-            RenderPassDescriptor, RenderPipelineDescriptor,
-            ShaderStages, ShaderType,
-            SpecializedMeshPipeline,
-            SpecializedMeshPipelineError,
-            SpecializedMeshPipelines, StoreOp,
-            TextureDescriptor, TextureDimension,
-            TextureFormat, TextureUsages, VertexFormat,
-            VertexState,
+            BindGroup, BindGroupEntries, BindGroupLayoutDescriptor, BindGroupLayoutEntries,
+            BindingType, BufferBindingType, CachedRenderPipelineId, ColorTargetState, ColorWrites,
+            CommandEncoderDescriptor, CompareFunction, DepthStencilState, Extent3d, Face,
+            FragmentState, FrontFace, MultisampleState, PipelineCache, PolygonMode, PrimitiveState,
+            RenderPassDescriptor, RenderPipelineDescriptor, ShaderStages, ShaderType,
+            SpecializedMeshPipeline, SpecializedMeshPipelineError, SpecializedMeshPipelines,
+            StoreOp, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
+            VertexFormat, VertexState,
         },
         renderer::{RenderContext, RenderDevice},
         sync_world::{MainEntity, RenderEntity},
         texture::{ColorAttachment, TextureCache},
         view::{
-            ExtractedView, RenderVisibleEntities,
-            RetainedViewEntity, ViewDepthTexture,
-            ViewTarget,
+            ExtractedView, RenderVisibleEntities, RetainedViewEntity, ViewDepthTexture, ViewTarget,
         },
     },
 };
@@ -91,22 +70,14 @@ pub mod post_process;
 // avoid collisions with other attributes. See the
 // MeshVertexAttribute docs for more info.
 pub const ATTRIBUTE_SECTION_COLOR: MeshVertexAttribute =
-    MeshVertexAttribute::new(
-        "_SECTION_COLOR",
-        923949917,
-        VertexFormat::Float32x4,
-    );
+    MeshVertexAttribute::new("_SECTION_COLOR", 923949917, VertexFormat::Float32x4);
 
 const SHADER_ASSET_PATH: &str = "custom_phase.wgsl";
 
-#[derive(
-    Component, ExtractComponent, Clone, Copy, Default,
-)]
+#[derive(Component, ExtractComponent, Clone, Copy, Default)]
 pub struct DrawSection;
 
-#[derive(
-    Component, ExtractComponent, Clone, Copy, ShaderType,
-)]
+#[derive(Component, ExtractComponent, Clone, Copy, ShaderType)]
 pub struct SectionGroupId {
     pub id: u32,
 }
@@ -137,11 +108,9 @@ fn insert_section_ids(
     query: Query<&SectionGroupId>,
 ) {
     if query.get(inserted.entity).is_err() {
-        commands.entity(inserted.entity).insert(
-            SectionGroupId {
-                id: generator.generate_id(),
-            },
-        );
+        commands.entity(inserted.entity).insert(SectionGroupId {
+            id: generator.generate_id(),
+        });
     }
 }
 
@@ -152,20 +121,14 @@ pub struct SectionTexturePhasePlugin;
 
 impl Plugin for SectionTexturePhasePlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<SectionGroupIdGenerator>()
-        .add_plugins((
-            ExtractComponentPlugin::<
-            DrawSection,
-        >::default(),
-        ExtractComponentPlugin::<
-            SectionGroupId,
-        >::default(),
-        UniformComponentPlugin::<SectionGroupId>::default(),
-        SortedRenderPhasePlugin::<
-        SectionTexturePhase,
-        MeshPipeline,
-    >::new(RenderDebugFlags::default()),
-    ));
+        app.init_resource::<SectionGroupIdGenerator>().add_plugins((
+            ExtractComponentPlugin::<DrawSection>::default(),
+            ExtractComponentPlugin::<SectionGroupId>::default(),
+            UniformComponentPlugin::<SectionGroupId>::default(),
+            SortedRenderPhasePlugin::<SectionTexturePhase, MeshPipeline>::new(
+                RenderDebugFlags::default(),
+            ),
+        ));
 
         // TODO: one day with Constructs we can register a
         // required component that implements
@@ -175,9 +138,7 @@ impl Plugin for SectionTexturePhasePlugin {
         // observers.
         app.add_observer(insert_section_ids);
 
-        let Some(render_app) =
-            app.get_sub_app_mut(RenderApp)
-        else {
+        let Some(render_app) = app.get_sub_app_mut(RenderApp) else {
             return;
         };
         render_app
@@ -191,7 +152,10 @@ impl Plugin for SectionTexturePhasePlugin {
                 Render,
                 (
                     sort_phase_system::<SectionTexturePhase>.in_set(RenderSystems::PhaseSort),
-                    batch_and_prepare_sorted_render_phase::<SectionTexturePhase, SectionTexturePipeline>
+                    batch_and_prepare_sorted_render_phase::<
+                        SectionTexturePhase,
+                        SectionTexturePipeline,
+                    >
                         .in_set(RenderSystems::PrepareResources),
                     prepare_section_data_bind_group.in_set(RenderSystems::PrepareBindGroups),
                     queue_custom_meshes.in_set(RenderSystems::QueueMeshes),
@@ -207,16 +171,13 @@ impl Plugin for SectionTexturePhasePlugin {
 
     fn finish(&self, app: &mut App) {
         // We need to get the render app from the main app
-        let Some(render_app) =
-            app.get_sub_app_mut(RenderApp)
-        else {
+        let Some(render_app) = app.get_sub_app_mut(RenderApp) else {
             return;
         };
         // The pipeline needs the RenderDevice to be
         // created and it's only available once plugins
         // are intialized
-        render_app
-            .init_resource::<SectionTexturePipeline>();
+        render_app.init_resource::<SectionTexturePipeline>();
     }
 }
 
@@ -236,28 +197,24 @@ pub struct SectionTexturePipeline {
     /// Stores the bind group layout for
     /// additional component data
     /// like that weird mesh_id substitute
-    section_data_layout: BindGroupLayout,
+    section_data_layout: BindGroupLayoutDescriptor,
 }
 impl FromWorld for SectionTexturePipeline {
     fn from_world(world: &mut World) -> Self {
         Self {
             mesh_pipeline: MeshPipeline::from_world(world),
-            shader_handle: world
-                .resource::<AssetServer>()
-                .load(SHADER_ASSET_PATH),
-            section_data_layout: world
-                .resource::<RenderDevice>()
-                .create_bind_group_layout(
-                    "section_data_bind_group_layout",
-                    &BindGroupLayoutEntries::single(
-                        ShaderStages::VERTEX_FRAGMENT,
-                        BindingType::Buffer {
-                            ty: BufferBindingType::Uniform,
-                            has_dynamic_offset: true,
-                            min_binding_size: None,
-                        },
-                    ),
+            shader_handle: world.resource::<AssetServer>().load(SHADER_ASSET_PATH),
+            section_data_layout: BindGroupLayoutDescriptor::new(
+                "section_data_bind_group_layout",
+                &BindGroupLayoutEntries::single(
+                    ShaderStages::VERTEX_FRAGMENT,
+                    BindingType::Buffer {
+                        ty: BufferBindingType::Uniform,
+                        has_dynamic_offset: true,
+                        min_binding_size: None,
+                    },
                 ),
+            ),
         }
     }
 }
@@ -271,35 +228,25 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
         &self,
         key: Self::Key,
         layout: &MeshVertexBufferLayoutRef,
-    ) -> Result<
-        RenderPipelineDescriptor,
-        SpecializedMeshPipelineError,
-    > {
+    ) -> Result<RenderPipelineDescriptor, SpecializedMeshPipelineError> {
         let mut vertex_attributes = Vec::new();
         let mut shader_defs = Vec::new();
 
         // add the position
         if layout.0.contains(Mesh::ATTRIBUTE_POSITION) {
             // @location(0)
-            vertex_attributes.push(
-                Mesh::ATTRIBUTE_POSITION
-                    .at_shader_location(0),
-            );
+            vertex_attributes.push(Mesh::ATTRIBUTE_POSITION.at_shader_location(0));
         }
         // add the section color
         if layout.0.contains(ATTRIBUTE_SECTION_COLOR) {
             // @location(1)
             shader_defs.push("SECTION_COLORS".into());
-            vertex_attributes.push(
-                ATTRIBUTE_SECTION_COLOR
-                    .at_shader_location(1),
-            );
+            vertex_attributes.push(ATTRIBUTE_SECTION_COLOR.at_shader_location(1));
         }
         // This will automatically generate the correct
         // `VertexBufferLayout` based on the vertex
         // attributes
-        let vertex_buffer_layout =
-            layout.0.get_layout(&vertex_attributes)?;
+        let vertex_buffer_layout = layout.0.get_layout(&vertex_attributes)?;
 
         Ok(RenderPipelineDescriptor {
             label: Some("Specialized Mesh Pipeline".into()),
@@ -309,26 +256,15 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
             layout: vec![
                 // Bind group 0 is the view uniform
                 self.mesh_pipeline
-                    .get_view_layout(
-                        MeshPipelineViewLayoutKey::from(
-                            key,
-                        ),
-                    )
+                    .get_view_layout(MeshPipelineViewLayoutKey::from(key))
                     .main_layout
                     .clone(),
                 self.mesh_pipeline
-                    .get_view_layout(
-                        MeshPipelineViewLayoutKey::from(
-                            key,
-                        ),
-                    )
+                    .get_view_layout(MeshPipelineViewLayoutKey::from(key))
                     .empty_layout
                     .clone(),
                 // Bind group 1 is the mesh uniform
-                self.mesh_pipeline
-                    .mesh_layouts
-                    .model_only
-                    .clone(),
+                self.mesh_pipeline.mesh_layouts.model_only.clone(),
                 // extra data
                 self.section_data_layout.clone(),
             ],
@@ -344,9 +280,7 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
                 shader_defs,
                 entry_point: Some("fragment".into()),
                 targets: vec![Some(ColorTargetState {
-                    format: if key
-                        .contains(MeshPipelineKey::HDR)
-                    {
+                    format: if key.contains(MeshPipelineKey::HDR) {
                         ViewTarget::TEXTURE_FORMAT_HDR
                     } else {
                         TextureFormat::bevy_default()
@@ -366,8 +300,7 @@ impl SpecializedMeshPipeline for SectionTexturePipeline {
             depth_stencil: Some(DepthStencilState {
                 format: CORE_3D_DEPTH_FORMAT,
                 depth_write_enabled: true,
-                depth_compare:
-                    CompareFunction::GreaterEqual,
+                depth_compare: CompareFunction::GreaterEqual,
                 stencil: default(),
                 bias: default(),
             }),
@@ -456,16 +389,8 @@ impl PhaseItem for SectionTexturePhase {
     }
 
     #[inline]
-    fn batch_range_and_extra_index_mut(
-        &mut self,
-    ) -> (
-        &mut Range<u32>,
-        &mut PhaseItemExtraIndex,
-    ) {
-        (
-            &mut self.batch_range,
-            &mut self.extra_index,
-        )
+    fn batch_range_and_extra_index_mut(&mut self) -> (&mut Range<u32>, &mut PhaseItemExtraIndex) {
+        (&mut self.batch_range, &mut self.extra_index)
     }
 }
 
@@ -514,45 +439,27 @@ impl GetBatchData for SectionTexturePipeline {
     fn get_batch_data(
         (mesh_instances, _render_assets, mesh_allocator): &SystemParamItem<Self::Param>,
         (_entity, main_entity): (Entity, MainEntity),
-    ) -> Option<(
-        Self::BufferData,
-        Option<Self::CompareData>,
-    )> {
-        let RenderMeshInstances::CpuBuilding(
-            ref mesh_instances,
-        ) = **mesh_instances
-        else {
+    ) -> Option<(Self::BufferData, Option<Self::CompareData>)> {
+        let RenderMeshInstances::CpuBuilding(ref mesh_instances) = **mesh_instances else {
             error!(
                 "`get_batch_data` should never be called in GPU mesh uniform \
                 building mode"
             );
             return None;
         };
-        let mesh_instance =
-            mesh_instances.get(&main_entity)?;
-        let first_vertex_index = match mesh_allocator
-            .mesh_vertex_slice(&mesh_instance.mesh_asset_id)
-        {
-            Some(mesh_vertex_slice) => {
-                mesh_vertex_slice.range.start
-            }
-            None => 0,
-        };
+        let mesh_instance = mesh_instances.get(&main_entity)?;
+        let first_vertex_index =
+            match mesh_allocator.mesh_vertex_slice(&mesh_instance.mesh_asset_id) {
+                Some(mesh_vertex_slice) => mesh_vertex_slice.range.start,
+                None => 0,
+            };
         let mesh_uniform = {
             let mesh_transforms = &mesh_instance.transforms;
-            let (
-                local_from_world_transpose_a,
-                local_from_world_transpose_b,
-            ) = mesh_transforms
-                .world_from_local
-                .inverse_transpose_3x3();
+            let (local_from_world_transpose_a, local_from_world_transpose_b) =
+                mesh_transforms.world_from_local.inverse_transpose_3x3();
             MeshUniform {
-                world_from_local: mesh_transforms
-                    .world_from_local
-                    .to_transpose(),
-                previous_world_from_local: mesh_transforms
-                    .previous_world_from_local
-                    .to_transpose(),
+                world_from_local: mesh_transforms.world_from_local.to_transpose(),
+                previous_world_from_local: mesh_transforms.previous_world_from_local.to_transpose(),
                 lightmap_uv_rect: UVec2::ZERO,
                 local_from_world_transpose_a,
                 local_from_world_transpose_b,
@@ -571,25 +478,18 @@ impl GetFullBatchData for SectionTexturePipeline {
     type BufferInputData = MeshInputUniform;
 
     fn get_index_and_compare_data(
-        (mesh_instances, _, _): &SystemParamItem<
-            Self::Param,
-        >,
+        (mesh_instances, _, _): &SystemParamItem<Self::Param>,
         main_entity: MainEntity,
-    ) -> Option<(NonMaxU32, Option<Self::CompareData>)>
-    {
+    ) -> Option<(NonMaxU32, Option<Self::CompareData>)> {
         // This should only be called during GPU building.
-        let RenderMeshInstances::GpuBuilding(
-            ref mesh_instances,
-        ) = **mesh_instances
-        else {
+        let RenderMeshInstances::GpuBuilding(ref mesh_instances) = **mesh_instances else {
             error!(
                 "`get_index_and_compare_data` should never be called in CPU mesh uniform building \
                     mode"
             );
             return None;
         };
-        let mesh_instance =
-            mesh_instances.get(&main_entity)?;
+        let mesh_instance = mesh_instances.get(&main_entity)?;
         Some((
             mesh_instance.current_uniform_index,
             mesh_instance
@@ -602,25 +502,18 @@ impl GetFullBatchData for SectionTexturePipeline {
         (mesh_instances, _render_assets, mesh_allocator): &SystemParamItem<Self::Param>,
         main_entity: MainEntity,
     ) -> Option<Self::BufferData> {
-        let RenderMeshInstances::CpuBuilding(
-            ref mesh_instances,
-        ) = **mesh_instances
-        else {
+        let RenderMeshInstances::CpuBuilding(ref mesh_instances) = **mesh_instances else {
             error!(
                 "`get_binned_batch_data` should never be called in GPU mesh uniform building mode"
             );
             return None;
         };
-        let mesh_instance =
-            mesh_instances.get(&main_entity)?;
-        let first_vertex_index = match mesh_allocator
-            .mesh_vertex_slice(&mesh_instance.mesh_asset_id)
-        {
-            Some(mesh_vertex_slice) => {
-                mesh_vertex_slice.range.start
-            }
-            None => 0,
-        };
+        let mesh_instance = mesh_instances.get(&main_entity)?;
+        let first_vertex_index =
+            match mesh_allocator.mesh_vertex_slice(&mesh_instance.mesh_asset_id) {
+                Some(mesh_vertex_slice) => mesh_vertex_slice.range.start,
+                None => 0,
+            };
 
         Some(MeshUniform::new(
             &mesh_instance.transforms,
@@ -643,27 +536,22 @@ impl GetFullBatchData for SectionTexturePipeline {
         // these structures, even though they
         // actually have distinct layouts. See the comment
         // above that type for more information.
-        let indirect_parameters =
-            IndirectParametersCpuMetadata {
-                base_output_index,
-                batch_set_index: match batch_set_index {
-                    None => !0,
-                    Some(batch_set_index) => {
-                        u32::from(batch_set_index)
-                    }
-                },
-            };
+        let indirect_parameters = IndirectParametersCpuMetadata {
+            base_output_index,
+            batch_set_index: match batch_set_index {
+                None => !0,
+                Some(batch_set_index) => u32::from(batch_set_index),
+            },
+        };
 
         if indexed {
-            indirect_parameters_buffers.indexed.set(
-                indirect_parameters_offset,
-                indirect_parameters,
-            );
+            indirect_parameters_buffers
+                .indexed
+                .set(indirect_parameters_offset, indirect_parameters);
         } else {
-            indirect_parameters_buffers.non_indexed.set(
-                indirect_parameters_offset,
-                indirect_parameters,
-            );
+            indirect_parameters_buffers
+                .non_indexed
+                .set(indirect_parameters_offset, indirect_parameters);
         }
     }
 
@@ -682,44 +570,21 @@ impl GetFullBatchData for SectionTexturePipeline {
 // will use that phase
 fn extract_camera_phases(
     mut commands: Commands,
-    mut sections_phases: ResMut<
-        ViewSortedRenderPhases<SectionTexturePhase>,
-    >,
-    cameras: Extract<
-        Query<
-            (
-                RenderEntity,
-                Entity,
-                &Camera,
-                Has<SectionsPrepass>,
-            ),
-            With<Camera3d>,
-        >,
-    >,
+    mut sections_phases: ResMut<ViewSortedRenderPhases<SectionTexturePhase>>,
+    cameras: Extract<Query<(RenderEntity, Entity, &Camera, Has<SectionsPrepass>), With<Camera3d>>>,
     mut live_entities: Local<HashSet<RetainedViewEntity>>,
 ) {
     live_entities.clear();
-    for (
-        render_entity,
-        main_entity,
-        camera,
-        has_sections_prepass,
-    ) in &cameras
-    {
+    for (render_entity, main_entity, camera, has_sections_prepass) in &cameras {
         if !camera.is_active {
             continue;
         }
         // This is the main camera, so we use the first
         // subview index (0)
-        let retained_view_entity = RetainedViewEntity::new(
-            main_entity.into(),
-            None,
-            0,
-        );
+        let retained_view_entity = RetainedViewEntity::new(main_entity.into(), None, 0);
 
         if has_sections_prepass {
-            sections_phases
-                .insert_or_clear(retained_view_entity);
+            sections_phases.insert_or_clear(retained_view_entity);
         } else {
             sections_phases.remove(&retained_view_entity);
         }
@@ -728,14 +593,10 @@ fn extract_camera_phases(
         commands
             .get_entity(render_entity)
             .expect("Camera entity wasn't synced.")
-            .insert_if(SectionsPrepass, || {
-                has_sections_prepass
-            });
+            .insert_if(SectionsPrepass, || has_sections_prepass);
     }
     // Clear out all dead views.
-    sections_phases.retain(|camera_entity, _| {
-        live_entities.contains(camera_entity)
-    });
+    sections_phases.retain(|camera_entity, _| live_entities.contains(camera_entity));
 }
 
 // This is a very important step when writing a
@@ -745,30 +606,18 @@ fn extract_camera_phases(
 // to the phase.
 #[allow(clippy::too_many_arguments)]
 fn queue_custom_meshes(
-    custom_draw_functions: Res<
-        DrawFunctions<SectionTexturePhase>,
-    >,
-    mut pipelines: ResMut<
-        SpecializedMeshPipelines<SectionTexturePipeline>,
-    >,
+    custom_draw_functions: Res<DrawFunctions<SectionTexturePhase>>,
+    mut pipelines: ResMut<SpecializedMeshPipelines<SectionTexturePipeline>>,
     pipeline_cache: Res<PipelineCache>,
     custom_draw_pipeline: Res<SectionTexturePipeline>,
     render_meshes: Res<RenderAssets<RenderMesh>>,
     render_mesh_instances: Res<RenderMeshInstances>,
-    mut custom_render_phases: ResMut<
-        ViewSortedRenderPhases<SectionTexturePhase>,
-    >,
-    mut views: Query<(
-        &ExtractedView,
-        &RenderVisibleEntities,
-        &Msaa,
-    )>,
+    mut custom_render_phases: ResMut<ViewSortedRenderPhases<SectionTexturePhase>>,
+    mut views: Query<(&ExtractedView, &RenderVisibleEntities, &Msaa)>,
     has_marker: Query<(), With<DrawSection>>,
 ) {
     for (view, visible_entities, msaa) in &mut views {
-        let Some(custom_phase) = custom_render_phases
-            .get_mut(&view.retained_view_entity)
-        else {
+        let Some(custom_phase) = custom_render_phases.get_mut(&view.retained_view_entity) else {
             continue;
         };
         let draw_custom = custom_draw_functions
@@ -777,31 +626,24 @@ fn queue_custom_meshes(
 
         // Create the key based on the view.
         // In this case we only care about MSAA and HDR
-        let view_key =
-            MeshPipelineKey::from_msaa_samples(
-                msaa.samples(),
-            ) | MeshPipelineKey::from_hdr(view.hdr);
+        let view_key = MeshPipelineKey::from_msaa_samples(msaa.samples())
+            | MeshPipelineKey::from_hdr(view.hdr);
 
         let rangefinder = view.rangefinder3d();
 
         // Since our phase can work on any 3d mesh we can
         // reuse the default mesh 2d filter
-        for (render_entity, visible_entity) in
-            visible_entities.iter::<Mesh3d>()
-        {
+        for (render_entity, visible_entity) in visible_entities.iter::<Mesh3d>() {
             // We only want meshes with the marker component
             // to be queued to our phase.
             if has_marker.get(*render_entity).is_err() {
                 continue;
             }
-            let Some(mesh_instance) = render_mesh_instances
-                .render_mesh_queue_data(*visible_entity)
+            let Some(mesh_instance) = render_mesh_instances.render_mesh_queue_data(*visible_entity)
             else {
                 continue;
             };
-            let Some(mesh) = render_meshes
-                .get(mesh_instance.mesh_asset_id)
-            else {
+            let Some(mesh) = render_meshes.get(mesh_instance.mesh_asset_id) else {
                 continue;
             };
 
@@ -811,10 +653,7 @@ fn queue_custom_meshes(
             // but you could have more complex keys and
             // that's where you'd need to create those keys
             let mut mesh_key = view_key;
-            mesh_key |=
-                MeshPipelineKey::from_primitive_topology(
-                    mesh.primitive_topology(),
-                );
+            mesh_key |= MeshPipelineKey::from_primitive_topology(mesh.primitive_topology());
 
             let pipeline_id = pipelines.specialize(
                 &pipeline_cache,
@@ -829,10 +668,7 @@ fn queue_custom_meshes(
                     continue;
                 }
             };
-            let distance = rangefinder
-                .distance_translation(
-                    &mesh_instance.translation,
-                );
+            let distance = rangefinder.distance(&mesh_instance.center);
             // At this point we have all the data we need to
             // create a phase item and add it to our
             // phase
@@ -854,9 +690,7 @@ fn queue_custom_meshes(
 
 // Render label used to order our render graph
 // node that will render our phase
-#[derive(
-    RenderLabel, Debug, Clone, Hash, PartialEq, Eq,
-)]
+#[derive(RenderLabel, Debug, Clone, Hash, PartialEq, Eq)]
 struct CustomDrawPassLabel;
 
 #[derive(Default)]
@@ -874,24 +708,18 @@ impl ViewNode for CustomDrawNode {
         &self,
         graph: &mut RenderGraphContext,
         render_context: &mut RenderContext<'w>,
-        (camera, _target, view, section_texture, depth): QueryItem<
-            'w,
-            '_,
-            Self::ViewQuery,
-        >,
+        (camera, _target, view, section_texture, depth): QueryItem<'w, '_, Self::ViewQuery>,
         world: &'w World,
     ) -> Result<(), NodeRunError> {
         // First, we need to get our phases resource
-        let Some(section_phases) = world
-            .get_resource::<ViewSortedRenderPhases<
-            SectionTexturePhase,
-        >>() else {
+        let Some(section_phases) =
+            world.get_resource::<ViewSortedRenderPhases<SectionTexturePhase>>()
+        else {
             return Ok(());
         };
         // Initialize diagnostic recording.
         // not required but makes profiling easier
-        let diagnostics =
-            render_context.diagnostic_recorder();
+        let diagnostics = render_context.diagnostic_recorder();
 
         // this target writes directly to output. keeping
         // as maybe potentially useful for debug?
@@ -916,14 +744,11 @@ impl ViewNode for CustomDrawNode {
         // };
         // Get the phase for the current view running our
         // node
-        let Some(section_phase) =
-            section_phases.get(&view.retained_view_entity)
-        else {
+        let Some(section_phase) = section_phases.get(&view.retained_view_entity) else {
             return Ok(());
         };
 
-        let depth_stencil_attachment =
-            Some(depth.get_attachment(StoreOp::Store));
+        let depth_stencil_attachment = Some(depth.get_attachment(StoreOp::Store));
 
         // This will generate a task to generate the
         // command buffer in parallel
@@ -986,9 +811,7 @@ fn prepare_section_textures(
     mut commands: Commands,
     mut texture_cache: ResMut<TextureCache>,
     render_device: Res<RenderDevice>,
-    sections_phases: Res<
-        ViewSortedRenderPhases<SectionTexturePhase>,
-    >,
+    sections_phases: Res<ViewSortedRenderPhases<SectionTexturePhase>>,
     views_3d: Query<(
         Entity,
         &ExtractedCamera,
@@ -999,18 +822,12 @@ fn prepare_section_textures(
 ) {
     let mut sections_textures = <HashMap<_, _>>::default();
 
-    for (entity, camera, view, msaa, sections_prepass) in
-        &views_3d
-    {
-        if !sections_phases
-            .contains_key(&view.retained_view_entity)
-        {
+    for (entity, camera, view, msaa, sections_prepass) in &views_3d {
+        if !sections_phases.contains_key(&view.retained_view_entity) {
             continue;
         };
 
-        let Some(physical_target_size) =
-            camera.physical_target_size
-        else {
+        let Some(physical_target_size) = camera.physical_target_size else {
             continue;
         };
 
@@ -1046,39 +863,25 @@ fn prepare_section_textures(
         });
 
         commands.entity(entity).insert(SectionTexture {
-            sections: cached_sections_texture.map(|t| {
-                ColorAttachment::new(
-                    t,
-                    None,
-                    Some(LinearRgba::BLACK),
-                )
-            }),
+            sections: cached_sections_texture
+                .map(|t| ColorAttachment::new(t, None, None, Some(LinearRgba::BLACK))),
             size,
         });
     }
 }
 
 pub struct SetSectionDataBindGroup<const I: usize>;
-impl<P: PhaseItem, const I: usize> RenderCommand<P>
-    for SetSectionDataBindGroup<I>
-{
+impl<P: PhaseItem, const I: usize> RenderCommand<P> for SetSectionDataBindGroup<I> {
     type Param = (SRes<SectionDataBindGroups>,);
     type ViewQuery = ();
-    type ItemQuery =
-        &'static DynamicUniformIndex<SectionGroupId>;
+    type ItemQuery = &'static DynamicUniformIndex<SectionGroupId>;
 
     #[inline]
     fn render<'w>(
         _item: &P,
         _view: (),
-        item_query: Option<
-            &DynamicUniformIndex<SectionGroupId>,
-        >,
-        (section_groups,): SystemParamItem<
-            'w,
-            '_,
-            Self::Param,
-        >,
+        item_query: Option<&DynamicUniformIndex<SectionGroupId>>,
+        (section_groups,): SystemParamItem<'w, '_, Self::Param>,
         pass: &mut TrackedRenderPass<'w>,
     ) -> RenderCommandResult {
         let section_groups = section_groups.into_inner();
@@ -1098,6 +901,7 @@ fn prepare_section_data_bind_group(
     section_texture_pipeline: Res<SectionTexturePipeline>,
     render_device: Res<RenderDevice>,
     uniforms: Res<ComponentUniforms<SectionGroupId>>,
+    pipeline_cache: Res<PipelineCache>,
 ) {
     // todo: maybe reset the resource instead?
     let Some(uniforms) = uniforms.binding() else {
@@ -1106,10 +910,8 @@ fn prepare_section_data_bind_group(
 
     let bind_group = render_device.create_bind_group(
         "section_data_bind_group",
-        &section_texture_pipeline.section_data_layout,
+        &pipeline_cache.get_bind_group_layout(&section_texture_pipeline.section_data_layout),
         &BindGroupEntries::single(uniforms),
     );
-    commands.insert_resource(SectionDataBindGroups(Some(
-        bind_group,
-    )));
+    commands.insert_resource(SectionDataBindGroups(Some(bind_group)));
 }
