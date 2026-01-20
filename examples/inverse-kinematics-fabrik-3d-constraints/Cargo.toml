@@ -1,0 +1,12 @@
+[package]
+name = "inverse-kinematics-fabrik-3d-constraints"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bevy.workspace = true
+itertools.workspace = true
+petgraph = "0.8"
+
+[lints]
+workspace = true
