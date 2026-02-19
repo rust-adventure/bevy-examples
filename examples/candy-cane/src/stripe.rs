@@ -5,9 +5,7 @@
 use bevy::{
     pbr::{ExtendedMaterial, MaterialExtension},
     prelude::*,
-    render::{
-        render_resource::*, storage::ShaderStorageBuffer,
-    },
+    render::{render_resource::*, storage::ShaderBuffer},
     shader::ShaderRef,
 };
 
@@ -61,7 +59,7 @@ pub struct CandyCaneMaterial {
     // so we start from binding slot 100, leaving slots
     // 0-99 for the base material.
     #[storage(100, read_only)]
-    pub stripes_buffer: Handle<ShaderStorageBuffer>,
+    pub stripes_buffer: Handle<ShaderBuffer>,
 }
 
 impl MaterialExtension for CandyCaneMaterial {

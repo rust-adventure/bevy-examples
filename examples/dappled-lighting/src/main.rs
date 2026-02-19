@@ -95,7 +95,7 @@ fn setup(
             .with_scale(Vec3::splat(2.)),
         DirectionalLight {
             illuminance: AMBIENT_DAYLIGHT,
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         DirectionalLightTexture {

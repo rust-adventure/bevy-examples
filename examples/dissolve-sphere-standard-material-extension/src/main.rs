@@ -1,31 +1,43 @@
 use bevy::{
     anti_alias::fxaa::Fxaa,
     color::palettes::tailwind::{BLUE_400, RED_400},
-    core_pipeline::prepass::{DepthPrepass, MotionVectorPrepass, NormalPrepass},
+    core_pipeline::prepass::{
+        DepthPrepass, MotionVectorPrepass, NormalPrepass,
+    },
+    dev_tools::render_debug::RenderDebugOverlayPlugin,
+    material::OpaqueRendererMethod,
     mesh::VertexAttributeValues,
-    pbr::{ExtendedMaterial, OpaqueRendererMethod},
+    pbr::ExtendedMaterial,
     prelude::*,
 };
 
-use bevy_prepass_debug::PrepassDebugPlugin;
 use bevy_shader_utils::ShaderUtilsPlugin;
 use dissolve_sphere_standard_material_extension::DissolveExtension;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Srgba::hex("1fa9f4").unwrap().into()))
+        .insert_resource(ClearColor(
+            Srgba::hex("1fa9f4").unwrap().into(),
+        ))
         .add_plugins((
             DefaultPlugins.set(AssetPlugin {
                 watch_for_changes_override: Some(true),
                 ..default()
             }),
             ShaderUtilsPlugin,
-            PrepassDebugPlugin,
-            MaterialPlugin::<ExtendedMaterial<StandardMaterial, DissolveExtension>>::default(),
+            MaterialPlugin::<
+                ExtendedMaterial<
+                    StandardMaterial,
+                    DissolveExtension,
+                >,
+            >::default(),
         ))
         .add_systems(Startup, setup)
         // .add_system(change_color)
-        .add_systems(Update, (animate_light_direction, movement))
+        .add_systems(
+            Update,
+            (animate_light_direction, movement),
+        )
         .run();
 }
 
@@ -36,21 +48,39 @@ struct Cube;
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut dissolve_materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, DissolveExtension>>>,
+    mut dissolve_materials: ResMut<
+        Assets<
+            ExtendedMaterial<
+                StandardMaterial,
+                DissolveExtension,
+            >,
+        >,
+    >,
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
     let mut mesh = Sphere::default().mesh().uv(32, 18);
     // let mut mesh = Mesh::from(shape::Cube { size:
     // 1.0 });
-    if let Some(VertexAttributeValues::Float32x3(positions)) =
-        mesh.attribute(Mesh::ATTRIBUTE_POSITION)
+    if let Some(VertexAttributeValues::Float32x3(
+        positions,
+    )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
     {
         let colors: Vec<[f32; 4]> = positions
             .iter()
-            .map(|[r, g, b]| [(1. - *r) / 2., (1. - *g) / 2., (1. - *b) / 2., 1.])
+            .map(|[r, g, b]| {
+                [
+                    (1. - *r) / 2.,
+                    (1. - *g) / 2.,
+                    (1. - *b) / 2.,
+                    1.,
+                ]
+            })
             .collect();
-        mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
+        mesh.insert_attribute(
+            Mesh::ATTRIBUTE_COLOR,
+            colors,
+        );
     }
 
     commands.spawn((
@@ -84,7 +114,8 @@ fn setup(
     // camera
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(-2.0, 2.5, 5.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
         Movable,
         DepthPrepass,
         NormalPrepass,
@@ -92,7 +123,9 @@ fn setup(
     ));
     // ground plane
     commands.spawn((
-        Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(10., 10.)))),
+        Mesh3d(meshes.add(Mesh::from(
+            Plane3d::default().mesh().size(10., 10.),
+        ))),
         MeshMaterial3d(materials.add(StandardMaterial {
             base_color: Color::WHITE,
             perceptual_roughness: 1.0,
@@ -108,16 +141,22 @@ fn setup(
                                 * non-halogen
                                 * incandescent bulb */
             color: RED_400.into(),
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         children![(
-            Mesh3d(meshes.add(Sphere { radius: 0.1 }.mesh()),),
-            MeshMaterial3d(materials.add(StandardMaterial {
-                base_color: RED_400.into(),
-                emissive: LinearRgba::new(100., 0., 0., 0.,),
-                ..default()
-            },)),
+            Mesh3d(
+                meshes.add(Sphere { radius: 0.1 }.mesh()),
+            ),
+            MeshMaterial3d(materials.add(
+                StandardMaterial {
+                    base_color: RED_400.into(),
+                    emissive: LinearRgba::new(
+                        100., 0., 0., 0.,
+                    ),
+                    ..default()
+                },
+            )),
         )],
     ));
 
@@ -129,28 +168,36 @@ fn setup(
                                 * non-halogen
                                 * incandescent bulb */
             color: BLUE_400.into(),
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         children![(
-            Mesh3d(meshes.add(Sphere { radius: 0.1 }.mesh()),),
-            MeshMaterial3d(materials.add(StandardMaterial {
-                base_color: BLUE_400.into(),
-                emissive: LinearRgba::new(0.0, 0.0, 100.0, 0.0,),
-                ..default()
-            },)),
+            Mesh3d(
+                meshes.add(Sphere { radius: 0.1 }.mesh()),
+            ),
+            MeshMaterial3d(materials.add(
+                StandardMaterial {
+                    base_color: BLUE_400.into(),
+                    emissive: LinearRgba::new(
+                        0.0, 0.0, 100.0, 0.0,
+                    ),
+                    ..default()
+                },
+            )),
         )],
     ));
 
     // directional 'sun' light
     commands.spawn((
         DirectionalLight {
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         Transform {
             translation: Vec3::new(10.0, 20.0, 10.0),
-            rotation: Quat::from_rotation_x(-std::f32::consts::FRAC_PI_4),
+            rotation: Quat::from_rotation_x(
+                -std::f32::consts::FRAC_PI_4,
+            ),
             ..default()
         },
     ));
@@ -158,7 +205,10 @@ fn setup(
 
 fn animate_light_direction(
     time: Res<Time>,
-    mut query: Query<&mut Transform, With<DirectionalLight>>,
+    mut query: Query<
+        &mut Transform,
+        With<DirectionalLight>,
+    >,
 ) {
     for mut transform in query.iter_mut() {
         transform.rotate_y(time.delta_secs() * 0.5);
@@ -198,6 +248,7 @@ fn movement(
             direction.x += 1.0;
         }
 
-        transform.translation += time.delta_secs() * 2.0 * direction;
+        transform.translation +=
+            time.delta_secs() * 2.0 * direction;
     }
 }

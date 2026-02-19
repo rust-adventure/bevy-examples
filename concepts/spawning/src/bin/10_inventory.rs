@@ -5,7 +5,10 @@ fn main() {
         .insert_resource(ClearColor(SLATE_950.into()))
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, setup)
-        .add_systems(Update, (move_lil_cube, update_inventory_display))
+        .add_systems(
+            Update,
+            (move_lil_cube, update_inventory_display),
+        )
         .run();
 }
 
@@ -80,11 +83,15 @@ fn setup(
         children![item_slot(0), item_slot(1), item_slot(2)],
     ));
 
-    commands.spawn((PointLight::default(), Transform::from_xyz(4.0, 8.0, 4.0)));
+    commands.spawn((
+        PointLight::default(),
+        Transform::from_xyz(4.0, 8.0, 4.0),
+    ));
 
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(-1.0, 2.0, 9.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(-1.0, 2.0, 9.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
     ));
 }
 
@@ -96,7 +103,7 @@ fn item_slot(index: u32) -> impl Bundle {
             Node {
                 width: px(50.),
                 height: px(50.),
-                margin: (2.).all(),
+                margin: px(2.).all(),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 ..default()
@@ -115,7 +122,10 @@ fn item_slot(index: u32) -> impl Bundle {
     )
 }
 
-fn move_lil_cube(mut query: Query<&mut Transform, With<LilCube>>, time: Res<Time>) {
+fn move_lil_cube(
+    mut query: Query<&mut Transform, With<LilCube>>,
+    time: Res<Time>,
+) {
     for mut transform in &mut query {
         transform.translation.x = time.elapsed_secs().sin();
     }
@@ -126,14 +136,17 @@ fn update_inventory_display(
     items: Query<(&Name, &DisplayImage)>,
     mut item_displays: Query<(&mut ImageNode, &ItemIndex)>,
 ) {
-    for (inventory_slot_id, entity) in inventory.into_inner().iter().enumerate() {
+    for (inventory_slot_id, entity) in
+        inventory.into_inner().iter().enumerate()
+    {
         let Ok(item) = items.get(entity) else {
             continue;
         };
 
-        let Some((mut node, _)) = item_displays
-            .iter_mut()
-            .find(|(_, index)| inventory_slot_id == index.0 as usize)
+        let Some((mut node, _)) =
+            item_displays.iter_mut().find(|(_, index)| {
+                inventory_slot_id == index.0 as usize
+            })
         else {
             continue;
         };

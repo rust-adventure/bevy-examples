@@ -70,6 +70,8 @@ fn fragment(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
         step(0.001, diff)
     );
 
+// return    textureSample(screen_texture, texture_sampler, in.uv);
+
     // render just sobel 
     // return vec4(diff,diff,diff, 1.);
 }

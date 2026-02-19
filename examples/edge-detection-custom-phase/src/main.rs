@@ -1,13 +1,13 @@
 use std::f32::consts::PI;
 
 use bevy::{
+    camera::Hdr,
     color::palettes::tailwind::{
         GREEN_400, SLATE_800, SLATE_950,
     },
     gltf::GltfPlugin,
     mesh::VertexAttributeValues,
     prelude::*,
-    render::view::Hdr,
 };
 use edge_detection_custom_phase::{
     ATTRIBUTE_SECTION_COLOR, DrawSection, SectionGroupId,

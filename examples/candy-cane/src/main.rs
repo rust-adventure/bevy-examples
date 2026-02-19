@@ -2,15 +2,23 @@ use bevy::{
     color::palettes::{css::RED, tailwind::GREEN_700},
     pbr::ExtendedMaterial,
     prelude::*,
-    render::storage::ShaderStorageBuffer,
+    render::storage::ShaderBuffer,
 };
 use bevy_shader_utils::ShaderUtilsPlugin;
-use candy_cane::stripe::{CandyCaneMaterial, Stripe, StripeMaterialPlugin};
+use candy_cane::stripe::{
+    CandyCaneMaterial, Stripe, StripeMaterialPlugin,
+};
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Srgba::hex("66b1c3").unwrap().into()))
-        .add_plugins((DefaultPlugins, ShaderUtilsPlugin, StripeMaterialPlugin))
+        .insert_resource(ClearColor(
+            Srgba::hex("66b1c3").unwrap().into(),
+        ))
+        .add_plugins((
+            DefaultPlugins,
+            ShaderUtilsPlugin,
+            StripeMaterialPlugin,
+        ))
         .add_systems(Startup, setup)
         .add_systems(Update, movement)
         .run();
@@ -20,8 +28,15 @@ fn main() {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut custom_materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, CandyCaneMaterial>>>,
-    mut buffers: ResMut<Assets<ShaderStorageBuffer>>,
+    mut custom_materials: ResMut<
+        Assets<
+            ExtendedMaterial<
+                StandardMaterial,
+                CandyCaneMaterial,
+            >,
+        >,
+    >,
+    mut buffers: ResMut<Assets<ShaderBuffer>>,
 ) {
     let mesh = Mesh::from(Capsule3d {
         radius: 1.0,
@@ -36,18 +51,23 @@ fn setup(
         offset: 0.0,
         color: RED.into(),
     }];
-    let stripes_buffer = buffers.add(ShaderStorageBuffer::from(data));
+    let stripes_buffer =
+        buffers.add(ShaderBuffer::from(data));
 
     commands.spawn((
         Mesh3d(meshes.add(mesh.clone())),
         Transform::from_xyz(-5.0, 0.5, 0.0),
-        MeshMaterial3d(custom_materials.add(ExtendedMaterial {
-            base: StandardMaterial {
-                base_color: Color::WHITE,
-                ..default()
+        MeshMaterial3d(custom_materials.add(
+            ExtendedMaterial {
+                base: StandardMaterial {
+                    base_color: Color::WHITE,
+                    ..default()
+                },
+                extension: CandyCaneMaterial {
+                    stripes_buffer,
+                },
             },
-            extension: CandyCaneMaterial { stripes_buffer },
-        })),
+        )),
     ));
 
     // second candy cane
@@ -81,19 +101,24 @@ fn setup(
             color: GREEN_700.into(),
         },
     ];
-    let stripes_buffer = buffers.add(ShaderStorageBuffer::from(data));
+    let stripes_buffer =
+        buffers.add(ShaderBuffer::from(data));
 
     commands.spawn((
         Mesh3d(meshes.add(mesh.clone())),
-        MeshMaterial3d(custom_materials.add(ExtendedMaterial {
-            base: StandardMaterial {
-                base_color: Color::WHITE,
-                clearcoat: 2.,
-                perceptual_roughness: 0.,
-                ..default()
+        MeshMaterial3d(custom_materials.add(
+            ExtendedMaterial {
+                base: StandardMaterial {
+                    base_color: Color::WHITE,
+                    clearcoat: 2.,
+                    perceptual_roughness: 0.,
+                    ..default()
+                },
+                extension: CandyCaneMaterial {
+                    stripes_buffer,
+                },
             },
-            extension: CandyCaneMaterial { stripes_buffer },
-        })),
+        )),
         Transform::from_xyz(0.0, 0.5, 0.0),
     ));
 
@@ -114,24 +139,30 @@ fn setup(
             color: Srgba::hex("b1b100").unwrap().into(),
         },
     ];
-    let stripes_buffer = buffers.add(ShaderStorageBuffer::from(data));
+    let stripes_buffer =
+        buffers.add(ShaderBuffer::from(data));
 
     commands.spawn((
         Mesh3d(meshes.add(mesh.clone())),
-        MeshMaterial3d(custom_materials.add(ExtendedMaterial {
-            base: StandardMaterial {
-                base_color: Color::WHITE,
-                ..default()
+        MeshMaterial3d(custom_materials.add(
+            ExtendedMaterial {
+                base: StandardMaterial {
+                    base_color: Color::WHITE,
+                    ..default()
+                },
+                extension: CandyCaneMaterial {
+                    stripes_buffer,
+                },
             },
-            extension: CandyCaneMaterial { stripes_buffer },
-        })),
+        )),
         Transform::from_xyz(5.0, 0.5, 0.0),
     ));
 
     // camera
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(-2.0, 10.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(-2.0, 10.0, 15.0)
+            .looking_at(Vec3::ZERO, Vec3::Y),
         Movable,
     ));
 
@@ -143,7 +174,9 @@ fn setup(
         DirectionalLight::default(),
         Transform {
             translation: Vec3::new(0.0, 2.0, 0.0),
-            rotation: Quat::from_rotation_x(-std::f32::consts::FRAC_PI_4),
+            rotation: Quat::from_rotation_x(
+                -std::f32::consts::FRAC_PI_4,
+            ),
             ..default()
         },
     ));
@@ -171,12 +204,17 @@ fn movement(
             direction.x += 1.0;
         }
 
-        transform.translation += time.delta_secs() * 2.0 * direction;
+        transform.translation +=
+            time.delta_secs() * 2.0 * direction;
 
         if input.pressed(KeyCode::KeyR) {
             transform.rotate_around(
                 Vec3::from((0.0, 0.5, 0.0)),
-                Quat::from_rotation_y(time.delta_secs() * 2.0 * std::f32::consts::FRAC_PI_8),
+                Quat::from_rotation_y(
+                    time.delta_secs()
+                        * 2.0
+                        * std::f32::consts::FRAC_PI_8,
+                ),
             );
         }
     }

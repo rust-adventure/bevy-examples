@@ -39,12 +39,70 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.18.0-rc.2", features = ["jpeg", "file_watcher"] }
-bevy_skein = "0.5.0-rc.1"
+bevy = { version = "0.19.0-dev", features = [
+  "jpeg",
+  "file_watcher",
+  "bevy_dev_tools",
+] }
+bevy_skein = "0.6.0-dev"
 # bevy-inspector-egui = "0.31.0"
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
-bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
 itertools = "0.14"
 
 # [patch.crates-io]
 # bevy = { git = "https://github.com/bevyengine/bevy" }
+[patch."crates-io"]
+bevy_skein = { git = "https://github.com/rust-adventure/skein", branch = "bevy-0.19" }
+bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_a11y = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_animation = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_anti_alias = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_app = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_asset = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_audio = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_camera = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_camera_controller = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_color = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_core_pipeline = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_derive = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_dev_tools = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_diagnostic = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_ecs = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_feathers = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_gilrs = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_gizmos = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_gizmos_render = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_gltf = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_image = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_input = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_input_focus = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_light = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_log = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_material = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_math = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_mesh = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_pbr = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_picking = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_platform = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_post_process = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_ptr = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_reflect = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_remote = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_render = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_scene = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_shader = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_solari = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_sprite = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_sprite_render = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_state = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_tasks = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_text = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_time = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_transform = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_ui = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_ui_render = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_ui_widgets = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_utils = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_window = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_winit = { git = "https://github.com/bevyengine/bevy", branch = "main" }
+bevy_android = { git = "https://github.com/bevyengine/bevy", branch = "main" }

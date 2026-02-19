@@ -68,7 +68,3 @@ Noise functions provided include: perlin, simplex, voronoise, and a pristine gri
 ![blockout](./libs/bevy_blockout/readme/demo.avif)
 
 A triplanar blockout material that uses worldspace coordinates to texture meshes using a grid where 1 box equals 1 world unit
-
-### bevy_prepass_debug
-
-A crate used in examples to display the depth, normal, and motion vector prepass information when examples use them.
