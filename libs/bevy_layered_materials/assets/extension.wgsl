@@ -19,6 +19,7 @@
 }
 #endif
 
+
 struct MyExtendedMaterial {
     quantize_steps: u32,
 #ifdef SIXTEEN_BYTE_ALIGNMENT

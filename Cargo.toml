@@ -39,8 +39,8 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.18.0-rc.2", features = ["jpeg", "file_watcher"] }
-bevy_skein = "0.5.0-rc.1"
+bevy = { version = "0.18", features = ["jpeg", "file_watcher"] }
+bevy_skein = "0.5"
 # bevy-inspector-egui = "0.31.0"
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 bevy_prepass_debug = { path = "./libs/bevy_prepass_debug" }
