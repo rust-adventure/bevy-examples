@@ -1,6 +1,6 @@
 #define_import_path bevy_layered_materials::pbr_fragment
 
-#import bevy_render::bindless::{bindless_samplers_filtering, bindless_textures_2d}
+#import bevy_render::bindless::{bindless_samplers_filtering, bindless_textures_2d, bindless_textures_2d_array}
 
 #import bevy_pbr::{
     pbr_functions,
@@ -201,7 +201,7 @@ pbr_input.material.uv_transform = uv_transform;
             textureSampleBias(
 #endif  // MESHLET_MESH_MATERIAL_PASS
 #ifdef BINDLESS
-                bindless_textures_2d[material_indices[slot].base_color_texture],
+                bindless_textures_2d_array[material_indices[slot].base_color_texture],
                 bindless_samplers_filtering[material_indices[slot].base_color_sampler],
 #else   // BINDLESS
                 pbr_bindings::base_color_texture,
@@ -694,7 +694,7 @@ pbr_input.material.uv_transform = uv_transform;
             textureSampleBias(
 #endif  // MESHLET_MESH_MATERIAL_PASS
 #ifdef BINDLESS
-                bindless_textures_2d[material_indices[slot].normal_map_texture],
+                bindless_textures_2d_array[material_indices[slot].normal_map_texture],
                 bindless_samplers_filtering[material_indices[slot].normal_map_sampler],
 #else   // BINDLESS
                 pbr_bindings::normal_map_texture,
