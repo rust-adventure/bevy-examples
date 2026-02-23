@@ -128,7 +128,7 @@ pub struct LayeredMaterial {
     /// if you want to use the full range of color of the emissive texture.
     ///
     /// [`emissive`]: LayeredMaterial::emissive
-    #[texture(3)]
+    #[texture(3, dimension = "2d_array")]
     #[sampler(4)]
     #[dependency]
     pub emissive_texture: Option<Handle<Image>>,
@@ -181,7 +181,7 @@ pub struct LayeredMaterial {
     ///
     /// [`metallic`]: LayeredMaterial::metallic
     /// [`perceptual_roughness`]: LayeredMaterial::perceptual_roughness
-    #[texture(5)]
+    #[texture(5, dimension = "2d_array")]
     #[sampler(6)]
     #[dependency]
     pub metallic_roughness_texture: Option<Handle<Image>>,
@@ -442,7 +442,7 @@ pub struct LayeredMaterial {
     ///
     /// The material will be less lit in places where this texture is dark.
     /// This is similar to ambient occlusion, but built into the model.
-    #[texture(7)]
+    #[texture(7, dimension = "2d_array")]
     #[sampler(8)]
     #[dependency]
     pub occlusion_texture: Option<Handle<Image>>,

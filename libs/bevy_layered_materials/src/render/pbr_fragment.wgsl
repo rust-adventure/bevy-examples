@@ -354,7 +354,7 @@ pbr_input.material.uv_transform = uv_transform;
                 textureSampleBias(
 #endif  // MESHLET_MESH_MATERIAL_PASS
 #ifdef BINDLESS
-                    bindless_textures_2d[material_indices[slot].emissive_texture],
+                    bindless_textures_2d_array[material_indices[slot].emissive_texture],
                     bindless_samplers_filtering[material_indices[slot].emissive_sampler],
 #else   // BINDLESS
                     pbr_bindings::emissive_texture,
@@ -365,6 +365,8 @@ pbr_input.material.uv_transform = uv_transform;
 #else
                     uv,
 #endif
+                    // TODO: bevy_layered_materials index
+                    layer_index,
 #ifdef MESHLET_MESH_MATERIAL_PASS
                     bias.ddx_uv,
                     bias.ddy_uv,
@@ -395,7 +397,7 @@ pbr_input.material.uv_transform = uv_transform;
                 textureSampleBias(
 #endif  // MESHLET_MESH_MATERIAL_PASS
 #ifdef BINDLESS
-                    bindless_textures_2d[material_indices[slot].metallic_roughness_texture],
+                    bindless_textures_2d_array[material_indices[slot].metallic_roughness_texture],
                     bindless_samplers_filtering[material_indices[slot].metallic_roughness_sampler],
 #else   // BINDLESS
                     pbr_bindings::metallic_roughness_texture,
@@ -406,6 +408,8 @@ pbr_input.material.uv_transform = uv_transform;
 #else
                     uv,
 #endif
+                    // TODO: bevy_layered_materials index
+                    layer_index,
 #ifdef MESHLET_MESH_MATERIAL_PASS
                     bias.ddx_uv,
                     bias.ddy_uv,
@@ -642,7 +646,7 @@ pbr_input.material.uv_transform = uv_transform;
                 textureSampleBias(
 #endif  // MESHLET_MESH_MATERIAL_PASS
 #ifdef BINDLESS
-                    bindless_textures_2d[material_indices[slot].occlusion_texture],
+                    bindless_textures_2d_array[material_indices[slot].occlusion_texture],
                     bindless_samplers_filtering[material_indices[slot].occlusion_sampler],
 #else   // BINDLESS
                     pbr_bindings::occlusion_texture,
@@ -653,6 +657,8 @@ pbr_input.material.uv_transform = uv_transform;
 #else
                     uv,
 #endif
+                    // TODO: bevy_layered_materials index
+                    layer_index,
 #ifdef MESHLET_MESH_MATERIAL_PASS
                     bias.ddx_uv,
                     bias.ddy_uv,

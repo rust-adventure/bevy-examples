@@ -1,6 +1,6 @@
 [package]
 name = "bevy_layered_materials"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "A StandardMaterial-compatible Material that accepts multiple textures in 2d texture array form"
 license = "MIT"
