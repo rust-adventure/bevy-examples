@@ -47,6 +47,13 @@
 #import bevy_pbr::decal::forward::get_forward_decal_info
 #endif
 
+#ifdef BINDLESS
+#import bevy_pbr::{
+    pbr_bindings::material_indices,
+    mesh_bindings::mesh,
+};
+#endif
+
 @fragment
 fn fragment(
 #ifdef MESHLET_MESH_MATERIAL_PASS
@@ -77,8 +84,12 @@ fn fragment(
 #endif
 
     // generate a PbrInput struct from the StandardMaterial bindings
+#ifdef BINDLESS
+    let slot = mesh[in.instance_index].material_and_lightmap_bind_group_slot & 0xffffu;
+    var pbr_input = pbr_input_from_standard_material(in, is_front, pbr_bindings::material_array[material_indices[slot].material].layer_index);
+#else
     var pbr_input = pbr_input_from_standard_material(in, is_front, pbr_bindings::material.layer_index);
-
+#endif
     // alpha discard
     pbr_input.material.base_color = alpha_discard(pbr_input.material, pbr_input.material.base_color);
 
