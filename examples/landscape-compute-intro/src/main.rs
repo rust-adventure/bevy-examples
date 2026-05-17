@@ -26,7 +26,9 @@ use bevy::{
         extract_component::{
             ExtractComponent, ExtractComponentPlugin,
         },
-        mesh::allocator::MeshAllocator,
+        mesh::allocator::{
+            MeshAllocator, MeshAllocatorSettings,
+        },
         render_resource::{
             binding_types::{
                 storage_buffer, uniform_buffer,
@@ -88,7 +90,7 @@ impl Plugin for ComputeShaderMeshGeneratorPlugin {
         };
         render_app
             .world_mut()
-            .resource_mut::<MeshAllocator>()
+            .resource_mut::<MeshAllocatorSettings>()
             // This allows using the mesh allocator slabs as
             // storage buffers directly in the compute shader.
             // Which means that we can write from our compute
@@ -113,6 +115,9 @@ fn setup(
         Assets<ScatteringMedium>,
     >,
 ) {
+    let earth_medium = scattering_mediums
+        .add(ScatteringMedium::earth(256, 256));
+
     let empty_mesh = {
         let mut mesh =
             Plane3d::new(Vec3::Y, Vec2::splat(200.))
@@ -163,15 +168,14 @@ fn setup(
         Transform::from_xyz(0., 0., 0.),
     ));
 
+    // Spawn earth atmosphere
+    commands.spawn(Atmosphere::earth(earth_medium));
+
     // camera
     commands.spawn((
         Camera3d::default(),
         Transform::from_xyz(-25., 45., 90.)
             .looking_at(Vec3::ZERO, Vec3::Y),
-        Atmosphere::earthlike(
-            scattering_mediums
-                .add(ScatteringMedium::default()),
-        ),
         // Can be adjusted to change the scene scale and rendering quality
         AtmosphereSettings::default(),
         // The directional light illuminance used in this scene

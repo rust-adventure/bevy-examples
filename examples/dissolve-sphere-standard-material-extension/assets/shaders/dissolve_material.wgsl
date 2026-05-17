@@ -24,13 +24,6 @@ fn fragment(
     // generate a PbrInput struct from the StandardMaterial bindings
     var pbr_input = pbr_input_from_standard_material(in, is_front);
 
-    // we can optionally modify the input before lighting and alpha_discard is applied
-    // pbr_input.material.base_color.b = pbr_input.material.base_color.r;
-
-    // alpha discard
-    // pbr_input.material.base_color = alpha_discard(pbr_input.material, pbr_input.material.base_color);
-
-
     var out: FragmentOutput;
     // apply lighting
     out.color = apply_pbr_lighting(pbr_input);
@@ -48,7 +41,7 @@ fn fragment(
     var base_color = out.color;
     var output_color: vec4f;
     var noise_step = 4.0;
-    var noise = simplex_noise_3d(in.color.xyz * noise_step);
+    var noise = simplex_noise_3d(abs(in.world_position.xyz) * noise_step);
     var threshold = sin(globals.time);
     var alpha = step(noise, threshold);
     var edge_color = vec3<f32>(0.0, 1.0, 0.8);

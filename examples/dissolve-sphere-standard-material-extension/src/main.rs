@@ -1,13 +1,13 @@
 use bevy::{
-    anti_alias::fxaa::Fxaa,
-    color::palettes::tailwind::{BLUE_400, RED_400},
+    asset::HandleTemplate,
+    camera_controller::free_camera::{
+        FreeCamera, FreeCameraPlugin,
+    },
     core_pipeline::prepass::{
         DepthPrepass, MotionVectorPrepass, NormalPrepass,
     },
-    dev_tools::render_debug::RenderDebugOverlayPlugin,
-    material::OpaqueRendererMethod,
-    mesh::VertexAttributeValues,
-    pbr::ExtendedMaterial,
+    math::Affine2,
+    pbr::{ExtendedMaterial, MeshMaterial3dTemplate},
     prelude::*,
 };
 
@@ -20,10 +20,7 @@ fn main() {
             Srgba::hex("1fa9f4").unwrap().into(),
         ))
         .add_plugins((
-            DefaultPlugins.set(AssetPlugin {
-                watch_for_changes_override: Some(true),
-                ..default()
-            }),
+            DefaultPlugins,
             ShaderUtilsPlugin,
             MaterialPlugin::<
                 ExtendedMaterial<
@@ -31,176 +28,74 @@ fn main() {
                     DissolveExtension,
                 >,
             >::default(),
+            FreeCameraPlugin,
         ))
-        .add_systems(Startup, setup)
-        // .add_system(change_color)
-        .add_systems(
-            Update,
-            (animate_light_direction, movement),
-        )
+        .add_systems(Startup, scene.spawn())
+        .add_systems(Update, animate_light_direction)
         .run();
 }
 
-#[derive(Component)]
-struct Cube;
-
-/// set up a simple 3D scene
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut dissolve_materials: ResMut<
-        Assets<
-            ExtendedMaterial<
-                StandardMaterial,
-                DissolveExtension,
-            >,
-        >,
-    >,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
-) {
-    let mut mesh = Sphere::default().mesh().uv(32, 18);
-    // let mut mesh = Mesh::from(shape::Cube { size:
-    // 1.0 });
-    if let Some(VertexAttributeValues::Float32x3(
-        positions,
-    )) = mesh.attribute(Mesh::ATTRIBUTE_POSITION)
-    {
-        let colors: Vec<[f32; 4]> = positions
-            .iter()
-            .map(|[r, g, b]| {
-                [
-                    (1. - *r) / 2.,
-                    (1. - *g) / 2.,
-                    (1. - *b) / 2.,
-                    1.,
-                ]
+fn scene() -> impl SceneList {
+    bsn_list![
+        (
+            Camera3d::default()
+            template_value(Transform::from_xyz(-1.0, 1.25, 2.5)
+                .looking_at(Vec3::new(0.,0.5,0.), Vec3::Y))
+            FreeCamera
+            DepthPrepass
+            NormalPrepass
+            MotionVectorPrepass
+        ),
+        (
+            DirectionalLight {
+                shadow_maps_enabled: true,
+            }
+            Transform {
+                translation: Vec3::new(10.0, 20.0, 10.0),
+                rotation: Quat::from_rotation_x(
+                    -std::f32::consts::FRAC_PI_4,
+                ),
+            }
+        ),
+        (
+        Mesh3d(asset_value(Sphere::default().mesh().uv(32, 18)))
+        Transform::from_xyz(0.0, 0.5, 0.0)
+        template(|ctx| {
+            let asset_server = ctx.resource::<AssetServer>();
+            let mat = ExtendedMaterial {
+                base: StandardMaterial {
+                    base_color_texture: Some(asset_server.load("concrete/sekjcawb_2K_Albedo.jpg")),
+                    normal_map_texture: Some(asset_server.load("concrete/sekjcawb_2K_Normal.jpg")),
+                    metallic_roughness_texture: Some(asset_server.load("concrete/sekjcawb_2K_Roughness.jpg")),
+                    double_sided: true,
+                    cull_mode: None,
+                    alpha_mode: AlphaMode::Mask(0.5),
+                    ..default()
+                },
+                extension: DissolveExtension {},
+            };
+            let mat = ctx.resource_mut::<Assets<ExtendedMaterial<StandardMaterial, DissolveExtension>>>().add(mat);
+            Ok(MeshMaterial3d(mat))
+        })
+        ),
+        (
+            Mesh3d(asset_value(
+                Plane3d::default().mesh().size(10., 10.),
+            ))
+            template(|ctx| {
+                let asset_server = ctx.resource::<AssetServer>();
+                let mat = StandardMaterial {
+                    base_color_texture: Some(asset_server.load("concrete/sekjcawb_2K_Albedo.jpg")),
+                    normal_map_texture: Some(asset_server.load("concrete/sekjcawb_2K_Normal.jpg")),
+                    metallic_roughness_texture: Some(asset_server.load("concrete/sekjcawb_2K_Roughness.jpg")),
+                    uv_transform: Affine2::from_scale(Vec2::splat(2.5)),
+                    ..default()
+                };
+                let mat = ctx.resource_mut::<Assets<StandardMaterial>>().add(mat);
+                Ok(MeshMaterial3d(mat))
             })
-            .collect();
-        mesh.insert_attribute(
-            Mesh::ATTRIBUTE_COLOR,
-            colors,
-        );
-    }
-
-    commands.spawn((
-        Mesh3d(meshes.add(mesh)),
-        Transform::from_xyz(0.0, 0.5, 0.0),
-        MeshMaterial3d(dissolve_materials.add(ExtendedMaterial {
-            base: StandardMaterial {
-                // base_color: Color::rgb(0.533, 0.533, 0.80),
-                base_color: Color::WHITE,
-                // base_color: Color::YELLOW,
-                base_color_texture: Some(asset_server.load("concrete/sekjcawb_2K_Albedo.jpg")),
-                normal_map_texture: Some(asset_server.load("concrete/sekjcawb_2K_Normal.jpg")),
-                double_sided: true,
-                cull_mode: None,
-                // can be used in forward or deferred mode.
-                opaque_render_method: OpaqueRendererMethod::Auto,
-                alpha_mode: AlphaMode::Blend,
-                // in deferred mode, only the PbrInput can be modified (uvs, color and other material properties),
-                // in forward mode, the output can also be modified after lighting is applied.
-                // see the fragment shader `extended_material.wgsl` for more info.
-                // Note: to run in deferred mode, you must also add a `DeferredPrepass` component to the camera and either
-                // change the above to `OpaqueRendererMethod::Deferred` or add the `DefaultOpaqueRendererMethod` resource.
-                ..default()
-            },
-            extension: DissolveExtension {
-                // quantize_steps: 3,
-            },
-        })),
-    ));
-
-    // camera
-    commands.spawn((
-        Camera3d::default(),
-        Transform::from_xyz(-2.0, 2.5, 5.0)
-            .looking_at(Vec3::ZERO, Vec3::Y),
-        Movable,
-        DepthPrepass,
-        NormalPrepass,
-        MotionVectorPrepass,
-    ));
-    // ground plane
-    commands.spawn((
-        Mesh3d(meshes.add(Mesh::from(
-            Plane3d::default().mesh().size(10., 10.),
-        ))),
-        MeshMaterial3d(materials.add(StandardMaterial {
-            base_color: Color::WHITE,
-            perceptual_roughness: 1.0,
-            ..default()
-        })),
-    ));
-
-    // red point light
-    commands.spawn((
-        Transform::from_xyz(1.0, 2.0, 0.0),
-        PointLight {
-            intensity: 1600.0, /* lumens - roughly a 100W
-                                * non-halogen
-                                * incandescent bulb */
-            color: RED_400.into(),
-            shadow_maps_enabled: true,
-            ..default()
-        },
-        children![(
-            Mesh3d(
-                meshes.add(Sphere { radius: 0.1 }.mesh()),
-            ),
-            MeshMaterial3d(materials.add(
-                StandardMaterial {
-                    base_color: RED_400.into(),
-                    emissive: LinearRgba::new(
-                        100., 0., 0., 0.,
-                    ),
-                    ..default()
-                },
-            )),
-        )],
-    ));
-
-    // blue point light
-    commands.spawn((
-        Transform::from_xyz(0.0, 4.0, 0.0),
-        PointLight {
-            intensity: 1600.0, /* lumens - roughly a 100W
-                                * non-halogen
-                                * incandescent bulb */
-            color: BLUE_400.into(),
-            shadow_maps_enabled: true,
-            ..default()
-        },
-        children![(
-            Mesh3d(
-                meshes.add(Sphere { radius: 0.1 }.mesh()),
-            ),
-            MeshMaterial3d(materials.add(
-                StandardMaterial {
-                    base_color: BLUE_400.into(),
-                    emissive: LinearRgba::new(
-                        0.0, 0.0, 100.0, 0.0,
-                    ),
-                    ..default()
-                },
-            )),
-        )],
-    ));
-
-    // directional 'sun' light
-    commands.spawn((
-        DirectionalLight {
-            shadow_maps_enabled: true,
-            ..default()
-        },
-        Transform {
-            translation: Vec3::new(10.0, 20.0, 10.0),
-            rotation: Quat::from_rotation_x(
-                -std::f32::consts::FRAC_PI_4,
-            ),
-            ..default()
-        },
-    ));
+        )
+    ]
 }
 
 fn animate_light_direction(
@@ -215,40 +110,30 @@ fn animate_light_direction(
     }
 }
 
-// fn change_color(
-//     mut materials:
-// ResMut<Assets<dissolve_sphere_standard_material_extension::StandardMaterial>>,
+// #[derive(Component, Default, Clone)]
+// struct Movable;
+
+// fn movement(
+//     input: Res<ButtonInput<KeyCode>>,
 //     time: Res<Time>,
+//     mut query: Query<&mut Transform, With<Movable>>,
 // ) {
-//     for material in materials.iter_mut() {
-//         // material.1.base_color =
-// Color::rgb(0.4,0.4,0.4);         material.1.
-// time = time.elapsed_seconds();     }
+//     for mut transform in query.iter_mut() {
+//         let mut direction = Vec3::ZERO;
+//         if input.pressed(KeyCode::ArrowUp) {
+//             direction.y += 1.0;
+//         }
+//         if input.pressed(KeyCode::ArrowDown) {
+//             direction.y -= 1.0;
+//         }
+//         if input.pressed(KeyCode::ArrowLeft) {
+//             direction.x -= 1.0;
+//         }
+//         if input.pressed(KeyCode::ArrowRight) {
+//             direction.x += 1.0;
+//         }
+
+//         transform.translation +=
+//             time.delta_secs() * 2.0 * direction;
+//     }
 // }
-
-#[derive(Component)]
-struct Movable;
-fn movement(
-    input: Res<ButtonInput<KeyCode>>,
-    time: Res<Time>,
-    mut query: Query<&mut Transform, With<Movable>>,
-) {
-    for mut transform in query.iter_mut() {
-        let mut direction = Vec3::ZERO;
-        if input.pressed(KeyCode::ArrowUp) {
-            direction.y += 1.0;
-        }
-        if input.pressed(KeyCode::ArrowDown) {
-            direction.y -= 1.0;
-        }
-        if input.pressed(KeyCode::ArrowLeft) {
-            direction.x -= 1.0;
-        }
-        if input.pressed(KeyCode::ArrowRight) {
-            direction.x += 1.0;
-        }
-
-        transform.translation +=
-            time.delta_secs() * 2.0 * direction;
-    }
-}

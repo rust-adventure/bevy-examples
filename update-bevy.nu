@@ -1,1 +1,0 @@
-ls examples/**/*.toml | get name | each { |it| open $it | upsert dependencies.bevy.rev {|v| "959f3b1186b20a5066bfb51b9b71542705db76d8"} | save $it }

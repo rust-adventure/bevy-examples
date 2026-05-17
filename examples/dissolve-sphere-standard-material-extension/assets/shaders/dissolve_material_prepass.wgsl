@@ -13,10 +13,10 @@ fn fragment(in: VertexOutput) {
     // prepass texture in the main pass, it would no information.
 
 
-    // same calcuation for gaps as the material, but without color
-    // output. 
+    // This is thesame calcuation for gaps as the fragment material,
+    // but without color output. 
     var noise_step = 4.0;
-    let c = in.color.xyz;
+    let c = abs(in.world_position.xyz);
     var noise = simplex_noise_3d(c * noise_step);
     var threshold = sin(globals.time);
     var alpha = step(noise, threshold);
