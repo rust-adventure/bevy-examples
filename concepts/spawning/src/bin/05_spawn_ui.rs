@@ -28,7 +28,10 @@ fn setup(mut commands: Commands) {
                     width: px(200.),
                     ..default()
                 },
-                children![(Text::new("New Game"), TextColor(SLATE_50.into()))]
+                children![(
+                    Text::new("New Game"),
+                    TextColor(SLATE_50.into())
+                )]
             ),
             (
                 Button,
@@ -38,7 +41,10 @@ fn setup(mut commands: Commands) {
                     width: px(200.),
                     ..default()
                 },
-                children![(Text::new("Options"), TextColor(SLATE_50.into()))]
+                children![(
+                    Text::new("Options"),
+                    TextColor(SLATE_50.into())
+                )]
             ),
             (
                 Button,
@@ -48,7 +54,10 @@ fn setup(mut commands: Commands) {
                     width: px(200.),
                     ..default()
                 },
-                children![(Text::new("Quit"), TextColor(SLATE_50.into()))]
+                children![(
+                    Text::new("Quit"),
+                    TextColor(SLATE_50.into())
+                )]
             )
         ],
     ));

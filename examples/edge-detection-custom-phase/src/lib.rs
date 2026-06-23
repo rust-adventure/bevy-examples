@@ -927,7 +927,8 @@ fn draw_section_texture(
     }
 
     // TODO: what is this comment
-    // render_pass.set_bind_group(2, group_id_binding, &[]);
+    // render_pass.set_bind_group(2,
+    // group_id_binding, &[]);
 }
 
 #[derive(Component)]

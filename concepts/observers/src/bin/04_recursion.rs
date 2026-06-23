@@ -41,7 +41,9 @@ fn on_my_event(
 struct MyCommand(usize);
 
 impl Command for MyCommand {
-    fn apply(self, world: &mut World) -> () {
+    type Out = ();
+
+    fn apply(self, _world: &mut World) -> () {
         info!(int=?self.0)
     }
 }

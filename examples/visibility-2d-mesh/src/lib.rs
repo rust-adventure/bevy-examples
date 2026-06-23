@@ -51,7 +51,7 @@ pub struct Player;
 
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-#[type_path="api"]
+#[type_path = "api"]
 pub struct Obstacle;
 
 #[derive(Debug)]

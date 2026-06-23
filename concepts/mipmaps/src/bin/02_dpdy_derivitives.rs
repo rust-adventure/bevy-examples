@@ -128,13 +128,14 @@ fn build_mips(
     let mip_1024 = build_mip(x1024)
         .expect("failed to build_mip for 1024");
 
-    let Some(x2048) = assets.get_mut(&manual_mips.x2048)
+    let Some(mut x2048) =
+        assets.get_mut(&manual_mips.x2048)
     else {
         return;
     };
     info!("ready");
     *processed = true;
-    let mip_2048 = build_mip(x2048)
+    let mip_2048 = build_mip(&*x2048)
         .expect("failed to build_mip for 2048");
 
     let mut new_image = mip_2048.as_bytes().to_vec();

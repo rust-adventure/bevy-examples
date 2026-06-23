@@ -17,41 +17,27 @@ use bevy_blockout::{BlockoutMaterialExt, BlockoutPlugin};
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, BlockoutPlugin))
-        .add_systems(Startup, setup)
+        .add_systems(Startup, setup.spawn())
         .add_systems(Update, rotate_camera)
         .run();
 }
 
-#[derive(Component)]
+#[derive(Default, Clone, Component)]
 struct MainCamera;
 
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<
-        Assets<
-            ExtendedMaterial<
-                StandardMaterial,
-                BlockoutMaterialExt,
-            >,
-        >,
-    >,
-    mut scattering_mediums: ResMut<
-        Assets<ScatteringMedium>,
-    >,
-) {
-    // floor
-    commands.spawn((
+fn setup() -> impl SceneList {
+    bsn_list![
+        #Floor
         Mesh3d(
-            meshes.add(Mesh::from(
+            asset_value(Mesh::from(
                 Plane3d::default()
                     .mesh()
                     .size(50., 50.)
                     .subdivisions(10),
             )),
-        ),
-        Transform::from_xyz(0.0, 0.0, 0.0),
-        MeshMaterial3d(materials.add(ExtendedMaterial {
+        )
+        Transform::from_xyz(0.0, 0.0, 0.0)
+        MeshMaterial3d::<ExtendedMaterial<StandardMaterial, BlockoutMaterialExt>>(asset_value(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: BLUE_50.into(),
                 perceptual_roughness: 1.,
@@ -60,15 +46,13 @@ fn setup(
             },
             extension: BlockoutMaterialExt::default(),
         })),
-    ));
 
-    // sphere
-    commands.spawn((
+        #Sphere
         Mesh3d(
-            meshes.add(Sphere::new(2.).mesh().uv(32, 18)),
-        ),
-        Transform::from_xyz(0.0, 4., 0.0),
-        MeshMaterial3d(materials.add(ExtendedMaterial {
+            asset_value(Sphere::new(2.).mesh().uv(32, 18)),
+        )
+        Transform::from_xyz(0.0, 4., 0.0)
+        MeshMaterial3d::<ExtendedMaterial<StandardMaterial, BlockoutMaterialExt>>(asset_value(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: SKY_400.into(),
                 perceptual_roughness: 1.,
@@ -77,16 +61,15 @@ fn setup(
             },
             extension: BlockoutMaterialExt::default(),
         })),
-    ));
 
-    commands.spawn((
+        #BoxA
         Mesh3d(
-            meshes.add(Cuboid::from_size(Vec3::new(
+            asset_value(Cuboid::from_size(Vec3::new(
                 2., 1., 4.,
             ))),
-        ),
-        Transform::from_xyz(4.0, 0.5, 0.0),
-        MeshMaterial3d(materials.add(ExtendedMaterial {
+        )
+        Transform::from_xyz(4.0, 0.5, 0.0)
+        MeshMaterial3d::<ExtendedMaterial<StandardMaterial, BlockoutMaterialExt>>(asset_value(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: LIME_400.into(),
                 perceptual_roughness: 1.,
@@ -95,17 +78,16 @@ fn setup(
             },
             extension: BlockoutMaterialExt::default(),
         })),
-    ));
 
-    commands.spawn((
-        Mesh3d(meshes.add(Extrusion::new(
+        #BoxB
+        Mesh3d(asset_value(Extrusion::new(
             RegularPolygon::new(2., 6),
             4.,
-        ))),
-        Transform::from_xyz(-1.0, 0., 0.0).with_rotation(
+        )))
+        template_value(Transform::from_xyz(-1.0, 0., 0.0).with_rotation(
             Quat::from_axis_angle(Vec3::Z, FRAC_PI_6),
-        ),
-        MeshMaterial3d(materials.add(ExtendedMaterial {
+        ))
+        MeshMaterial3d::<ExtendedMaterial<StandardMaterial, BlockoutMaterialExt>>(asset_value(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: RED_400.into(),
                 perceptual_roughness: 1.,
@@ -114,71 +96,74 @@ fn setup(
             },
             extension: BlockoutMaterialExt::default(),
         })),
-    ));
 
-    commands.spawn((
-        Mesh3d(meshes.add(Cuboid::from_size(Vec3::new(
+        #BoxC
+        Mesh3d(asset_value(Cuboid::from_size(Vec3::new(
             10., 3., 14.,
-        )))),
-        Transform::from_xyz(-15.0, 1., 0.0),
-        MeshMaterial3d(materials.add(ExtendedMaterial {
+        ))))
+        Transform::from_xyz(-15.0, 1., 0.0)
+        MeshMaterial3d::<ExtendedMaterial<StandardMaterial, BlockoutMaterialExt>>(asset_value(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: SKY_400.into(),
                 ..default()
             },
             extension: BlockoutMaterialExt::default(),
         })),
-    ));
-    commands.spawn((
+
+        #BoxD
         Mesh3d(
-            meshes.add(Cuboid::from_size(Vec3::new(
+            asset_value(Cuboid::from_size(Vec3::new(
                 5., 4., 7.,
             ))),
-        ),
-        Transform::from_xyz(-12.5, 2., -10.5),
-        MeshMaterial3d(materials.add(ExtendedMaterial {
+        )
+        Transform::from_xyz(-12.5, 2., -10.5)
+        MeshMaterial3d::<ExtendedMaterial<StandardMaterial, BlockoutMaterialExt>>(asset_value(ExtendedMaterial {
             base: StandardMaterial {
                 base_color: SKY_400.into(),
                 ..default()
             },
             extension: BlockoutMaterialExt::default(),
         })),
-    ));
-    // camera
-    commands.spawn((
-        MainCamera,
-        Camera3d::default(),
-        Camera::default(),
-        Hdr,
-        Transform::from_xyz(-10.2, 5., 10.0)
-            .looking_at(Vec3::Y * 0.1, Vec3::Y),
-        Atmosphere::earthlike(
-            scattering_mediums
-                .add(ScatteringMedium::default()),
-        ),
-        AtmosphereSettings::default(),
-        Exposure::SUNLIGHT,
-        Tonemapping::AcesFitted,
-        Bloom::NATURAL,
-        AtmosphereEnvironmentMapLight::default(),
-    ));
 
-    // Sun
-    commands.spawn((
+        #Atmosphere
+        template(|context| {
+            let mut scattering_mediums = context.resource_mut::<
+                Assets<ScatteringMedium>,
+            >();
+            Ok(Atmosphere::earth(
+                scattering_mediums.add(ScatteringMedium::earth(256, 256)),
+            ))
+        }),
+
+        #MainCamera
+        MainCamera
+        Camera3d::default()
+        Camera::default()
+        Hdr
+        template_value(Transform::from_xyz(-10.2, 5., 10.0)
+            .looking_at(Vec3::Y * 0.1, Vec3::Y))
+        AtmosphereSettings::default()
+        Exposure::SUNLIGHT
+        template_value(Tonemapping::AcesFitted)
+        Bloom::NATURAL
+        AtmosphereEnvironmentMapLight::default(),
+
+        #GlobalDirectionLight
         DirectionalLight {
             shadow_maps_enabled: true,
             illuminance: lux::RAW_SUNLIGHT,
-            ..default()
-        },
-        Transform::from_xyz(1.0, -0.4, 0.0)
-            .looking_at(Vec3::ZERO, Vec3::Y)
-            .with_rotation(Quat::from_array([
-                0.688806,
-                0.10741661,
-                0.6988995,
-                -0.15983216,
-            ])),
-    ));
+        }
+        template_value(
+            Transform::from_xyz(1.0, -0.4, 0.0)
+                .looking_at(Vec3::ZERO, Vec3::Y)
+                .with_rotation(Quat::from_array([
+                    0.688806,
+                    0.10741661,
+                    0.6988995,
+                    -0.15983216,
+                ]))
+        )
+    ]
 }
 
 fn rotate_camera(

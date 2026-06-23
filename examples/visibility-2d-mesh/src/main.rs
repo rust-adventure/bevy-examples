@@ -3,7 +3,9 @@ use std::f32::consts::FRAC_PI_3;
 use bevy::{
     asset::RenderAssetUsages,
     camera::{RenderTarget, visibility::RenderLayers},
-    color::palettes::tailwind::{GREEN_400, RED_400, SKY_400, YELLOW_400},
+    color::palettes::tailwind::{
+        GREEN_400, RED_400, SKY_400, YELLOW_400,
+    },
     gltf::{GltfMesh, GltfPrimitive},
     input::common_conditions::input_just_pressed,
     log::tracing_subscriber::field::MakeExt,
@@ -19,15 +21,21 @@ use bevy_skein::SkeinPlugin;
 use itertools::Itertools;
 use visibility_2d_mesh::{
     Obstacle, Player, VisibilityMesh,
-    post_processing::{PostProcessPlugin, PostProcessSettings, VisibilityTexture},
+    post_processing::{
+        PostProcessPlugin, PostProcessSettings,
+        VisibilityTexture,
+    },
 };
 
-fn fmt_layer(_app: &mut App) -> Option<bevy::log::BoxedFmtLayer> {
+fn fmt_layer(
+    _app: &mut App,
+) -> Option<bevy::log::BoxedFmtLayer> {
     Some(Box::new(
-        bevy::log::tracing_subscriber::fmt::Layer::default()
-            .without_time()
-            .map_fmt_fields(|f| f.debug_alt())
-            .with_writer(std::io::stderr),
+        bevy::log::tracing_subscriber::fmt::Layer::default(
+        )
+        .without_time()
+        .map_fmt_fields(|f| f.debug_alt())
+        .with_writer(std::io::stderr),
     ))
 }
 
@@ -80,20 +88,32 @@ fn load_gltf(
                 for primitive in gltf
                     .meshes
                     .iter()
-                    .filter_map(|mesh_handle| gltf_meshes.get(mesh_handle))
-                    .flat_map(|gltf_mesh| gltf_mesh.primitives.iter())
+                    .filter_map(|mesh_handle| {
+                        gltf_meshes.get(mesh_handle)
+                    })
+                    .flat_map(|gltf_mesh| {
+                        gltf_mesh.primitives.iter()
+                    })
                 {
-                    let Some(mesh) = meshes.get_mut(&primitive.mesh) else {
+                    let Some(mesh) =
+                        meshes.get_mut(&primitive.mesh)
+                    else {
                         continue;
                     };
-                    // mesh.scale_by(Vec3::new(50., 50., 1.));
+                    // mesh.scale_by(Vec3::new(50.
+                    // , 50., 1.));
                     // mesh.transform_by(
                     //     Transform::default()
                     //         .with_scale(Vec3::splat(50.)),
                     // );
                 }
                 commands
-                    .spawn(SceneRoot(gltf.default_scene.as_ref().unwrap().clone()))
+                    .spawn(SceneRoot(
+                        gltf.default_scene
+                            .as_ref()
+                            .unwrap()
+                            .clone(),
+                    ))
                     .observe(replace_3d_mats_with_2d);
             }
             _ => {}
@@ -104,7 +124,11 @@ fn load_gltf(
 fn replace_3d_mats_with_2d(
     _: On<SceneInstanceReady>,
     children: Query<&Children>,
-    query: Query<(Entity, &Mesh3d, &MeshMaterial3d<StandardMaterial>)>,
+    query: Query<(
+        Entity,
+        &Mesh3d,
+        &MeshMaterial3d<StandardMaterial>,
+    )>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut commands: Commands,
     materials_std: Res<Assets<StandardMaterial>>,
@@ -116,7 +140,12 @@ fn replace_3d_mats_with_2d(
             .remove::<MeshMaterial3d<StandardMaterial>>()
             .insert(Mesh2d(mesh.0.clone()))
             .insert(MeshMaterial2d(
-                materials.add(materials_std.get(&material.0).unwrap().base_color),
+                materials.add(
+                    materials_std
+                        .get(&material.0)
+                        .unwrap()
+                        .base_color,
+                ),
             ));
         // Obstacle inserted in Blender
         // .insert(Obstacle);
@@ -124,8 +153,12 @@ fn replace_3d_mats_with_2d(
 }
 /// An observer to rotate an entity when it is
 /// dragged
-fn on_drag(drag: On<Pointer<Drag>>, mut transforms: Query<&mut Transform, With<Player>>) {
-    let Ok(mut transform) = transforms.get_mut(drag.entity) else {
+fn on_drag(
+    drag: On<Pointer<Drag>>,
+    mut transforms: Query<&mut Transform, With<Player>>,
+) {
+    let Ok(mut transform) = transforms.get_mut(drag.entity)
+    else {
         return;
     };
     transform.translation.x += drag.delta.x;
@@ -158,8 +191,8 @@ fn setup(
 
     commands.spawn((
         Camera2d::default(),
-        // Projection::Orthographic(OrthographicProjection {
-        //     scaling_mode:
+        // Projection::Orthographic(OrthographicProjection
+        // {     scaling_mode:
         //         bevy::camera::ScalingMode::FixedHorizontal {
         //             viewport_width: 1300.,
         //         },
@@ -176,13 +209,15 @@ fn setup(
     // let shapes = [
     //     meshes.add(Circle::new(50.0)),
     //     meshes.add(CircularSector::new(50.0, 1.0)),
-    //     meshes.add(CircularSegment::new(50.0, 1.25)),
-    //     meshes.add(Ellipse::new(25.0, 50.0)),
-    //     // meshes.add(Annulus::new(25.0, 50.0)),
-    //     meshes.add(Capsule2d::new(25.0, 50.0)),
-    //     meshes.add(build_rhombus(Vec2::new(75.0, 100.0))),
-    //     meshes.add(Rectangle::new(50.0, 100.0)),
-    //     meshes.add(RegularPolygon::new(50.0, 6)),
+    //     meshes.add(CircularSegment::new(50.0,
+    // 1.25)),     meshes.add(Ellipse::new(25.0,
+    // 50.0)),     // meshes.add(Annulus::new(25.
+    // 0, 50.0)),     meshes.
+    // add(Capsule2d::new(25.0, 50.0)),
+    //     meshes.add(build_rhombus(Vec2::new(75.0,
+    // 100.0))),     meshes.add(Rectangle::new(50.
+    // 0, 100.0)),     meshes.
+    // add(RegularPolygon::new(50.0, 6)),
     //     meshes.add(Triangle2d::new(
     //         Vec2::Y * 50.0,
     //         Vec2::new(-50.0, -50.0),
@@ -228,7 +263,11 @@ fn setup(
 
     for (i, shape) in shapes.into_iter().enumerate() {
         // Distribute colors evenly across the rainbow.
-        let color = Color::hsl(360. * i as f32 / num_shapes as f32, 0.95, 0.7);
+        let color = Color::hsl(
+            360. * i as f32 / num_shapes as f32,
+            0.95,
+            0.7,
+        );
 
         commands.spawn((
             Mesh2d(shape),
@@ -236,7 +275,9 @@ fn setup(
             Transform::from_xyz(
                 // Distribute shapes from -X_EXTENT/2 to
                 // +X_EXTENT/2.
-                -X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * X_EXTENT,
+                -X_EXTENT / 2.
+                    + i as f32 / (num_shapes - 1) as f32
+                        * X_EXTENT,
                 Y_EXTENT / 2.,
                 0.0,
             ),
@@ -246,7 +287,11 @@ fn setup(
 
     commands.spawn((
         Mesh2d(meshes.add(Rectangle::new(1200.0, 800.0))),
-        MeshMaterial2d(materials.add(Color::from(GREEN_400.with_alpha(0.01)))),
+        MeshMaterial2d(
+            materials.add(Color::from(
+                GREEN_400.with_alpha(0.01),
+            )),
+        ),
         Transform::default(),
         Obstacle,
     ));
@@ -260,9 +305,13 @@ fn setup(
         // Add 4 vertices, each with its own position
         // attribute (coordinate in 3D space), for
         // each of the corners of the parallelogram.
-        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, empty_vec),
+        .with_inserted_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            empty_vec,
+        ),
     );
-    commands.insert_resource(VisibilityMesh(vismesh.clone()));
+    commands
+        .insert_resource(VisibilityMesh(vismesh.clone()));
 
     commands.spawn((
         Camera2d::default(),
@@ -297,7 +346,9 @@ fn setup(
     // ));
 }
 
-fn toggle_wireframe(mut wireframe_config: ResMut<Wireframe2dConfig>) {
+fn toggle_wireframe(
+    mut wireframe_config: ResMut<Wireframe2dConfig>,
+) {
     wireframe_config.global = !wireframe_config.global;
 }
 
@@ -354,21 +405,37 @@ fn build_rhombus(size: Vec2) -> Mesh {
         [0.0, -vhd, 0.0],
     ];
     let normals = vec![[0.0, 0.0, 1.0]; 4];
-    let uvs = vec![[1.0, 0.5], [0.0, 0.5], [0.5, 0.0], [0.5, 1.0]];
-    let indices = bevy::mesh::Indices::U32(vec![2, 0, 1, 2, 3, 0]);
+    let uvs = vec![
+        [1.0, 0.5],
+        [0.0, 0.5],
+        [0.5, 0.0],
+        [0.5, 1.0],
+    ];
+    let indices =
+        bevy::mesh::Indices::U32(vec![2, 0, 1, 2, 3, 0]);
 
     Mesh::new(
         PrimitiveTopology::TriangleList,
         RenderAssetUsages::default(),
     )
     .with_inserted_indices(indices)
-    .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, positions)
-    .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, normals)
+    .with_inserted_attribute(
+        Mesh::ATTRIBUTE_POSITION,
+        positions,
+    )
+    .with_inserted_attribute(
+        Mesh::ATTRIBUTE_NORMAL,
+        normals,
+    )
     .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, uvs)
 }
 
 fn update_visibility_texture(
-    mut query: Query<(&mut VisibilityTexture, &Camera, &mut PostProcessSettings)>,
+    mut query: Query<(
+        &mut VisibilityTexture,
+        &Camera,
+        &mut PostProcessSettings,
+    )>,
     window: Single<&Window, With<PrimaryWindow>>,
     mut images: ResMut<Assets<Image>>,
 ) {
@@ -382,7 +449,10 @@ fn update_visibility_texture(
         settings.height = size.y;
 
         image.resize(Extent3d {
-            width: size.x / 2, // TODO: this is the scale_factor, but how is this supposed to be handled?
+            width: size.x / 2, /* TODO: this is the
+                                * scale_factor, but how
+                                * is this supposed to be
+                                * handled? */
             height: size.y / 2,
             depth_or_array_layers: 1,
         });

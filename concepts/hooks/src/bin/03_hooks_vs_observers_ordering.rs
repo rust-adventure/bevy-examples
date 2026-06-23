@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    ecs::{lifecycle::HookContext, world::DeferredWorld},
+    prelude::*,
+};
 
 fn main() {
     App::new()
@@ -6,7 +9,7 @@ fn main() {
         .add_systems(Startup, startup)
         .add_observer(on_add)
         .add_observer(on_insert)
-        .add_observer(on_replace)
+        .add_observer(on_discard)
         .add_observer(on_remove)
         .add_observer(on_despawn)
         .run();
@@ -16,20 +19,43 @@ fn startup(mut commands: Commands) {
     let id = commands.spawn(ExampleComponent(0)).id();
 
     commands.entity(id).insert(ExampleComponent(10));
-    info!("");
+    info!("one");
 
     commands.entity(id).remove::<ExampleComponent>();
     commands.entity(id).remove::<ExampleComponent>();
-    info!("");
+    info!("two");
 
     commands.entity(id).insert(ExampleComponent(100));
-    info!("");
+    info!("three");
 
     commands.entity(id).despawn();
 }
 
 #[derive(Debug, Component)]
+#[component(on_add = log_hook("on_add"))]
+#[component(on_insert = log_hook("on_insert"))]
+#[component(on_discard = log_hook("on_discard"))]
+#[component(on_remove = log_hook("on_remove"))]
+#[component(on_despawn = log_hook("on_despawn"))]
 struct ExampleComponent(i32);
+
+fn log_hook(
+    hook_name: &str,
+) -> impl Fn(DeferredWorld, HookContext) {
+    move |world: DeferredWorld,
+     HookContext { entity, caller, .. }: HookContext| {
+        let component_value =
+        world.get::<ExampleComponent>(entity).unwrap();
+        warn!(
+            ?entity,
+            line = caller
+                .map(|loc| loc.line())
+                .unwrap_or_default(),
+                ?component_value,
+                "{hook_name} (hook)"
+        );
+    }
+}
 
 fn on_add(
     add: On<Add, ExampleComponent>,
@@ -52,14 +78,14 @@ fn on_insert(
         "on_insert",
     );
 }
-fn on_replace(
-    replace: On<Replace, ExampleComponent>,
+fn on_discard(
+    discard: On<Discard, ExampleComponent>,
     query: Query<&ExampleComponent>,
 ) {
     info!(
-        target = ?replace.entity,
-        value = ?query.get(replace.entity),
-        "on_replace",
+        target = ?discard.entity,
+        value = ?query.get(discard.entity),
+        "on_discard",
     );
 }
 fn on_remove(

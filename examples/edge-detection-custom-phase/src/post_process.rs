@@ -54,12 +54,14 @@ impl Plugin for PostProcessPlugin {
             return;
         };
 
-        // render_app.add_systems(RenderStartup, init_post_process_pipeline);
+        // render_app.add_systems(RenderStartup,
+        // init_post_process_pipeline);
         render_app.add_systems(
             Core3d,
             post_process_system
                 .in_set(Core3dSystems::PostProcess)
-                // TODO: Probably not supposed to run after tonemapping??
+                // TODO: Probably not supposed to run after
+                // tonemapping??
                 .after(tonemapping),
         );
     }
@@ -248,16 +250,19 @@ impl FromWorld for PostProcessPipeline {
         let layout = BindGroupLayoutDescriptor::new(
             "post_process_bind_group_layout",
             &BindGroupLayoutEntries::sequential(
-                // The layout entries will only be visible in the fragment stage
+                // The layout entries will only be visible
+                // in the fragment stage
                 ShaderStages::FRAGMENT,
                 (
                     // The screen texture
                     texture_2d(TextureSampleType::Float {
                         filterable: true,
                     }),
-                    // The sampler that will be used to sample the screen texture
+                    // The sampler that will be used to
+                    // sample the screen texture
                     sampler(SamplerBindingType::Filtering),
-                    // The settings uniform that will control the effect
+                    // The settings uniform that will
+                    // control the effect
                     uniform_buffer::<PostProcessSettings>(
                         true,
                     ),
@@ -265,7 +270,8 @@ impl FromWorld for PostProcessPipeline {
                     texture_2d(TextureSampleType::Float {
                         filterable: true,
                     }),
-                    // The sampler that will be used to sample the vertex color id texture
+                    // The sampler that will be used to
+                    // sample the vertex color id texture
                     sampler(SamplerBindingType::Filtering),
                 ),
             ),

@@ -60,7 +60,8 @@ fn main() {
         .run();
 }
 
-// We need a plugin to organize all the systems and render node required for this example
+// We need a plugin to organize all the systems
+// and render node required for this example
 struct ComputeShaderMeshGeneratorPlugin;
 impl Plugin for ComputeShaderMeshGeneratorPlugin {
     fn build(&self, app: &mut App) {
@@ -92,15 +93,16 @@ impl Plugin for ComputeShaderMeshGeneratorPlugin {
             .world_mut()
             .resource_mut::<MeshAllocatorSettings>()
             // This allows using the mesh allocator slabs as
-            // storage buffers directly in the compute shader.
-            // Which means that we can write from our compute
+            // storage buffers directly in the compute
+            // shader. Which means that we can
+            // write from our compute
             // shader directly to the allocated mesh slabs.
             .extra_buffer_usages = BufferUsages::STORAGE;
     }
 }
 
-/// Holds a handle to the empty mesh that should be filled
-/// by the compute shader.
+/// Holds a handle to the empty mesh that should
+/// be filled by the compute shader.
 #[derive(Component, ExtractComponent, Clone)]
 struct GenerateMesh {
     num_vertices: u32,
@@ -141,7 +143,8 @@ fn setup(
         //     Mesh::ATTRIBUTE_UV_0,
         //     vec![[0.; 2]; 50],
         // )
-        // .with_inserted_indices(Indices::U32(vec![0; 50]));
+        // .with_inserted_indices(Indices::U32(vec![0;
+        // 50]));
 
         mesh.asset_usage = RenderAssetUsages::RENDER_WORLD;
         mesh
@@ -176,19 +179,23 @@ fn setup(
         Camera3d::default(),
         Transform::from_xyz(-25., 45., 90.)
             .looking_at(Vec3::ZERO, Vec3::Y),
-        // Can be adjusted to change the scene scale and rendering quality
+        // Can be adjusted to change the scene scale and
+        // rendering quality
         AtmosphereSettings::default(),
-        // The directional light illuminance used in this scene
-        // (the one recommended for use with this feature) is
-        // quite bright, so raising the exposure compensation helps
+        // The directional light illuminance used in this
+        // scene (the one recommended for use with
+        // this feature) is quite bright, so
+        // raising the exposure compensation helps
         // bring the scene to a nicer brightness range.
         Exposure { ev100: 13.0 },
-        // Tonemapper chosen just because it looked good with the scene, any
-        // tonemapper would be fine :)
+        // Tonemapper chosen just because it looked good
+        // with the scene, any tonemapper would be
+        // fine :)
         Tonemapping::AcesFitted,
         // Bloom gives the sun a much more natural look.
         Bloom::NATURAL,
-        // Enables the atmosphere to drive reflections and ambient lighting (IBL) for this view
+        // Enables the atmosphere to drive reflections and
+        // ambient lighting (IBL) for this view
         AtmosphereEnvironmentMapLight::default(),
         FreeCamera::default(),
         VolumetricFog {
@@ -199,7 +206,9 @@ fn setup(
         Fxaa::default(),
         ScreenSpaceReflections::default(),
     ));
-    // Configure a properly scaled cascade shadow map for this scene (defaults are too large, mesh units are in km)
+    // Configure a properly scaled cascade shadow map
+    // for this scene (defaults are too large, mesh
+    // units are in km)
     let cascade_shadow_config =
         CascadeShadowConfigBuilder {
             first_cascade_far_bound: 0.3,
@@ -212,11 +221,14 @@ fn setup(
     commands.spawn((
         DirectionalLight {
             // shadow_maps_enabled: true,
-            // lux::RAW_SUNLIGHT is recommended for use with this feature, since
-            // other values approximate sunlight *post-scattering* in various
-            // conditions. RAW_SUNLIGHT in comparison is the illuminance of the
-            // sun unfiltered by the atmosphere, so it is the proper input for
-            // sunlight to be filtered by the atmosphere.
+            // lux::RAW_SUNLIGHT is recommended for use with
+            // this feature, since other values
+            // approximate sunlight *post-scattering* in
+            // various conditions. RAW_SUNLIGHT
+            // in comparison is the illuminance of the
+            // sun unfiltered by the atmosphere, so it is
+            // the proper input for sunlight to
+            // be filtered by the atmosphere.
             illuminance: lux::RAW_SUNLIGHT,
             ..default()
         },
@@ -227,17 +239,20 @@ fn setup(
     ));
 }
 
-/// This is called `ChunksToProcess` because this example originated
-/// from a use case of generating chunks of landscape or voxels
+/// This is called `ChunksToProcess` because this
+/// example originated from a use case of
+/// generating chunks of landscape or voxels
 /// It only exists in the render world.
 #[derive(Resource, Default)]
 struct ChunksToProcess(Vec<(u32, AssetId<Mesh>)>);
 
-/// `processed` is a `HashSet` contains the `AssetId`s that have been
-/// processed. We use that to remove `AssetId`s that have already
-/// been processed, which means each unique `GenerateMesh` will result
-/// in one compute shader mesh generation process instead of generating
-/// the mesh every frame.
+/// `processed` is a `HashSet` contains the
+/// `AssetId`s that have been processed. We use
+/// that to remove `AssetId`s that have already
+/// been processed, which means each unique
+/// `GenerateMesh` will result in one compute
+/// shader mesh generation process instead of
+/// generating the mesh every frame.
 fn prepare_chunks(
     meshes_to_generate: Query<&GenerateMesh>,
     mut chunks: ResMut<ChunksToProcess>,
@@ -247,14 +262,15 @@ fn prepare_chunks(
 ) {
     // If the pipeline isn't ready, then meshes
     // won't be processed. So we want to wait until
-    // the pipeline is ready before considering any mesh processed.
+    // the pipeline is ready before considering any
+    // mesh processed.
     if pipeline_cache
         .get_compute_pipeline(pipeline.pipeline)
         .is_some()
     {
         // get the AssetId for each Handle<Mesh>
-        // which we'll use later to get the relevant buffers
-        // from the mesh_allocator
+        // which we'll use later to get the relevant
+        // buffers from the mesh_allocator
         let chunk_data: Vec<(u32, AssetId<Mesh>)> =
             meshes_to_generate
                 .iter()
@@ -271,7 +287,8 @@ fn prepare_chunks(
                 })
                 .collect();
 
-        // Cache any meshes we're going to process this frame
+        // Cache any meshes we're going to process this
+        // frame
         for id in &chunk_data {
             processed.insert(*id);
         }
@@ -323,8 +340,9 @@ fn init_compute_pipeline(
     });
 }
 
-// A uniform that holds the vertex and index offsets
-// for the vertex/index mesh_allocator buffer slabs
+// A uniform that holds the vertex and index
+// offsets for the vertex/index mesh_allocator
+// buffer slabs
 #[derive(ShaderType)]
 struct DataRanges {
     num_vertices: u32,
@@ -346,10 +364,13 @@ fn compute_landscape(
         if let Some(init_pipeline) = pipeline_cache
             .get_compute_pipeline(pipeline.pipeline)
         {
-            // the mesh_allocator holds slabs of meshes, so the buffers we get here
-            // can contain more data than just the mesh we're asking for.
-            // That's why there is a range field.
-            // You should *not* touch data in these buffers that is outside of the range.
+            // the mesh_allocator holds slabs of meshes, so
+            // the buffers we get here
+            // can contain more data than just the mesh
+            // we're asking for. That's why
+            // there is a range field.
+            // You should *not* touch data in these buffers
+            // that is outside of the range.
             let vertex_buffer_slice = mesh_allocator
                 .mesh_vertex_slice(&mesh_id.1)
                 .unwrap();
@@ -359,9 +380,12 @@ fn compute_landscape(
 
             let first = DataRanges {
                 num_vertices: mesh_id.0,
-                // there are 12 vertex data values (pos, normal, uv, tangent) per vertex
-                // and the vertex_buffer_slice.range.start is in "vertex elements"
-                // which includes all of that data, so each index is worth 8 indices
+                // there are 12 vertex data values (pos,
+                // normal, uv, tangent) per vertex
+                // and the vertex_buffer_slice.range.start
+                // is in "vertex elements"
+                // which includes all of that data, so each
+                // index is worth 8 indices
                 // to our shader code.
                 vertex_start: vertex_buffer_slice
                     .range
@@ -369,8 +393,10 @@ fn compute_landscape(
                     * 12,
                 vertex_end: vertex_buffer_slice.range.end
                     * 12,
-                // but each vertex index is a single value, so the index of the
-                // vertex indices is exactly what the value is
+                // but each vertex index is a single value,
+                // so the index of the
+                // vertex indices is exactly what the value
+                // is
                 index_start: index_buffer_slice.range.start,
                 index_end: index_buffer_slice.range.end,
             };
@@ -381,8 +407,9 @@ fn compute_landscape(
                 &render_queue,
             );
 
-            // pass in the full mesh_allocator slabs as well as the first index
-            // offsets for the vertex and index buffers
+            // pass in the full mesh_allocator slabs as well
+            // as the first index offsets for
+            // the vertex and index buffers
             let bind_group = render_context
                 .render_device()
                 .create_bind_group(
@@ -415,8 +442,9 @@ fn compute_landscape(
 
             pass.set_bind_group(0, &bind_group, &[]);
             pass.set_pipeline(init_pipeline);
-            // we only dispatch 1,1,1 workgroup here, but a real compute shader
-            // would take advantage of more and larger size workgroups
+            // we only dispatch 1,1,1 workgroup here, but a
+            // real compute shader would take
+            // advantage of more and larger size workgroups
             pass.dispatch_workgroups(1, 1, 1);
 
             pass.pop_debug_group();

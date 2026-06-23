@@ -39,15 +39,15 @@ opt-level = 1
 opt-level = 3
 
 [workspace.dependencies]
-bevy = { version = "0.19.0-rc.1", features = [
+bevy = { version = "0.19.0", features = [
   "jpeg",
   "file_watcher",
   "bevy_dev_tools",
 ] }
-bevy_skein = "0.6.0-rc.1"
+bevy_skein = "0.6.0"
 # bevy-inspector-egui = "0.31.0"
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
-itertools = "0.14"
+itertools = "0.15"
 
 # [patch.crates-io]
 # bevy = { git = "https://github.com/bevyengine/bevy" }

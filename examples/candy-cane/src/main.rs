@@ -167,7 +167,8 @@ fn setup(
     ));
 
     // ambient light
-    // commands.insert_resource(AmbientLight { ..default() });
+    // commands.insert_resource(AmbientLight {
+    // ..default() });
 
     // directional 'sun' light
     commands.spawn((

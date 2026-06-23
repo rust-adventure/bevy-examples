@@ -19,7 +19,11 @@ fn setup(mut commands: Commands) {
             row_gap: px(10.),
             ..default()
         },
-        children![button("New Game"), button("Options"), button("Quit")],
+        children![
+            button("New Game"),
+            button("Options"),
+            button("Quit")
+        ],
     ));
 
     commands.spawn(Camera2d::default());
@@ -34,6 +38,9 @@ fn button<T: Into<String>>(text: T) -> impl Bundle {
             width: px(200.),
             ..default()
         },
-        children![(Text::new(text), TextColor(SLATE_50.into()))],
+        children![(
+            Text::new(text),
+            TextColor(SLATE_50.into())
+        )],
     )
 }

@@ -29,7 +29,7 @@ fn startup(mut commands: Commands) {
 #[derive(Debug, Component)]
 #[component(on_add = log_on_add)]
 #[component(on_insert = log_on_insert)]
-#[component(on_replace = log_on_replace)]
+#[component(on_discard = log_on_discard)]
 #[component(on_remove = log_on_remove)]
 #[component(on_despawn = log_on_despawn)]
 struct ExampleHooksComponent(i32);
@@ -64,7 +64,7 @@ fn log_on_insert(
         "on_insert"
     );
 }
-fn log_on_replace(
+fn log_on_discard(
     world: DeferredWorld,
     HookContext { entity, caller, .. }: HookContext,
 ) {
@@ -76,7 +76,7 @@ fn log_on_replace(
             .map(|loc| loc.line())
             .unwrap_or_default(),
         ?component_value,
-        "on_replace"
+        "on_discard"
     );
 }
 fn log_on_remove(

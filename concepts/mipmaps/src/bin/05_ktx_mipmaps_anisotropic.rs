@@ -22,7 +22,8 @@ fn startup(
 ) {
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0., 0., 15.).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(0., 0., 15.)
+            .looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.spawn((
@@ -70,7 +71,9 @@ fn startup(
     ));
 }
 
-fn rotate(mut transforms: Query<&mut Transform, With<Mesh3d>>) {
+fn rotate(
+    mut transforms: Query<&mut Transform, With<Mesh3d>>,
+) {
     for mut transform in &mut transforms {
         // transform.rotate_x(0.01);
     }

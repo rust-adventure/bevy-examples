@@ -1,5 +1,5 @@
 [package]
-name = "hooks_and_observers"
+name = "hooks"
 version = "0.1.0"
 edition = "2024"
 

@@ -116,8 +116,8 @@ fn animate_light_direction(
 // fn movement(
 //     input: Res<ButtonInput<KeyCode>>,
 //     time: Res<Time>,
-//     mut query: Query<&mut Transform, With<Movable>>,
-// ) {
+//     mut query: Query<&mut Transform,
+// With<Movable>>, ) {
 //     for mut transform in query.iter_mut() {
 //         let mut direction = Vec3::ZERO;
 //         if input.pressed(KeyCode::ArrowUp) {
@@ -134,6 +134,6 @@ fn animate_light_direction(
 //         }
 
 //         transform.translation +=
-//             time.delta_secs() * 2.0 * direction;
-//     }
+//             time.delta_secs() * 2.0 *
+// direction;     }
 // }

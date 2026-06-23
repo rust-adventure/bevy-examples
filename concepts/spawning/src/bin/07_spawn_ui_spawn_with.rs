@@ -23,23 +23,25 @@ fn setup(mut commands: Commands) {
             row_gap: px(10.),
             ..default()
         },
-        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<ChildOf>| {
-            parent
-                .spawn(button("New Game"))
-                .observe(|_: On<Pointer<Click>>| {
-                    info!("New Game");
-                });
-            parent
-                .spawn(button("Options"))
-                .observe(|_: On<Pointer<Click>>| {
-                    info!("Options");
-                });
-            parent
-                .spawn(button("Quit"))
-                .observe(|_: On<Pointer<Click>>| {
-                    info!("Quit");
-                });
-        })),
+        Children::spawn(SpawnWith(
+            |parent: &mut RelatedSpawner<ChildOf>| {
+                parent.spawn(button("New Game")).observe(
+                    |_: On<Pointer<Click>>| {
+                        info!("New Game");
+                    },
+                );
+                parent.spawn(button("Options")).observe(
+                    |_: On<Pointer<Click>>| {
+                        info!("Options");
+                    },
+                );
+                parent.spawn(button("Quit")).observe(
+                    |_: On<Pointer<Click>>| {
+                        info!("Quit");
+                    },
+                );
+            },
+        )),
     ));
 
     commands.spawn(Camera2d::default());
@@ -54,6 +56,9 @@ fn button<T: Into<String>>(text: T) -> impl Bundle {
             width: px(200.),
             ..default()
         },
-        children![(Text::new(text), TextColor(SLATE_50.into()))],
+        children![(
+            Text::new(text),
+            TextColor(SLATE_50.into())
+        )],
     )
 }

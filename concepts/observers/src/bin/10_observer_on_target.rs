@@ -7,16 +7,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, startup)
-        .add_observer(
-            |trigger: On<Add, ExampleComponent>| {
-                info!(
-                    observer=?trigger.observer(),
-                    target= ?trigger.entity,
-                    event=?trigger.event(),
-                    "on_add (global)",
-                );
-            },
-        )
+        .add_observer(on_add_global)
         .run();
 }
 
@@ -37,6 +28,15 @@ fn startup(mut commands: Commands) {
     commands.entity(id).insert(ExampleComponent(0));
     commands.entity(id2).insert(ExampleComponent(10));
     commands.entity(id3).insert(ExampleComponent(100));
+}
+
+fn on_add_global(trigger: On<Add, ExampleComponent>) {
+    info!(
+        observer=?trigger.observer(),
+        target= ?trigger.entity,
+        event=?trigger.event(),
+        "on_add (global)",
+    );
 }
 
 fn on_add(trigger: On<Add, ExampleComponent>) {

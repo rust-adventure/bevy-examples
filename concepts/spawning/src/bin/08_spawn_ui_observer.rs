@@ -1,4 +1,7 @@
-use bevy::{color::palettes::tailwind::*, prelude::*, ui_widgets::observe};
+use bevy::{
+    color::palettes::tailwind::*, prelude::*,
+    ui_widgets::observe,
+};
 
 fn main() {
     App::new()
@@ -53,6 +56,9 @@ fn button<T: Into<String>>(text: T) -> impl Bundle {
             width: px(200.),
             ..default()
         },
-        children![(Text::new(text), TextColor(SLATE_50.into()))],
+        children![(
+            Text::new(text),
+            TextColor(SLATE_50.into())
+        )],
     )
 }

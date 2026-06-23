@@ -22,21 +22,22 @@ fn startup(
 ) {
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0., 0., 15.).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(0., 0., 15.)
+            .looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(30., 90.)))),
         MeshMaterial3d(materials.add(StandardMaterial {
-            base_color_texture: Some(asset_server.load_with_settings(
-                "floor_graph_base_color.png",
-                |settings: &mut ImageLoaderSettings| {
+            base_color_texture: Some(asset_server.load_builder().with_settings(
+                    |settings: &mut ImageLoaderSettings| {
                     settings
                         .sampler
                         .get_or_init_descriptor()
                         .set_address_mode(ImageAddressMode::Repeat);
-                },
-            )),
+                }
+                ).load("floor_graph_base_color.png")
+            ),
             unlit: true,
             cull_mode: None,
             uv_transform: Affine2::from_scale(Vec2::new(30., 90.)),
@@ -48,15 +49,14 @@ fn startup(
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::new(30., 90.)))),
         MeshMaterial3d(materials.add(StandardMaterial {
-            base_color_texture: Some(asset_server.load_with_settings(
-                "floor_graph_base_color_uncompressed.ktx2",
+            base_color_texture: Some(asset_server.load_builder().with_settings(
                 |settings: &mut ImageLoaderSettings| {
                     settings
                         .sampler
                         .get_or_init_descriptor()
                         .set_address_mode(ImageAddressMode::Repeat);
                 },
-            )),
+            ).load("floor_graph_base_color_uncompressed.ktx2")),
             unlit: true,
             cull_mode: None,
             uv_transform: Affine2::from_scale(Vec2::new(30., 90.)),
@@ -66,8 +66,10 @@ fn startup(
     ));
 }
 
-fn rotate(mut transforms: Query<&mut Transform, With<Mesh3d>>) {
-    for mut transform in &mut transforms {
-        // transform.rotate_x(0.01);
-    }
+fn rotate(
+    mut transforms: Query<&mut Transform, With<Mesh3d>>,
+) {
+    // for mut transform in &mut transforms {
+    //     transform.rotate_x(0.01);
+    // }
 }
