@@ -95,7 +95,7 @@ fn example_navigation(
     mut example_index: Local<u32>,
     names: Query<&Name>,
     mut name_text: Query<&mut Text, With<ExampleName>>,
-    active_cameras: Query<Entity, With<ActiveCamera>>,
+    active_cameras: Query<(Entity, Has<Camera2d>, Has<Camera3d>), With<ActiveCamera>>,
 ) {
     let Some(examples) = examples else { return };
     if input.just_pressed(KeyCode::ArrowLeft) {
@@ -131,21 +131,34 @@ fn example_navigation(
         }
     }
 
-    for entity in active_cameras.iter() {
-        commands.entity(entity).despawn();
-    }
+
+
     match examples.0[*example_index as usize].camera_type {
         CameraType::TwoD => {
-            commands
-                .spawn((Camera2d::default(), ActiveCamera));
+            if active_cameras.iter().all(|(_, is_2d, _)| {
+                !is_2d
+            }) {
+                for (entity, _, _) in active_cameras.iter() {
+                    commands.entity(entity).despawn();
+                }
+                commands
+                    .spawn((Camera2d::default(), ActiveCamera));
+            }
         }
         CameraType::ThreeD => {
+            if active_cameras.iter().all(|(_, _, is_3d)| {
+                !is_3d
+            }) {
+                for (entity, _, _) in active_cameras.iter() {
+                    commands.entity(entity).despawn();
+                }
             commands.spawn((
                 Camera3d::default(),
                 Transform::from_xyz(-2.0, 2.5, 5.0)
                     .looking_at(Vec3::ZERO, Vec3::Y),
                 ActiveCamera,
             ));
+            }
         }
     }
 }
@@ -435,7 +448,7 @@ fn setup(
         ),
         TextColor(Color::WHITE),
         TextFont {
-            font_size: 25.0,
+            font_size: 25.0.into(),
             ..default()
         },
         Node {
@@ -450,7 +463,7 @@ fn setup(
         Text::new(""),
         TextColor(Color::WHITE),
         TextFont {
-            font_size: 25.0,
+            font_size: 25.0.into(),
             ..default()
         },
         Node {
