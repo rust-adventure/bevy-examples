@@ -1,0 +1,13 @@
+[package]
+name = "cube-level-editor"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bevy.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+bevy-inspector-egui.workspace = true
+
+[lints]
+workspace = true

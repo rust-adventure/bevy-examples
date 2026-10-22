@@ -1,0 +1,16 @@
+{
+  "cube_level_editor::ManyBoxes": {
+    "boxes": [
+      {
+        "transform": {
+          "translation": [0.5, 0.0, 0.0],
+          "rotation": [0.0, 0.0, -0.70710677, 0.70710677],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "color": {
+          "Srgba": { "red": 1.0, "green": 0.0, "blue": 0.49, "alpha": 1.0 }
+        }
+      }
+    ]
+  }
+}

@@ -17,6 +17,7 @@ members = [
   "examples/cube-sphere",
   "examples/visibility-2d-mesh",
   "examples/landscape-compute-intro",
+  "examples/cube-level-editor",
 ]
 # "examples/spacecraft-noiseland",
 # rotating-column depends on bevy_tweening
@@ -48,6 +49,9 @@ bevy_skein = "0.6.0"
 # bevy-inspector-egui = "0.31.0"
 bevy_shader_utils = { path = "./libs/bevy_shader_utils" }
 itertools = "0.15"
+serde = "1.0"
+serde_json = "1.0"
+bevy-inspector-egui = "0.37"
 
 # [patch.crates-io]
 # bevy = { git = "https://github.com/bevyengine/bevy" }

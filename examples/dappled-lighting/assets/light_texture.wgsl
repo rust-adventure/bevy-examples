@@ -10,10 +10,10 @@
 
 @fragment
 fn fragment(mesh: VertexOutput) -> @location(0) vec4<f32> {
-    let sample_base = textureSample(base_texture, base_sampler, mesh.uv + globals.time / 50.);
+    let sample_base = textureSample(base_texture, base_sampler, sin(mesh.uv + globals.time / 50.));
     let sample_layer_1 = textureSample(layer_1_texture, layer_1_sampler, mesh.uv + globals.time / 20. + vec2(0.1, 0.2));
     let sample_layer_2 = textureSample(layer_2_texture, layer_2_sampler, mesh.uv - globals.time / 18. + vec2(0.2, 0.1));
-    return  sample_base * sample_layer_1 * sample_layer_2;
+    return  sample_base * 1. + (sample_layer_1 * 0.4) + (sample_layer_2 * 0.2);
     // if mesh.uv.x < 0.1 || mesh.uv.x > 0.9 || mesh.uv.y < 0.1 || mesh.uv.y > 0.9 {
     //     return vec4(0, 0, 0, 1.);
     // } else {

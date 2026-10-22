@@ -1,7 +1,6 @@
 use bevy::{
     camera::{RenderTarget, visibility::RenderLayers},
     color::palettes::tailwind::*,
-    image::ImageLoaderSettings,
     light::DirectionalLightTexture,
     pbr::decal,
     prelude::*,
@@ -53,8 +52,8 @@ fn setup(
     let image = Image::new_target_texture(
         512,
         512,
-        TextureFormat::bevy_default(),
-        Some(TextureFormat::bevy_default()),
+        TextureFormat::Rgba8UnormSrgb,
+        Some(TextureFormat::Rgba8UnormSrgb),
     );
     // the image we'll use
     let image_handle = images.add(image);
@@ -115,30 +114,15 @@ fn setup(
         ),
         MeshMaterial2d(materials_light_texture.add(
             LightTextureMaterial {
-                base_texture: Some(asset_server.load_with_settings(
-                    "pattern_42.png",
-                    |settings: &mut ImageLoaderSettings| {
-                        let  sampler = settings.sampler.get_or_init_descriptor();
-                        sampler.address_mode_u = bevy::image::ImageAddressMode::Repeat;
-                        sampler.address_mode_v = bevy::image::ImageAddressMode::Repeat;
-                    }
-                )),
-                layer_1_texture: Some(asset_server.load_with_settings(
-                    "pattern_77.png",
-                    |settings: &mut ImageLoaderSettings| {
-                        let  sampler = settings.sampler.get_or_init_descriptor();
-                        sampler.address_mode_u = bevy::image::ImageAddressMode::Repeat;
-                        sampler.address_mode_v = bevy::image::ImageAddressMode::Repeat;
-                    }
-                )),
-                layer_2_texture: Some(asset_server.load_with_settings(
-                    "pattern_82.png",
-                    |settings: &mut ImageLoaderSettings| {
-                        let  sampler = settings.sampler.get_or_init_descriptor();
-                        sampler.address_mode_u = bevy::image::ImageAddressMode::Repeat;
-                        sampler.address_mode_v = bevy::image::ImageAddressMode::Repeat;
-                    }
-                )),
+                base_texture: Some(
+                    asset_server.load("pattern_42.png"),
+                ),
+                layer_1_texture: Some(
+                    asset_server.load("pattern_77.png"),
+                ),
+                layer_2_texture: Some(
+                    asset_server.load("pattern_82.png"),
+                ),
             },
         )),
         Transform::from_translation(Vec3::new(
